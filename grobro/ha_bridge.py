@@ -175,9 +175,7 @@ def on_message(client, userdata, msg: MQTTMessage):
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
             clientidd= msg.topic.split("/")[-1]
-            print (f"cvlientidd= {clientidd}")
             Forwarding_Client = connect_to_growatt_server(msg.topic.split("/")[-1])
-            print(Forwarding_Client)
             Forwarding_Client.publish(msg.topic, payload=msg.payload, qos=msg.qos, retain=msg.retain)
         unscrambled = unscramble(msg.payload)
         msg_type = struct.unpack_from('>H', unscrambled, 4)[0]
@@ -244,7 +242,7 @@ def on_message_forward_client(client, userdata, msg: MQTTMessage):
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
             # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/deviceid}
-            print("msg von Growatt")
+            print("msg from Growatt")
             source_client.publish(msg.topic.split("/")[0] + "/33/" + msg.topic.split("/")[-1], payload=msg.payload, qos=msg.qos, retain=msg.retain)
     except Exception as e:
         print(f"Error processing message: {e}")
