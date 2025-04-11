@@ -7,10 +7,12 @@ import struct
 import ssl
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
+import threading
 from grobro import unscramble, parse_modbus_type, load_modbus_input_register_file, parse_config_type, find_config_offset
 
 config_cache = {}
 ha_lookup = {}
+Forwarding_Clients = {}
 for fname in os.listdir("."):
     if fname.startswith("config_") and fname.endswith(".json"):
         try:
@@ -34,7 +36,9 @@ TARGET_MQTT_PORT = int(os.getenv("TARGET_MQTT_PORT", SOURCE_MQTT_PORT))
 TARGET_MQTT_USER = os.getenv("TARGET_MQTT_USER", SOURCE_MQTT_USER)
 TARGET_MQTT_PASS = os.getenv("TARGET_MQTT_PASS", SOURCE_MQTT_PASS)
 TARGET_MQTT_TLS = os.getenv("TARGET_MQTT_TLS", "false").lower() == "true"
-
+FORWARD_MQTT_HOST = os.getenv("FORWARD_MQTT_HOST", "mqtt.growatt.com")
+FORWARD_MQTT_PORT = int( os.getenv("FORWARD_MQTT_PORT", 7006))
+ACTIVATE_COMMUNICATION_GROWATT_SERVER= bool( os.getenv("ACTIVATE_COMMUNICATION_GROWATT_SERVER", False))
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 # Register filter configuration
@@ -169,6 +173,15 @@ def publish_state(device_id, registers):
 
 def on_message(client, userdata, msg: MQTTMessage):
     try:
+        if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
+            clientidd= msg.topic.split("/")[-1]
+            print (f"cvlientidd= {clientidd}")
+            Forwarding_Client = connect_to_growatt_server(msg.topic.split("/")[-1])
+            print("test")
+            print(Forwarding_Client)
+            Forwarding_Client.publish(msg.topic, payload=msg.payload, qos=msg.qos, retain=msg.retain)
+        unscrambled = unscramble(msg.payload)
+        msg_type = struct.unpack_from('>H', unscrambled, 4)[0]
         unscrambled = unscramble(msg.payload)
         msg_type = struct.unpack_from('>H', unscrambled, 4)[0]
 
@@ -228,7 +241,37 @@ def on_message(client, userdata, msg: MQTTMessage):
             print(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
         print(f"Error processing message: {e}")
+def on_message_forward_client(client, userdata, msg: MQTTMessage):
+    try:
+        if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
+            # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/deviceid}
+            print("msg von Growatt")
+            source_client.publish(msg.topic.split("/")[0] + "/33/" + msg.topic.split("/")[-1], payload=msg.payload, qos=msg.qos, retain=msg.retain)
+    except Exception as e:
+        print(f"Error processing message: {e}")
 
+def start_source_client_loop():
+    source_client.loop_forever()
+
+def start_forward_client_loop(forward_client_with_clientid):
+    forward_client_with_clientid.loop_forever()
+
+def connect_to_growatt_server(client_id):
+# Setup Growatt Server MQTT for  forwarding messages
+    
+    if f"forward_client_{client_id}" in Forwarding_Clients:
+        print(f"Already connectet to Growatt Server with ClientID: {client_id}")
+    else:
+        Forwarding_Clients[f"forward_client_{client_id}"] = mqtt.Client(client_id=client_id)
+        Forwarding_Clients[f"forward_client_{client_id}"].tls_set(cert_reqs=ssl.CERT_NONE)
+        Forwarding_Clients[f"forward_client_{client_id}"].tls_insecure_set(True)
+        Forwarding_Clients[f"forward_client_{client_id}"].on_message = on_message_forward_client
+        Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
+        Forwarding_Clients[f"forward_client_{client_id}"].subscribe("#")
+        print(f"Connected to Forwarding Server  at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
+        forward_thread = threading.Thread(target=start_forward_client_loop, args=(Forwarding_Clients[f"forward_client_{client_id}"],))
+        forward_thread.start()
+    return Forwarding_Clients[f"forward_client_{client_id}"]
 # Setup source MQTT client for subscribing
 source_client = mqtt.Client(client_id="grobro-source")
 if SOURCE_MQTT_USER and SOURCE_MQTT_PASS:
@@ -240,4 +283,5 @@ source_client.on_message = on_message
 source_client.connect(SOURCE_MQTT_HOST, SOURCE_MQTT_PORT, 60)
 source_client.subscribe("c/#")
 print(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
-source_client.loop_forever()
+source_thread = threading.Thread(target=start_source_client_loop)
+source_thread.start()
