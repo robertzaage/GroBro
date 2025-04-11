@@ -177,7 +177,6 @@ def on_message(client, userdata, msg: MQTTMessage):
             clientidd= msg.topic.split("/")[-1]
             print (f"cvlientidd= {clientidd}")
             Forwarding_Client = connect_to_growatt_server(msg.topic.split("/")[-1])
-            print("test")
             print(Forwarding_Client)
             Forwarding_Client.publish(msg.topic, payload=msg.payload, qos=msg.qos, retain=msg.retain)
         unscrambled = unscramble(msg.payload)
