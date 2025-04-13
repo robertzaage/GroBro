@@ -8,21 +8,12 @@ import ssl
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 import threading
+import logging
 from grobro import unscramble, parse_modbus_type, load_modbus_input_register_file, parse_config_type, find_config_offset
 
 config_cache = {}
 ha_lookup = {}
 Forwarding_Clients = {}
-for fname in os.listdir("."):
-    if fname.startswith("config_") and fname.endswith(".json"):
-        try:
-            with open(fname, "r") as f:
-                config = json.load(f)
-                device_id = config.get("serial_number") or fname[7:-5]
-                if device_id:
-                    config_cache[device_id] = config
-        except Exception as e:
-            print(f"Failed to load config {fname}: {e}")
 
 # Configuration from environment variables
 SOURCE_MQTT_HOST = os.getenv("SOURCE_MQTT_HOST", "localhost")
@@ -39,10 +30,38 @@ TARGET_MQTT_TLS = os.getenv("TARGET_MQTT_TLS", "false").lower() == "true"
 FORWARD_MQTT_HOST = os.getenv("FORWARD_MQTT_HOST", "mqtt.growatt.com")
 FORWARD_MQTT_PORT = int( os.getenv("FORWARD_MQTT_PORT", 7006))
 ACTIVATE_COMMUNICATION_GROWATT_SERVER = bool( os.getenv("ACTIVATE_COMMUNICATION_GROWATT_SERVER", False))
+LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = "/dump"
+
+# Setup Logger
+try:
+    logging.basicConfig(
+        level=LOG_LEVEL,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+except Exception as e:
+    logging.basicConfig(
+        level=logging.ERROR,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )    
+    print(f"Failed to setup Logger {e} USING DEFAULT LOG Level(Error)")
+logger = logging.getLogger(__name__)
+
+for fname in os.listdir("."):
+    if fname.startswith("config_") and fname.endswith(".json"):
+        try:
+            with open(fname, "r") as f:
+                config = json.load(f)
+                device_id = config.get("serial_number") or fname[7:-5]
+                if device_id:
+                    config_cache[device_id] = config
+        except Exception as e:
+            logger.error(f"Failed to load config {fname}: {e}")
+
+
 
 # Register filter configuration
 NEO_SP2_REGISTERS = [
@@ -123,7 +142,7 @@ def publish_ha_discovery(device_id, reg):
                 with open(config_path, "r") as f:
                     config = json.load(f)
                     config_cache[device_id] = config
-                    print(f"Loaded cached config for {device_id} from file (fallback)")
+                    logger.info(f"Loaded cached config for {device_id} from file (fallback)")
             except Exception:
                 config = {}
     if isinstance(config, dict):
@@ -170,7 +189,7 @@ def publish_state(device_id, registers):
         reg["name"]: round(reg["value"], 2) if isinstance(reg["value"], float) else reg["value"]
         for reg in registers
     }
-    print(f"Device {device_id} matched {len(registers)} registers after filtering.")
+    logger.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
     topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
     target_client.publish(topic, json.dumps(payload), retain=False)
 
@@ -189,14 +208,13 @@ def dump_message_binary(topic, payload):
         with open(file_path, "wb") as f:
             f.write(payload)
     except Exception as e:
-        print(f"Failed to dump message for topic {topic}: {e}")
+        logger.error(f"Failed to dump message for topic {topic}: {e}")
 
 def on_message(client, userdata, msg: MQTTMessage):
     if DUMP_MESSAGES:
         dump_message_binary(msg.topic, msg.payload)
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
-            clientidd= msg.topic.split("/")[-1]
             Forwarding_Client = connect_to_growatt_server(msg.topic.split("/")[-1])
             Forwarding_Client.publish(msg.topic, payload=msg.payload, qos=msg.qos, retain=msg.retain)
         unscrambled = unscramble(msg.payload)
@@ -223,9 +241,9 @@ def on_message(client, userdata, msg: MQTTMessage):
             if save_config:
                 with open(config_path, "w") as f:
                     json.dump(config, f, indent=2)
-                print(f"Saved updated config for {device_id}")
+                logger.info(f"Saved updated config for {device_id}")
             else:
-                print(f"No config change for {device_id}")
+                logger.debug(f"No config change for {device_id}")
             config_cache[device_id] = config
         else:
             # Modbus message
@@ -257,17 +275,19 @@ def on_message(client, userdata, msg: MQTTMessage):
             publish_state(device_id, all_registers)
             for reg in all_registers:
                 publish_ha_discovery(device_id, reg)
-            print(f"Published state for {device_id} with {len(all_registers)} registers")
+            logger.info(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
-        print(f"Error processing message: {e}")
+        logger.error(f"Error processing message: {e}")
 def on_message_forward_client(client, userdata, msg: MQTTMessage):
+    if DUMP_MESSAGES:
+        dump_message_binary(msg.topic, msg.payload)
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
-            # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/deviceid}
-            print("msg from Growatt")
+            # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/{deviceid}
+            logger.debug("msg from Growatt")
             source_client.publish(msg.topic.split("/")[0] + "/33/" + msg.topic.split("/")[-1], payload=msg.payload, qos=msg.qos, retain=msg.retain)
     except Exception as e:
-        print(f"Error processing message: {e}")
+        logger.error(f"Error processing message: {e}")
 
 def start_source_client_loop():
     source_client.loop_forever()
@@ -277,16 +297,14 @@ def start_forward_client_loop(forward_client_with_clientid):
 
 # Setup Growatt Server MQTT for forwarding messages
 def connect_to_growatt_server(client_id):
-    if f"forward_client_{client_id}" in Forwarding_Clients:
-        print(f"Already connected to Growatt Server with ClientID: {client_id}")
-    else:
+    if f"forward_client_{client_id}" not in Forwarding_Clients:
         Forwarding_Clients[f"forward_client_{client_id}"] = mqtt.Client(client_id=client_id)
         Forwarding_Clients[f"forward_client_{client_id}"].tls_set(cert_reqs=ssl.CERT_NONE)
         Forwarding_Clients[f"forward_client_{client_id}"].tls_insecure_set(True)
         Forwarding_Clients[f"forward_client_{client_id}"].on_message = on_message_forward_client
         Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
         Forwarding_Clients[f"forward_client_{client_id}"].subscribe("#")
-        print(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
+        logger.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
         forward_thread = threading.Thread(target=start_forward_client_loop, args=(Forwarding_Clients[f"forward_client_{client_id}"],))
         forward_thread.start()
     return Forwarding_Clients[f"forward_client_{client_id}"]
@@ -300,6 +318,6 @@ if SOURCE_MQTT_TLS:
 source_client.on_message = on_message
 source_client.connect(SOURCE_MQTT_HOST, SOURCE_MQTT_PORT, 60)
 source_client.subscribe("c/#")
-print(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
+logger.info(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
 source_thread = threading.Thread(target=start_source_client_loop)
 source_thread.start()

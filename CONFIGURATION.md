@@ -113,4 +113,5 @@ docker run --detach \
 | `HA_BASE_TOPIC`      | ❌ No    | Base MQTT topic used for Home Assistant auto-discovery and sensor states   |
 | `REGISTER_FILTER`    | ❌ No    | Comma-separated list of `serial:alias` pairs (e.g. `123456789:NOAH,987654321:NEO800`). Allows specifying which register set to apply per device. Defaults to inverter register map if not set. |
 | `ACTIVATE_COMMUNICATION_GROWATT_SERVER` | ❌ No    | Set to True to redirect messages to and from the Growatt Server. Default is False |
+| `LOG_LEVEL` | ❌ No    | Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR. |
 
