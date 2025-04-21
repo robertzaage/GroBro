@@ -1,0 +1,49 @@
+name: "Grobro"
+description: "Growatt MQTT Message Broker"
+version: "0.0.1"
+slug: "grobro"
+init: false
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+
+build_from:
+  amd64: "ghcr.io/home-assistant/amd64-python"
+  armhf: "ghcr.io/home-assistant/armhf-python"
+  armv7: "ghcr.io/home-assistant/armv7-python"
+  aarch64: "ghcr.io/home-assistant/aarch64-python"
+  i386: "ghcr.io/home-assistant/i386-python"
+
+options:
+  SOURCE_MQTT_HOST: homeassistant.local
+  SOURCE_MQTT_PORT: 7006
+  SOURCE_MQTT_TLS: true
+  SOURCE_MQTT_USER: ""
+  SOURCE_MQTT_PASS: ""
+  TARGET_MQTT_HOST: homeassistant.local
+  TARGET_MQTT_PORT: 1883
+  TARGET_MQTT_TLS: false
+  TARGET_MQTT_USER: ""
+  TARGET_MQTT_PASS: ""
+  HA_BASE_TOPIC: "homeassistant"
+  ACTIVATE_COMMUNICATION_GROWATT_SERVER: false
+  LOG_LEVEL: ERROR
+
+schema:
+  SOURCE_MQTT_HOST: str
+  SOURCE_MQTT_PORT: int
+  SOURCE_MQTT_TLS: bool
+  SOURCE_MQTT_USER: str?
+  SOURCE_MQTT_PASS: str?
+  TARGET_MQTT_HOST: str
+  TARGET_MQTT_PORT: int
+  TARGET_MQTT_TLS: bool
+  TARGET_MQTT_USER: "str?"
+  TARGET_MQTT_PASS: "str?"
+  HA_BASE_TOPIC: "str?"
+  REGISTER_FILTER: "str?"
+  ACTIVATE_COMMUNICATION_GROWATT_SERVER: bool
+  LOG_LEVEL: list(INFO|ERROR|DEBUG)?

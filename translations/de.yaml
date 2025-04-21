@@ -1,0 +1,43 @@
+configuration:
+  SOURCE_MQTT_HOST:
+    name: MQTT Quelle
+    description: MQTT Hotname/IP an den der Growatt WR/ Speicher Daten sendet
+  SOURCE_MQTT_PORT:
+    name: MQTT Port Quelle
+    description: MQTT Port  an den der Growatt WR/ Speicher Daten sendet
+  SOURCE_MQTT_TLS:
+    name: MQTT TLS Quelle
+    description: Setze auf 'true' um TLS zu aktivieren (sollte immer true sein, da Growatt nur an einen TLS Server Daten schickt)
+  SOURCE_MQTT_USER:
+    name: MQTT Benutzername (Quelle)
+    description: Benutzername für die MQTT Instanz, falls Authentifizierung erforderlich ist
+  SOURCE_MQTT_PASS:
+    name: MQTT Passwort (Quelle)
+    description: Passwort für die MQTT Instanz, falls Authentifizierung erforderlich ist
+  TARGET_MQTT_HOST:
+    name: MQTT Ziel-Host
+    description: MQTT Instanz, an die die Daten für Home Assistant gesendet werden
+  TARGET_MQTT_PORT:
+    name: MQTT Port Ziel
+    description: Portnummer der MQTT Instanz für Home Assistant
+  TARGET_MQTT_TLS:
+    name: MQTT TLS Ziel
+    description: Setze auf 'true' um TLS zu aktivieren
+  TARGET_MQTT_USER:
+    name: MQTT Benutzername Ziel
+    description: Benutzername für die MQTT Zielinstanz, falls Authentifizierung erforderlich ist
+  TARGET_MQTT_PASS:
+    name: MQTT Passwort Ziel
+    description: Passwort für die MQTT Zielinstanz, falls Authentifizierung erforderlich ist
+  HA_BASE_TOPIC:
+    name: Basis MQTT Thema
+    description: Das Basis MQTT Thema für Home Assistant Auto-Discovery und Sensorzustände
+  REGISTER_FILTER:
+    name: Register Filter
+    description: Komma-getrennte Liste von Seriennummern:Alias-Paaren (z.B. 123456789:NOAH). Ermöglicht es, für jedes Gerät ein spezifisches Register-Set zu definieren.
+  ACTIVATE_COMMUNICATION_GROWATT_SERVER:
+    name: Kommunikation Growatt Server aktivieren
+    description: Setze auf 'True', um die Nachrichten an und vom Growatt-Server weiterzuleiten. Standard ist 'False'.
+  LOG_LEVEL:
+    name: Log Level
+    description: Setze das Log-Level für das Programm. Die verfügbaren Werte sind 'ERROR', 'DEBUG' und 'INFO'. Standard ist 'ERROR'.

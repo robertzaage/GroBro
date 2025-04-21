@@ -1,0 +1,43 @@
+configuration:
+  SOURCE_MQTT_HOST:
+    name: MQTT Source Host
+    description: MQTT hostname or IP address where the Growatt inverter/battery sends data
+  SOURCE_MQTT_PORT:
+    name: MQTT Source Port
+    description: MQTT port where the Growatt inverter/battery sends data
+  SOURCE_MQTT_TLS:
+    name: MQTT TLS (Source)
+    description: Set to 'true' to enable TLS (should always be true since Growatt only sends data to a TLS server)
+  SOURCE_MQTT_USER:
+    name: MQTT Username (Source)
+    description: Username for the MQTT instance if authentication is required
+  SOURCE_MQTT_PASS:
+    name: MQTT Password (Source)
+    description: Password for the MQTT instance if authentication is required
+  TARGET_MQTT_HOST:
+    name: MQTT Target Host
+    description: MQTT instance that receives data for Home Assistant
+  TARGET_MQTT_PORT:
+    name: MQTT Target Port
+    description: Port number of the MQTT instance for Home Assistant
+  TARGET_MQTT_TLS:
+    name: MQTT TLS (Target)
+    description: Set to 'true' to enable TLS
+  TARGET_MQTT_USER:
+    name: MQTT Username (Target)
+    description: Username for the target MQTT instance if authentication is required
+  TARGET_MQTT_PASS:
+    name: MQTT Password (Target)
+    description: Password for the target MQTT instance if authentication is required
+  HA_BASE_TOPIC:
+    name: Base MQTT Topic
+    description: Base MQTT topic used for Home Assistant auto-discovery and sensor states
+  REGISTER_FILTER:
+    name: Register Filter
+    description: Comma-separated list of serial:alias pairs (e.g. 123456789:NOAH). Allows specifying a custom register set per device.
+  ACTIVATE_COMMUNICATION_GROWATT_SERVER:
+    name: Activate Growatt Server Communication
+    description: Set to 'True' to redirect messages to and from the Growatt server. Default is 'False'.
+  LOG_LEVEL:
+    name: Log Level
+    description: Sets the logging level. Available values: 'ERROR', 'DEBUG', and 'INFO'. Default is 'ERROR'.
