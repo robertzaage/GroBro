@@ -3,7 +3,7 @@
 GroBro is a bridge service that decodes encrypted MQTT packets from Growatt inverters and republishes them in a format compatible with Home Assistant. 
 It supports auto-discovery via MQTT and allows full integration of Growatt data into your smart home.
 
-![GroBro Logo](./assets/grobro_logo.png)
+![GroBro Logos](https://raw.githubusercontent.com/robertzaage/GroBro/refs/heads/main/assets/grobro_logo.png)
 
 ---
 
@@ -23,7 +23,7 @@ It supports auto-discovery via MQTT and allows full integration of Growatt data 
 2. Configure a Mosquitto instance **with TLS**
 3. Run **GroBro HA Bridge** Container
 
-[View the Configuration Guide](CONFIGURATION.md) for details.
+[View the Configuration Guide](https://github.com/robertzaage/GroBro/blob/main/CONFIGURATION.md) for details.
 
 ### Minimal Example 
 Mosquitto TLS for Growatt to plain Mosquitto configured in Home Assistant
@@ -38,9 +38,24 @@ docker run --rm \
   ghcr.io/robertzaage/grobro:latest
 ```
 
+## Installation as Add-On:
+
+
+1. Click the Add Add-ON Repository button below to add this repositiory on your Home
+   Assistant instance.
+
+   [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fjojeji%2FGroBro)
+
+1. Refresh your add-ons in your Add-On Store and search for GroBro
+1. Click the "Install" button to install the add-on.
+1. configure the "Grobro" add-on.
+1. Start the "Grobro" add-on.
+1. Check the logs of the "Grobro" add-on to see it in action.
+
 ## Hint
 Growatt NEO and NOAH devices rely on a TLS-enabled Mosquitto broker to send their packages. 
-The full trust chain must be present, including the root certificate. [View the Certificates Guide](CERTIFICATES.md) for setup instructions.
+The full trust chain must be present, including the root certificate. [View the Certificates Guide](https://github.com/robertzaage/GroBro/blob/main/CERTIFICATES.md) for setup instructions.
 
 ## Contributions
 Questions? Issues? PRs welcome!
+

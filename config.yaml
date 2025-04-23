@@ -1,8 +1,9 @@
 name: "Grobro"
 description: "Growatt MQTT Message Broker"
-version: "0.0.1"
+version: "1.4"
 slug: "grobro"
 init: false
+url: https://github.com/robertzaage/GroBro
 arch:
   - armhf
   - armv7
