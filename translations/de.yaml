@@ -1,43 +1,43 @@
 configuration:
   SOURCE_MQTT_HOST:
-    name: MQTT Quelle
-    description: MQTT Hotname/IP an den der Growatt WR/ Speicher Daten sendet
+    name: SOURCE_MQTT_HOST
+    description: Hostname oder IP-Adresse des Quell-MQTT-Brokers (für Growatt)
   SOURCE_MQTT_PORT:
-    name: MQTT Port Quelle
-    description: MQTT Port  an den der Growatt WR/ Speicher Daten sendet
+    name: SOURCE_MQTT_PORT
+    description: Port-Nummer des Quell-MQTT-Brokers
   SOURCE_MQTT_TLS:
-    name: MQTT TLS Quelle
-    description: Setze auf 'true' um TLS zu aktivieren (sollte immer true sein, da Growatt nur an einen TLS Server Daten schickt)
+    name: SOURCE_MQTT_TLS
+    description: Auf true setzen, um TLS ohne Zertifikatsvalidierung zu aktivieren
   SOURCE_MQTT_USER:
-    name: MQTT Benutzername (Quelle)
-    description: Benutzername für die MQTT Instanz, falls Authentifizierung erforderlich ist
+    name: SOURCE_MQTT_USER
+    description: Benutzername für den Quell-MQTT-Broker (falls Authentifizierung erforderlich)
   SOURCE_MQTT_PASS:
-    name: MQTT Passwort (Quelle)
-    description: Passwort für die MQTT Instanz, falls Authentifizierung erforderlich ist
+    name: SOURCE_MQTT_PASS
+    description: Passwort für den Quell-MQTT-Broker
   TARGET_MQTT_HOST:
-    name: MQTT Ziel-Host
-    description: MQTT Instanz, an die die Daten für Home Assistant gesendet werden
+    name: TARGET_MQTT_HOST
+    description: Hostname oder IP-Adresse des Ziel-MQTT-Brokers (für Home Assistant)
   TARGET_MQTT_PORT:
-    name: MQTT Port Ziel
-    description: Portnummer der MQTT Instanz für Home Assistant
+    name: TARGET_MQTT_PORT
+    description: Port-Nummer des Ziel-MQTT-Brokers
   TARGET_MQTT_TLS:
-    name: MQTT TLS Ziel
-    description: Setze auf 'true' um TLS zu aktivieren
+    name: TARGET_MQTT_TLS
+    description: Auf true setzen, um TLS ohne Zertifikatsvalidierung zu aktivieren
   TARGET_MQTT_USER:
-    name: MQTT Benutzername Ziel
-    description: Benutzername für die MQTT Zielinstanz, falls Authentifizierung erforderlich ist
+    name: TARGET_MQTT_USER
+    description: Benutzername für den Ziel-MQTT-Broker (falls Authentifizierung erforderlich)
   TARGET_MQTT_PASS:
-    name: MQTT Passwort Ziel
-    description: Passwort für die MQTT Zielinstanz, falls Authentifizierung erforderlich ist
+    name: TARGET_MQTT_PASS
+    description: Passwort für den Ziel-MQTT-Broker
   HA_BASE_TOPIC:
-    name: Basis MQTT Thema
-    description: Das Basis MQTT Thema für Home Assistant Auto-Discovery und Sensorzustände
+    name: HA_BASE_TOPIC
+    description: Basis-MQTT-Topic für Home Assistant Auto-Discovery und Sensor-Status
   REGISTER_FILTER:
-    name: Register Filter
-    description: Komma-getrennte Liste von Seriennummern:Alias-Paaren (z.B. 123456789:NOAH). Ermöglicht es, für jedes Gerät ein spezifisches Register-Set zu definieren.
+    name: REGISTER_FILTER
+    description: Kommagetrennte Liste von Serial:Alias-Paaren (z.B. 123456789:NOAH,987654321:NEO800). Ermöglicht die Angabe, welcher Registersatz pro Gerät angewendet werden soll. Standardmäßig wird die Wechselrichter-Registerkarte verwendet, wenn nicht gesetzt.
   ACTIVATE_COMMUNICATION_GROWATT_SERVER:
-    name: Kommunikation Growatt Server aktivieren
-    description: Setze auf 'True', um die Nachrichten an und vom Growatt-Server weiterzuleiten. Standard ist 'False'.
+    name: ACTIVATE_COMMUNICATION_GROWATT_SERVER
+    description: Auf True setzen, um Nachrichten zum und vom Growatt-Server umzuleiten. Standard ist False
   LOG_LEVEL:
-    name: Log Level
-    description: Setze das Log-Level für das Programm. Die verfügbaren Werte sind 'ERROR', 'DEBUG' und 'INFO'. Standard ist 'ERROR'.
+    name: LOG_LEVEL
+    description: Legt den Logging-Level fest. Das Programm verwendet derzeit nur die Level ERROR, DEBUG und INFO. Standard ist ERROR.
