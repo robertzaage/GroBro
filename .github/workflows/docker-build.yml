@@ -45,3 +45,4 @@ jobs:
           file: ./Containerfile
           push: true
           tags: ${{ env.TAGS }}
+          provenance: false
