@@ -33,9 +33,9 @@ jobs:
         id: vars
         run: |
           if [[ "${{ github.event_name }}" == "release" ]]; then
-            echo "TAGS=ghcr.io/robertzaage/grobro:latest,ghcr.io/robertzaage/grobro:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "TAGS=ghcr.io/wastlbava/grobro:latest,ghcr.io/wastlbava/grobro:${{ github.ref_name }}" >> $GITHUB_ENV
           else
-            echo "TAGS=ghcr.io/robertzaage/grobro:dev" >> $GITHUB_ENV
+            echo "TAGS=ghcr.io/wastlbava/grobro:dev" >> $GITHUB_ENV
           fi
 
       - name: Build and push to GHCR
