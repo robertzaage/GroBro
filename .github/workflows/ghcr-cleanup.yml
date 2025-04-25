@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: dataaxiom/ghcr-cleanup-action@v1
         with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            owner: wastlbava
-            repository: GroBro
-            package: grobro
+            # token: ${{ secrets.GITHUB_TOKEN }}
+            # owner: wastlbava
+            # repository: GroBro
+            # package: grobro
             dry-run: true
