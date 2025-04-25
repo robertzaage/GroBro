@@ -1,4 +1,4 @@
-name: Build and Push Container Image to GHCR
+name: Cleanup GHCR images
 
 on:
   workflow_dispatch:
