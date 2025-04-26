@@ -1,4 +1,4 @@
-name: Cleanup GHCR images test
+name: Cleanup GHCR images
 
 on:
   workflow_dispatch:
