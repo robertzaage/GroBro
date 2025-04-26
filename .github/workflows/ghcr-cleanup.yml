@@ -13,5 +13,7 @@ jobs:
     steps:
       - uses: dataaxiom/ghcr-cleanup-action@v1
         with:
+          owner: robertzaage
+          repository: GroBro
           package: grobro
           dry-run: true
