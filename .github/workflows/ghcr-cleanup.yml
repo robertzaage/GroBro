@@ -2,6 +2,8 @@ name: Cleanup GHCR images
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "40 20 * * *"
 
 jobs:
   cleanup:
