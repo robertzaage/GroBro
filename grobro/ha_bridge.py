@@ -29,7 +29,7 @@ TARGET_MQTT_PASS = os.getenv("TARGET_MQTT_PASS", SOURCE_MQTT_PASS)
 TARGET_MQTT_TLS = os.getenv("TARGET_MQTT_TLS", "false").lower() == "true"
 FORWARD_MQTT_HOST = os.getenv("FORWARD_MQTT_HOST", "mqtt.growatt.com")
 FORWARD_MQTT_PORT = int( os.getenv("FORWARD_MQTT_PORT", 7006))
-ACTIVATE_COMMUNICATION_GROWATT_SERVER = bool( os.getenv("ACTIVATE_COMMUNICATION_GROWATT_SERVER", False))
+ACTIVATE_COMMUNICATION_GROWATT_SERVER = os.getenv("ACTIVATE_COMMUNICATION_GROWATT_SERVER", "false").lower() == "true"
 LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
