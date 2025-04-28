@@ -115,3 +115,35 @@ docker run --detach \
 | `ACTIVATE_COMMUNICATION_GROWATT_SERVER` | ❌ No    | Set to `true` to redirect messages to and from the Growatt Server. This is turned off by default. |
 | `LOG_LEVEL` | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
+
+# Example Setup with DuckDNS and HA-MQTT
+
+### 1. Set up DynDNS Address and Certificates
+There are many guides available on how to do this. I use a DuckDNS address and the DuckDNS add-on to create the certificates. Just follow their guide. Your certificate should then be located at `/ssl/fullchain.pem` and your key at `/ssl/privkey.pem`.
+
+### 2. Open Port in Your Router and Redirect to Home Assistant
+If you completed step 1, you should already know how to do this. Open port **7006** and redirect it to your Home Assistant instance. Example on a FritzBox:
+![Step 2](assets/example_setup_1.png)
+
+(It might also be possible to use the default MQTT TLS port **8883**. In that case, you must also change the port in the ShinePhone app as described in step 4 of the configuration guide above. Alternatively, you can open external port **7006** and redirect it internally to **8883** — there are many ways to set it up 😉.)
+
+### 3. Set up HA-MQTT
+You just need to create a new user.  
+The username must be the serial number of your inverter. (If you are unsure, enable debug logging and check the logs while reconfiguring your inverter or Noah. You should see a line like `"checking auth cache for <username>"` in the logs.)
+
+The password is **Growatt**.
+
+Make sure the certificate names from step 1 are correctly configured:
+![Step 3](assets/example_setup_2.png)
+
+Start your MQTT server on port **7006** (or on the default TLS port, as described above):
+![Step 3](assets/example_setup_3.png)
+
+### 4. Check If Everything Works
+You can use MQTT Explorer (https://github.com/thomasnordquist/MQTT-Explorer) for this.  
+Make sure that **Validate certificate** and **Encryption** are enabled.  
+If you can log in, everything is working correctly!
+![Step 4](assets/example_setup_4.png)
+
+### 5. Optional: DNS Rewrite
+To stay fully local, you can set up a DNS server (like AdGuard) to rewrite your `*.duckdns.org` address to the IP of your Home Assistant instance. The certificates will remain valid.
