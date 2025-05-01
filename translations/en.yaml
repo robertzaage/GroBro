@@ -41,3 +41,9 @@ configuration:
   LOG_LEVEL:
     name: LOG_LEVEL
     description: Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR.
+  DUMP_MESSAGES:
+    name: DUMP_MESSAGES
+    description: Dumps every received messages into $DUMP_DIR for later in-depth inspection.
+  DUMP_DIR:
+    name: DUMP_DIR
+    description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share

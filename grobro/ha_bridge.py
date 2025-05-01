@@ -34,7 +34,7 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
-DUMP_DIR = "/dump"
+DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
 
 # Setup Logger
 try:
@@ -61,7 +61,10 @@ for fname in os.listdir("."):
         except Exception as e:
             logger.error(f"Failed to load config {fname}: {e}")
 
-
+# Ensure that the dump directory exists (not sure if needed, but for safety)
+if DUMP_MESSAGES and not os.path.exists(DUMP_DIR):
+    os.makedirs(DUMP_DIR, exist_ok=True)
+    logger.info(f"Dump directory created: {DUMP_DIR}")
 
 # Register filter configuration
 NEO_SP2_REGISTERS = [
