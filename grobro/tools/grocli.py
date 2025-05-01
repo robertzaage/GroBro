@@ -106,6 +106,24 @@ def build_slot(device_id: str, action: str, slot: int, start: str = None, end: s
 
     return header + struct.pack(">H", mtype) + payload
 
+def build_smart_powerset(device_id: str, action: str, powerdiff: int) -> bytes:
+    header = struct.pack(">HHH", 1, 7, 42)
+    mtype = 0x0110
+    dev_bytes = device_id.encode("ascii").ljust(16, b"\x00")
+    
+    setup = 0
+    setdown = 0
+    if action == "power_set_up":
+        setup = powerdiff
+    elif action == "power_set_down":
+        setdown = powerdiff
+    else:
+        raise ValueError(f"Unknown smart powerset action {action}")
+
+    payload = dev_bytes + (b"\x00" * 14) + b"\x01\x36\x01\x38" + struct.pack(">HHH", setdown, setup, 1)
+
+    return header + struct.pack(">H", mtype) + payload
+
 # --- MQTT ---
 
 def on_connect(client, userdata, flags, rc):
@@ -143,7 +161,7 @@ def main():
     parser = argparse.ArgumentParser(description="Growatt MQTT CLI Tool")
     parser.add_argument("--action", required=True, choices=[
         "charge_limit", "output_limit", "inverter_config",
-        "slot_create", "slot_delete"
+        "slot_create", "slot_delete", "power_set_up", "power_set_down",
     ], help="Action to perform")
 
     parser.add_argument("--device-id", required=True, help="Growatt device ID / Serial Number")
@@ -157,7 +175,7 @@ def main():
 
     parser.add_argument("--upper", type=int, help="Upper limit (for charge_limit)")
     parser.add_argument("--lower", type=int, help="Lower limit (for charge_limit)")
-    parser.add_argument("--power", type=int, help="Power setting (for output_limit or slot_create)")
+    parser.add_argument("--power", type=int, help="Power setting (for output_limit, slot_create or power_set_up/down)")
     parser.add_argument("--model-id", help="Model ID in hex (for inverter_config)")
     parser.add_argument("--slot", type=int, help="Slot number (for slot_create/slot_delete)")
     parser.add_argument("--start", help="Start time HH:MM (for slot_create)")
@@ -192,6 +210,13 @@ def main():
                 print("Error: --start, --end and --power are required for slot_create")
                 sys.exit(1)
         pkt = build_slot(args.device_id, args.action, args.slot, args.start, args.end, args.power)
+
+    elif args.action in ("power_set_up", "power_set_down"):
+        if args.power is None:
+            print("Error: --power is required for power_set_up/power_set_down")
+            sys.exit(1)
+
+        pkt = build_smart_powerset(args.device_id, args.action, args.power) 
 
     else:
         print("Error: Unknown action")

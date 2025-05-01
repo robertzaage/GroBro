@@ -93,6 +93,14 @@ def noah_decode_inverter(body: bytes):
     model_id = body[-2:].hex()
     return {"action": "inverter_config", "model_id": model_id}
 
+def noah_decode_smartpowerset(body: bytes):
+    pos = body.find(b"\x01\x36\x01\x38")
+    if pos == -1 or pos + 10 > len(body):
+        return None
+    setdown = struct.unpack(">H", body[pos + 4 : pos + 6])[0]
+    setup = struct.unpack(">H", body[pos + 6 : pos + 8])[0]
+    return {"action": "smart_powerset", "set_power_up": setup, "set_power_down": setdown}
+
 def decode_noah(mtype: int, payload: bytes):
     body = payload
     for fn in (
@@ -101,6 +109,7 @@ def decode_noah(mtype: int, payload: bytes):
         noah_decode_output_limit,
         noah_decode_datetime,
         noah_decode_inverter,
+        noah_decode_smartpowerset,
     ):
         res = fn(body)
         if res:
