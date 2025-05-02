@@ -9,10 +9,9 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 import threading
 import logging
-from grobro import unscramble, parse_modbus_type, load_modbus_input_register_file, parse_config_type, find_config_offset
+from .grobro import unscramble, parse_modbus_type, load_modbus_input_register_file, parse_config_type, find_config_offset # TODO avoid relative import with more refactoring
+import grobro.ha as ha
 
-config_cache = {}
-ha_lookup = {}
 Forwarding_Clients = {}
 
 # Configuration from environment variables
@@ -31,7 +30,6 @@ FORWARD_MQTT_HOST = os.getenv("FORWARD_MQTT_HOST", "mqtt.growatt.com")
 FORWARD_MQTT_PORT = int( os.getenv("FORWARD_MQTT_PORT", 7006))
 ACTIVATE_COMMUNICATION_GROWATT_SERVER = os.getenv("ACTIVATE_COMMUNICATION_GROWATT_SERVER", "false").lower() == "true"
 LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
-HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
@@ -57,7 +55,7 @@ for fname in os.listdir("."):
                 config = json.load(f)
                 device_id = config.get("serial_number") or fname[7:-5]
                 if device_id:
-                    config_cache[device_id] = config
+                    ha_client.set_config(device_id, config)
         except Exception as e:
             logger.error(f"Failed to load config {fname}: {e}")
 
@@ -98,15 +96,7 @@ alias_to_registers = {
     "NOAH": NOAH_REGISTERS
 }
 
-# Setup target MQTT client for publishing
-target_client = mqtt.Client(client_id="grobro-target")
-if TARGET_MQTT_USER and TARGET_MQTT_PASS:
-    target_client.username_pw_set(TARGET_MQTT_USER, TARGET_MQTT_PASS)
-if TARGET_MQTT_TLS:
-    target_client.tls_set(cert_reqs=ssl.CERT_NONE)
-    target_client.tls_insecure_set(True)
-target_client.connect(TARGET_MQTT_HOST, TARGET_MQTT_PORT, 60)
-target_client.loop_start()
+ha_client = ha.Client(TARGET_MQTT_HOST, TARGET_MQTT_PORT, TARGET_MQTT_TLS, TARGET_MQTT_USER, TARGET_MQTT_PASS)
 
 def parse_ascii(value):
     try:
@@ -120,60 +110,6 @@ def apply_conversion(register):
         register["value"] = parse_ascii(register["value"])
     elif isinstance(register.get("value"), (int, float)) and register.get("multiplier"):
         register["value"] *= register["multiplier"]
-
-def publish_ha_discovery(device_id, reg):
-    variable = reg['name']
-    ha = ha_lookup.get(variable, {})
-    topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{variable}/config"
-    device_info = {
-        "identifiers": [device_id],
-        "name": f"Growatt {device_id}",
-        "manufacturer": "Growatt",
-        "serial_number": device_id
-    }
-    # Find matching config
-    config = config_cache.get(device_id)
-
-    # Fallback: try loading from file
-    if not config:
-        config_path = f"config_{device_id}.json"
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, "r") as f:
-                    config = json.load(f)
-                    config_cache[device_id] = config
-                    logger.info(f"Loaded cached config for {device_id} from file (fallback)")
-            except Exception:
-                config = {}
-    if isinstance(config, dict):
-        device_type_map = {
-            "55": "NEO-series",
-            "72": "NEXA-series",
-            "61": "NOAH-series"
-        }
-        known_model_id = device_type_map.get(config.get("device_type"))
-        if known_model_id:
-            device_info["model"] = known_model_id
-        elif config.get("model_id"):
-            device_info["model"] = config["model_id"]
-        if config.get("sw_version"):
-            device_info["sw_version"] = config["sw_version"]
-        if config.get("hw_version"):
-            device_info["hw_version"] = config["hw_version"]
-        if config.get("mac_address"):
-            device_info["connections"] = [["mac", config["mac_address"]]]
-    payload = {
-        "name": ha.get("name", variable),
-        "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
-        "value_template": f"{{{{ value_json['{variable}'] }}}}",
-        "unique_id": f"grobro_{device_id}_{variable}",
-        "object_id": f"{device_id}_{variable}",
-        "device": device_info
-    }
-    for key in ["device_class", "state_class", "unit_of_measurement", "icon"]:
-        if key in ha:
-            payload[key] = ha[key]
-    target_client.publish(topic, json.dumps(payload), retain=True)
 
 def publish_state(device_id, registers):
     alias = device_filter_alias_map.get(device_id)
@@ -190,8 +126,7 @@ def publish_state(device_id, registers):
         for reg in registers
     }
     logger.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
-    topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
-    target_client.publish(topic, json.dumps(payload), retain=False)
+    ha_client.publish_state(device_id, payload)
 
 def dump_message_binary(topic, payload):
     try:
@@ -275,7 +210,7 @@ def on_message(client, userdata, msg: MQTTMessage):
                 ]
             publish_state(device_id, all_registers)
             for reg in all_registers:
-                publish_ha_discovery(device_id, reg)
+                ha_client.publish_discovery(device_id, reg['name'])
             logger.info(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
         logger.error(f"Error processing message: {e}")
