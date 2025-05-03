@@ -186,7 +186,7 @@ def publish_state(device_id, registers):
     for reg in registers:
         apply_conversion(reg)
     payload = {
-        reg["name"]: round(reg["value"], 2) if isinstance(reg["value"], float) else reg["value"]
+        reg["name"]: round(reg["value"], 3) if isinstance(reg["value"], float) else reg["value"]
         for reg in registers
     }
     logger.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
