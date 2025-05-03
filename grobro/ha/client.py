@@ -1,16 +1,16 @@
 import paho.mqtt.client as mqtt
 import os
+import json
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 class Client:
     client: mqtt.Client
-    ha_lookup = {}
     config_cache = {}
 
     def __init__(self, host:str, port:str, tls:bool, user:str|None, password:str|None):
         # Setup target MQTT client for publishing
-        print(f"Connect to target mqtt '{host}:{port}'")
+        print(f"connecting to HA mqtt '{host}:{port}'")
         self.client = mqtt.Client(client_id="grobro-ha")
         if user and password:
             self.client.username_pw_set(user, password)
@@ -20,12 +20,11 @@ class Client:
         self.client.connect(host, port, 60)
         self.client.loop_start()
 
-    def set_config(device_id, config):
+    def set_config(self, device_id, config):
         self.config_cache[device_id] = config
         pass
 
-    def publish_discovery(device_id, variable):
-        ha = self.ha_lookup.get(variable, {})
+    def publish_discovery(self, device_id, variable, ha):
         topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{variable}/config"
         device_info = {
             "identifiers": [device_id],
@@ -77,6 +76,6 @@ class Client:
                 payload[key] = ha[key]
         self.client.publish(topic, json.dumps(payload), retain=True)
 
-    def publish_state(device_id, state):
+    def publish_state(self, device_id, state):
         topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
-        target_client.publish(topic, json.dumps(payload), retain=False)
+        self.client.publish(topic, json.dumps(state), retain=False)

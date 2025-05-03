@@ -13,6 +13,7 @@ from .grobro import unscramble, parse_modbus_type, load_modbus_input_register_fi
 import grobro.ha as ha
 
 Forwarding_Clients = {}
+ha_lookup = {}
 
 # Configuration from environment variables
 SOURCE_MQTT_HOST = os.getenv("SOURCE_MQTT_HOST", "localhost")
@@ -146,6 +147,7 @@ def dump_message_binary(topic, payload):
         logger.error(f"Failed to dump message for topic {topic}: {e}")
 
 def on_message(client, userdata, msg: MQTTMessage):
+    logger.info(f"received: {msg}")
     if DUMP_MESSAGES:
         dump_message_binary(msg.topic, msg.payload)
     try:
@@ -210,7 +212,8 @@ def on_message(client, userdata, msg: MQTTMessage):
                 ]
             publish_state(device_id, all_registers)
             for reg in all_registers:
-                ha_client.publish_discovery(device_id, reg['name'])
+                ha = ha_lookup.get(reg['name'], {})
+                ha_client.publish_discovery(device_id, reg['name'], ha)
             logger.info(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
         logger.error(f"Error processing message: {e}")
@@ -225,12 +228,6 @@ def on_message_forward_client(client, userdata, msg: MQTTMessage):
     except Exception as e:
         logger.error(f"Error processing message: {e}")
 
-def start_source_client_loop():
-    source_client.loop_forever()
-
-def start_forward_client_loop(forward_client_with_clientid):
-    forward_client_with_clientid.loop_forever()
-
 # Setup Growatt Server MQTT for forwarding messages
 def connect_to_growatt_server(client_id):
     if f"forward_client_{client_id}" not in Forwarding_Clients:
@@ -241,11 +238,11 @@ def connect_to_growatt_server(client_id):
         Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
         Forwarding_Clients[f"forward_client_{client_id}"].subscribe("#")
         logger.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
-        forward_thread = threading.Thread(target=start_forward_client_loop, args=(Forwarding_Clients[f"forward_client_{client_id}"],))
+        forward_thread = threading.Thread(target=Forwarding_Clients[f"forward_client_{client_id}"].loop_forever)
         forward_thread.start()
     return Forwarding_Clients[f"forward_client_{client_id}"]
 # Setup source MQTT client for subscribing
-source_client = mqtt.Client(client_id="grobro-source")
+source_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, client_id="grobro-source")
 if SOURCE_MQTT_USER and SOURCE_MQTT_PASS:
     source_client.username_pw_set(SOURCE_MQTT_USER, SOURCE_MQTT_PASS)
 if SOURCE_MQTT_TLS:
@@ -255,5 +252,5 @@ source_client.on_message = on_message
 source_client.connect(SOURCE_MQTT_HOST, SOURCE_MQTT_PORT, 60)
 source_client.subscribe("c/#")
 logger.info(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
-source_thread = threading.Thread(target=start_source_client_loop)
+source_thread = threading.Thread(target=source_client.loop_forever)
 source_thread.start()
