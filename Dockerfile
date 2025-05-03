@@ -1,7 +1,9 @@
+ARG BUILD_FROM="python:3.11-alpine"
+
 # -----------------------------
 # Stage 1: Build environment
 # -----------------------------
-FROM python:3.11-alpine as builder
+FROM python:3.11-alpine AS builder
 
 # Set environment
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -26,10 +28,27 @@ RUN pip wheel . --wheel-dir=/wheels
 # -----------------------------
 # Stage 2: Final minimal image
 # -----------------------------
-FROM python:3.11-alpine
+FROM $BUILD_FROM
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
+
+ENV SOURCE_MQTT_HOST="$(bashio::config 'SOURCE_MQTT_HOST')" \
+    SOURCE_MQTT_PORT="$(bashio::config 'SOURCE_MQTT_PORT')" \
+    SOURCE_MQTT_TLS="$(bashio::config 'SOURCE_MQTT_TLS')" \
+    SOURCE_MQTT_USER="$(bashio::config 'SOURCE_MQTT_USER')" \
+    SOURCE_MQTT_PASS="$(bashio::config 'SOURCE_MQTT_PASS')" \
+    TARGET_MQTT_HOST="$(bashio::config 'TARGET_MQTT_HOST')" \
+    TARGET_MQTT_PORT="$(bashio::config 'TARGET_MQTT_PORT')" \
+    TARGET_MQTT_TLS="$(bashio::config 'TARGET_MQTT_TLS')" \
+    TARGET_MQTT_USER="$(bashio::config 'TARGET_MQTT_USER')" \
+    TARGET_MQTT_PASS="$(bashio::config 'TARGET_MQTT_PASS')" \
+    HA_BASE_TOPIC="$(bashio::config 'HA_BASE_TOPIC')" \
+    REGISTER_FILTER="$(bashio::config 'REGISTER_FILTER')" \
+    ACTIVATE_COMMUNICATION_GROWATT_SERVER="$(bashio::config 'ACTIVATE_COMMUNICATION_GROWATT_SERVER')" \
+    LOG_LEVEL="$(bashio::config 'LOG_LEVEL')" \
+    DUMP_DIR="$(bashio::config 'DUMP_DIR')" \
+    DUMP_MESSAGES="$(bashio::config 'DUMP_MESSAGES')"
 
 WORKDIR /app
 
