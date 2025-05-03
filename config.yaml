@@ -4,6 +4,7 @@ version: "1.6"
 slug: "grobro"
 init: false
 url: https://github.com/robertzaage/GroBro
+image: ghcr.io/robertzaage/grobro
 arch:
   - armhf
   - armv7
