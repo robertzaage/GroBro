@@ -171,7 +171,7 @@
       "size": 2,
       "multiplier": 0.001,
       "ha": {
-        "name": "Battery 1 maxCellVoltage",
+        "name": "Battery 1 max. Cell Voltage",
         "unit_of_measurement": "V",
         "icon": "mdi:flash",
         "state_class": "measurement",
@@ -186,7 +186,7 @@
       "size": 2,
       "multiplier": 0.001,
       "ha": {
-        "name": "Battery 1 minCellvoltage",
+        "name": "Battery 1 min. Cell Voltage",
         "unit_of_measurement": "V",
         "icon": "mdi:flash",
         "state_class": "measurement",
