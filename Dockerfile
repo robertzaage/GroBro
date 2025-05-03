@@ -1,21 +1,45 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+# -----------------------------
+# Stage 1: Build environment
+# -----------------------------
+FROM python:3.11-alpine as builder
 
-RUN apk add --no-cache python3 py3-pip
-
-RUN python3 -m venv /venv
-
-ENV PATH="/venv/bin:$PATH"
+# Set environment
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY grobro/requirements.txt ./requirements.txt
+# Install build dependencies
+RUN apk add --no-cache \
+    python3-dev \
+    py3-pip
 
-RUN pip install --no-cache-dir -r requirements.txt
+# upgrade pip an install build deps
+RUN pip install --upgrade pip setuptools wheel
 
-WORKDIR /app/grobro
-COPY grobro/ /app/grobro/
-COPY run.sh /
-RUN chmod a+x /run.sh
+# Copy project
+COPY . /app
 
-CMD [ "/run.sh" ]
+# Build wheels
+RUN pip wheel . --wheel-dir=/wheels
+
+# -----------------------------
+# Stage 2: Final minimal image
+# -----------------------------
+FROM python:3.11-alpine
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Copy project and prebuilt wheels
+COPY --from=builder /wheels /wheels
+COPY . /app
+
+# Install Python packages from wheel cache only
+RUN pip install --no-cache-dir --no-index --find-links=/wheels grobro
+
+# Set default command
+CMD ["python", "-m", "grobro.ha_bridge"]
+

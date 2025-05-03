@@ -1,0 +1,20 @@
+[project]
+name = "grobro"
+version = "1.6.0"
+description = "Home Assistant bridge for Growatt inverters"
+authors = [
+    { name="Robert Zaage", email="robert@zaage.it" }
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+dependencies = [
+    "paho-mqtt",
+    "crc"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["grobro"]
