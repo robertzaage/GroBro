@@ -6,6 +6,7 @@ import json
 import sys
 import os
 from itertools import cycle
+import importlib.resources as resources
 
 def hexdump(data: bytes, width: int = 16):
     for i in range(0, len(data), width):
@@ -220,7 +221,7 @@ def find_config_offset(data):
     return 0x1C
 
 def parse_growatt_file(filepath, modbus_input_register_descriptions: list):
-    with open(filepath, 'rb') as f:
+    with resources.files(__package__).joinpath(filepath).open("rb") as f:
         raw = f.read()
 
     data = unscramble(raw)
@@ -246,7 +247,7 @@ def parse_growatt_file(filepath, modbus_input_register_descriptions: list):
     return result
 
 def load_modbus_input_register_file(filepath):
-    with open(filepath, "rb") as f:
+    with resources.files(__package__).joinpath(filepath).open("rb") as f:
         data = json.load(f)
 
     return data["input_registers"]
