@@ -71,6 +71,7 @@ def parse_modbus_block(data, offset, modbus_input_register_descriptions: list):
         bytesize = reg_desc['size']
         value, = struct.unpack_from(unpack_typemap[bytesize], data, reg_offset)
         value *= reg_desc.get("multiplier", 1)
+        value += reg_desc.get("delta", 0)
 
         if "value_options" in reg_desc:
             # Replace numeric value options with their actual meaning
