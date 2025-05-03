@@ -210,13 +210,14 @@
     },
     {
       "register_no": 11,
-      "variable_name": "out_power_limit",
-      "description": "Output power limit",
+      "variable_name": "charging_discharging",
+      "description": "Charging and Discharging Power",
       "unit": "W",
-      "size": 1,
+      "size": 2,
       "multiplier": 1,
+      "delta": -30000,
       "ha": {
-        "name": "Output power limit",
+        "name": "Charging Power",
         "unit_of_measurement": "W",
         "icon": "mdi:flash",
         "state_class": "measurement",
