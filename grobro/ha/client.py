@@ -11,7 +11,7 @@ class Client:
     def __init__(self, host:str, port:str, tls:bool, user:str|None, password:str|None):
         # Setup target MQTT client for publishing
         print(f"connecting to HA mqtt '{host}:{port}'")
-        self.client = mqtt.Client(client_id="grobro-ha")
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,client_id="grobro-ha")
         if user and password:
             self.client.username_pw_set(user, password)
         if tls:

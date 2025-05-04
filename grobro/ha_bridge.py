@@ -242,7 +242,7 @@ def connect_to_growatt_server(client_id):
         forward_thread.start()
     return Forwarding_Clients[f"forward_client_{client_id}"]
 # Setup source MQTT client for subscribing
-source_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, client_id="grobro-source")
+source_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-source")
 if SOURCE_MQTT_USER and SOURCE_MQTT_PASS:
     source_client.username_pw_set(SOURCE_MQTT_USER, SOURCE_MQTT_PASS)
 if SOURCE_MQTT_TLS:
