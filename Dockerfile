@@ -10,5 +10,6 @@ RUN python3 -m venv /venv && \
 
 WORKDIR /app
 COPY . /app
+RUN chmod +x ./run.sh
 
 CMD [ "./run.sh" ]
