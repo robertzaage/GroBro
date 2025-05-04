@@ -47,8 +47,10 @@ except Exception as e:
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
     print(f"Failed to setup Logger {e} USING DEFAULT LOG Level(Error)")
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
+
+ha_client = ha.Client(TARGET_MQTT_HOST, TARGET_MQTT_PORT, TARGET_MQTT_TLS, TARGET_MQTT_USER, TARGET_MQTT_PASS)
 for fname in os.listdir("."):
     if fname.startswith("config_") and fname.endswith(".json"):
         try:
@@ -58,12 +60,12 @@ for fname in os.listdir("."):
                 if device_id:
                     ha_client.set_config(device_id, config)
         except Exception as e:
-            logger.error(f"Failed to load config {fname}: {e}")
+            LOG.error(f"Failed to load config {fname}: {e}")
 
 # Ensure that the dump directory exists (not sure if needed, but for safety)
 if DUMP_MESSAGES and not os.path.exists(DUMP_DIR):
     os.makedirs(DUMP_DIR, exist_ok=True)
-    logger.info(f"Dump directory created: {DUMP_DIR}")
+    LOG.info(f"Dump directory created: {DUMP_DIR}")
 
 # Register filter configuration
 NEO_SP2_REGISTERS = [
@@ -97,8 +99,6 @@ alias_to_registers = {
     "NOAH": NOAH_REGISTERS
 }
 
-ha_client = ha.Client(TARGET_MQTT_HOST, TARGET_MQTT_PORT, TARGET_MQTT_TLS, TARGET_MQTT_USER, TARGET_MQTT_PASS)
-
 def parse_ascii(value):
     try:
         return bytes.fromhex(hex(value)[2:].zfill(4)).decode('ascii').strip()
@@ -126,7 +126,7 @@ def publish_state(device_id, registers):
         reg["name"]: round(reg["value"], 3) if isinstance(reg["value"], float) else reg["value"]
         for reg in registers
     }
-    logger.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
+    LOG.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
     ha_client.publish_state(device_id, payload)
 
 def dump_message_binary(topic, payload):
@@ -144,10 +144,10 @@ def dump_message_binary(topic, payload):
         with open(file_path, "wb") as f:
             f.write(payload)
     except Exception as e:
-        logger.error(f"Failed to dump message for topic {topic}: {e}")
+        LOG.error(f"Failed to dump message for topic {topic}: {e}")
 
 def on_message(client, userdata, msg: MQTTMessage):
-    logger.info(f"received: {msg}")
+    LOG.debug(f"received: {msg.topic} {msg.payload}")
     if DUMP_MESSAGES:
         dump_message_binary(msg.topic, msg.payload)
     try:
@@ -178,10 +178,10 @@ def on_message(client, userdata, msg: MQTTMessage):
             if save_config:
                 with open(config_path, "w") as f:
                     json.dump(config, f, indent=2)
-                logger.info(f"Saved updated config for {device_id}")
+                LOG.info(f"Saved updated config for {device_id}")
             else:
-                logger.debug(f"No config change for {device_id}")
-            config_cache[device_id] = config
+                LOG.debug(f"No config change for {device_id}")
+            ha_client.set_config(device_id=device_id, config=config)
         # NOAH=323 NEO=577
         elif msg_type in (323, 577):
             # Modbus message
@@ -214,30 +214,30 @@ def on_message(client, userdata, msg: MQTTMessage):
             for reg in all_registers:
                 ha = ha_lookup.get(reg['name'], {})
                 ha_client.publish_discovery(device_id, reg['name'], ha)
-            logger.info(f"Published state for {device_id} with {len(all_registers)} registers")
+            LOG.info(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
-        logger.error(f"Error processing message: {e}")
+        LOG.error(f"Error processing message: {e}")
 def on_message_forward_client(client, userdata, msg: MQTTMessage):
     if DUMP_MESSAGES:
         dump_message_binary(msg.topic, msg.payload)
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
             # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/{deviceid}
-            logger.debug("msg from Growatt")
+            LOG.debug("msg from Growatt")
             source_client.publish(msg.topic.split("/")[0] + "/33/" + msg.topic.split("/")[-1], payload=msg.payload, qos=msg.qos, retain=msg.retain)
     except Exception as e:
-        logger.error(f"Error processing message: {e}")
+        LOG.error(f"Error processing message: {e}")
 
 # Setup Growatt Server MQTT for forwarding messages
 def connect_to_growatt_server(client_id):
     if f"forward_client_{client_id}" not in Forwarding_Clients:
-        Forwarding_Clients[f"forward_client_{client_id}"] = mqtt.Client(client_id=client_id)
+        Forwarding_Clients[f"forward_client_{client_id}"] = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id)
         Forwarding_Clients[f"forward_client_{client_id}"].tls_set(cert_reqs=ssl.CERT_NONE)
         Forwarding_Clients[f"forward_client_{client_id}"].tls_insecure_set(True)
         Forwarding_Clients[f"forward_client_{client_id}"].on_message = on_message_forward_client
         Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
         Forwarding_Clients[f"forward_client_{client_id}"].subscribe("#")
-        logger.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
+        LOG.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
         forward_thread = threading.Thread(target=Forwarding_Clients[f"forward_client_{client_id}"].loop_forever)
         forward_thread.start()
     return Forwarding_Clients[f"forward_client_{client_id}"]
@@ -251,6 +251,6 @@ if SOURCE_MQTT_TLS:
 source_client.on_message = on_message
 source_client.connect(SOURCE_MQTT_HOST, SOURCE_MQTT_PORT, 60)
 source_client.subscribe("c/#")
-logger.info(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
+LOG.info(f"Connected to source MQTT at {SOURCE_MQTT_HOST}:{SOURCE_MQTT_PORT}, listening on 'c/#'")
 source_thread = threading.Thread(target=source_client.loop_forever)
 source_thread.start()

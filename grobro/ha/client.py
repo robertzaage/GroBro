@@ -1,17 +1,24 @@
 import paho.mqtt.client as mqtt
 import os
 import json
+import logging
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
+LOG = logging.getLogger(__name__)
+
 
 class Client:
     client: mqtt.Client
     config_cache = {}
 
-    def __init__(self, host:str, port:str, tls:bool, user:str|None, password:str|None):
+    def __init__(
+        self, host: str, port: str, tls: bool, user: str | None, password: str | None
+    ):
         # Setup target MQTT client for publishing
-        print(f"connecting to HA mqtt '{host}:{port}'")
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,client_id="grobro-ha")
+        LOG.info(f"connecting to HA mqtt '{host}:{port}'")
+        self.client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-ha"
+        )
         if user and password:
             self.client.username_pw_set(user, password)
         if tls:
@@ -30,7 +37,7 @@ class Client:
             "identifiers": [device_id],
             "name": f"Growatt {device_id}",
             "manufacturer": "Growatt",
-            "serial_number": device_id
+            "serial_number": device_id,
         }
         # Find matching config
         config = self.config_cache.get(device_id)
@@ -43,14 +50,16 @@ class Client:
                     with open(config_path, "r") as f:
                         config = json.load(f)
                         self.config_cache[device_id] = config
-                        logger.info(f"Loaded cached config for {device_id} from file (fallback)")
+                        LOG.info(
+                            f"Loaded cached config for {device_id} from file (fallback)"
+                        )
                 except Exception:
                     config = {}
         if isinstance(config, dict):
             device_type_map = {
                 "55": "NEO-series",
                 "72": "NEXA-series",
-                "61": "NOAH-series"
+                "61": "NOAH-series",
             }
             known_model_id = device_type_map.get(config.get("device_type"))
             if known_model_id:
@@ -69,7 +78,7 @@ class Client:
             "value_template": f"{{{{ value_json['{variable}'] }}}}",
             "unique_id": f"grobro_{device_id}_{variable}",
             "object_id": f"{device_id}_{variable}",
-            "device": device_info
+            "device": device_info,
         }
         for key in ["device_class", "state_class", "unit_of_measurement", "icon"]:
             if key in ha:
