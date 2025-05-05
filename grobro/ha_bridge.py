@@ -15,7 +15,6 @@ import time
 from threading import Timer
 
 Forwarding_Clients = {}
-ha_lookup = {}
 device_timers = {}
 
 # Configuration from environment variables
@@ -202,11 +201,10 @@ def on_message(client, userdata, msg: MQTTMessage):
             modbus_input_register_descriptions = load_modbus_input_register_file(regfile)
 
             # Rebuild HA metadata lookup for this register set
-            ha_lookup.clear()
-            ha_lookup.update({
+            ha_lookup = {
                 reg["variable_name"]: reg.get("ha")
                 for reg in modbus_input_register_descriptions if reg.get("ha")
-            })
+            }
             parsed = parse_modbus_type(unscrambled, modbus_input_register_descriptions)
             device_id = parsed.get("device_id")
             all_registers = parsed.get("modbus1", {}).get("registers", []) + parsed.get("modbus2", {}).get("registers", [])
