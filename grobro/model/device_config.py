@@ -3,12 +3,20 @@ import logging
 import json
 from typing import Optional
 import os
+from pydantic import BaseModel
 
 LOG = logging.getLogger(__name__)
 
 
-@dataclass
-class DeviceConfig:
+class DeviceState(BaseModel):
+    name: Optional[str]
+    device_class: Optional[str] = None
+    state_class: Optional[str] = None
+    unit_of_measurement: Optional[str] = None
+    icon: Optional[str] = None
+
+
+class DeviceConfig(BaseModel):
     data_interval: Optional[str] = None
     unknown_5: Optional[str] = None
     unknown_6: Optional[str] = None
@@ -46,7 +54,7 @@ class DeviceConfig:
 
     def to_file(self, file_path: str) -> str:
         with open(file_path, "w") as f:
-            json.dump({k: v for k, v in asdict(self).items() if v is not None}, f)
+            f.write(self.model_dump_json(exclude_none=True))
 
     @staticmethod
     def from_file(file_path: str) -> Optional["DeviceConfig"]:

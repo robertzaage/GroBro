@@ -14,6 +14,7 @@ from .grobro import unscramble, parse_modbus_type, load_modbus_input_register_fi
 import grobro.ha as ha
 import time
 from threading import Timer
+import grobro.model as model
 
 Forwarding_Clients = {}
 device_timers = {}
@@ -175,10 +176,18 @@ def on_message(client, userdata, msg: MQTTMessage):
             modbus_input_register_descriptions = load_modbus_input_register_file(regfile)
 
             # Rebuild HA metadata lookup for this register set
-            ha_lookup = {
-                reg["variable_name"]: reg.get("ha")
-                for reg in modbus_input_register_descriptions if reg.get("ha")
-            }
+            ha_lookup = {}
+            for reg in modbus_input_register_descriptions:
+                if reg.get("ha"):
+                    name = reg["variable_name"]
+                    ha = reg["ha"]
+                    ha_lookup[name] = model.DeviceState(
+                        name=name,
+                        device_class =ha.get("device_class"),
+                        state_class =ha.get("state_class"),
+                        unit_of_measurement =ha.get("unit_of_measurement"),
+                        icon =ha.get("icon"),
+                    )
             parsed = parse_modbus_type(unscrambled, modbus_input_register_descriptions)
             device_id = parsed.get("device_id")
             all_registers = parsed.get("modbus1", {}).get("registers", []) + parsed.get("modbus2", {}).get("registers", [])
