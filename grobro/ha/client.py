@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import os
 import json
 import logging
+import grobro.model as model
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 LOG = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ LOG = logging.getLogger(__name__)
 
 class Client:
     client: mqtt.Client
-    config_cache = {}
+    config_cache: dict[str, model.DeviceConfig] = {}
 
     def __init__(
         self, host: str, port: str, tls: bool, user: str | None, password: str | None
@@ -27,11 +28,26 @@ class Client:
         self.client.connect(host, port, 60)
         self.client.loop_start()
 
-    def set_config(self, device_id, config):
-        self.config_cache[device_id] = config
-        pass
+        for fname in os.listdir("."):
+            if fname.startswith("config_") and fname.endswith(".json"):
+                config = model.DeviceConfig.from_file(fname)
+                if config:
+                    self.config_cache[config.device_id] = config
+
+    def set_config(self, config: model.DeviceConfig):
+        device_id = config.serial_number
+        config_path = f"config_{config.device_id}.json"
+        existing_config = model.DeviceConfig.from_file(config_path)
+        if existing_config is None or existing_config != config:
+            LOG.info(f"save updated config for {config.device_id}")
+            config.to_file(config_path)
+        else:
+            LOG.debug(f"no config change for {config.device_id}")
+        self.config_cache[config.device_id] = config
 
     def publish_discovery(self, device_id, variable, ha):
+        sensor_name = ha.get("name", variable)
+
         topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{variable}/config"
         device_info = {
             "identifiers": [device_id],
@@ -41,39 +57,39 @@ class Client:
         }
         # Find matching config
         config = self.config_cache.get(device_id)
-
         # Fallback: try loading from file
         if not config:
             config_path = f"config_{device_id}.json"
-            if os.path.exists(config_path):
-                try:
-                    with open(config_path, "r") as f:
-                        config = json.load(f)
-                        self.config_cache[device_id] = config
-                        LOG.info(
-                            f"Loaded cached config for {device_id} from file (fallback)"
-                        )
-                except Exception:
-                    config = {}
+            config = model.DeviceConfig.from_file(config_path)
+            self.config_cache[device_id] = config
+            LOG.info(f"Loaded cached config for {device_id} from file (fallback)")
+        # Fallback 2: save minimal config if it was neither in cache nor on disk
+        if not config:
+            config_path = f"config_{device_id}.json"
+            config = model.DeviceConfig(serial_number=device_id)
+            config.to_file(config_path)
+            self.config_cache[device_id] = config
+            LOG.info(f"saved minimal config for unknown device: {config}")
+
         if isinstance(config, dict):
             device_type_map = {
                 "55": "NEO-series",
                 "72": "NEXA-series",
                 "61": "NOAH-series",
             }
-            known_model_id = device_type_map.get(config.get("device_type"))
+            known_model_id = device_type_map.get(config.device_type)
             if known_model_id:
                 device_info["model"] = known_model_id
-            elif config.get("model_id"):
-                device_info["model"] = config["model_id"]
-            if config.get("sw_version"):
-                device_info["sw_version"] = config["sw_version"]
-            if config.get("hw_version"):
-                device_info["hw_version"] = config["hw_version"]
-            if config.get("mac_address"):
-                device_info["connections"] = [["mac", config["mac_address"]]]
+            elif config.model_id:
+                device_info["model"] = config.model_id
+            if config.sw_version:
+                device_info["sw_version"] = config.sw_version
+            if config.hw_version:
+                device_info["hw_version"] = config.hw_version
+            if config.mac_address:
+                device_info["connections"] = [["mac", config.mac_address]]
         payload = {
-            "name": ha.get("name", variable),
+            "name": sensor_name,
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
             "availability_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
             "value_template": f"{{{{ value_json['{variable}'] }}}}",

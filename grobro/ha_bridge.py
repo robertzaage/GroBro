@@ -2,6 +2,7 @@
 # Reads Growatt MQTT packets, decodes them, maps registers and republishes values for Home Assistant auto-discovery
 
 import os
+from dataclasses import asdict
 import json
 import struct
 import ssl
@@ -54,16 +55,6 @@ LOG = logging.getLogger(__name__)
 
 
 ha_client = ha.Client(TARGET_MQTT_HOST, TARGET_MQTT_PORT, TARGET_MQTT_TLS, TARGET_MQTT_USER, TARGET_MQTT_PASS)
-for fname in os.listdir("."):
-    if fname.startswith("config_") and fname.endswith(".json"):
-        try:
-            with open(fname, "r") as f:
-                config = json.load(f)
-                device_id = config.get("serial_number") or fname[7:-5]
-                if device_id:
-                    ha_client.set_config(device_id, config)
-        except Exception as e:
-            LOG.error(f"Failed to load config {fname}: {e}")
 
 # Ensure that the dump directory exists (not sure if needed, but for safety)
 if DUMP_MESSAGES and not os.path.exists(DUMP_DIR):
@@ -170,23 +161,6 @@ def on_message(client, userdata, msg: MQTTMessage):
             # Config message
             config_offset = find_config_offset(unscrambled)
             config = parse_config_type(unscrambled, config_offset)
-            device_id = config.get("serial_number")
-            config_path = f"config_{device_id}.json"
-            save_config = True
-            if os.path.exists(config_path):
-                try:
-                    with open(config_path, "r") as f:
-                        existing = json.load(f)
-                        if existing == config:
-                            save_config = False
-                except Exception:
-                    pass
-            if save_config:
-                with open(config_path, "w") as f:
-                    json.dump(config, f, indent=2)
-                LOG.info(f"Saved updated config for {device_id}")
-            else:
-                LOG.debug(f"No config change for {device_id}")
             ha_client.set_config(device_id=device_id, config=config)
         # NOAH=323 NEO=577
         elif msg_type in (323, 577):

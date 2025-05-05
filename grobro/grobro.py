@@ -5,6 +5,7 @@ import struct
 import json
 import sys
 import os
+import grobro.model as model
 from itertools import cycle
 import importlib.resources as resources
 
@@ -153,7 +154,7 @@ def parse_modbus_type(data, modbus_input_register_descriptions: list):
 
     return result
 
-def parse_config_type(data, offset):
+def parse_config_type(data, offset) -> model.DeviceConfig:
     """
     Parse a configuration message starting at offset as a TLV block
     Each parameter is stored as:
@@ -206,7 +207,7 @@ def parse_config_type(data, offset):
     if not any_params:
         config["raw"] = raw_hex
 
-    return config
+    return model.DeviceConfig(**config)
 
 def find_config_offset(data):
     """
