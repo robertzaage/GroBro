@@ -46,11 +46,11 @@ class Client:
             LOG.debug(f"no config change for {config.device_id}")
         self.config_cache[config.device_id] = config
 
-    def publish_discovery(self, device_id: str, variable: str, ha: model.DeviceState):
-        if ha.name in self.discovery_cache.get(device_id, []):
-            return # already published
+    def publish_discovery(self, device_id: str, ha: model.DeviceState):
+        if ha.variable_name in self.discovery_cache.get(device_id, []):
+            return  # already published
 
-        topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{variable}/config"
+        topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{ha.variable_name}/config"
         # Find matching config
         config = self.config_cache.get(device_id)
         config_path = f"config_{device_id}.json"
@@ -92,22 +92,24 @@ class Client:
             "name": ha.name,
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
             "availability_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
-            "value_template": f"{{{{ value_json['{variable}'] }}}}",
-            "unique_id": f"grobro_{device_id}_{variable}",
-            "object_id": f"{device_id}_{variable}",
+            "value_template": f"{{{{ value_json['{ha.variable_name}'] }}}}",
+            "unique_id": f"grobro_{device_id}_{ha.variable_name}",
+            "object_id": f"{device_id}_{ha.variable_name}",
             "device": device_info,
+            "device_class": ha.device_class,
+            "state_class": ha.state_class,
+            "unit_of_measurement": ha.unit_of_measurement,
+            "icon": ha.icon,
         }
-        for key in ["device_class", "state_class", "unit_of_measurement", "icon"]:
-            if key in ha:
-                payload[key] = ha[key]
         self.client.publish(topic, json.dumps(payload), retain=True)
         if device_id not in self.discovery_cache:
             self.discovery_cache[device_id] = []
-        self.discovery_cache[device_id].append(ha.name) 
+        self.discovery_cache[device_id].append(ha.variable_name)
 
     def publish_state(self, device_id, state):
         topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
         self.client.publish(topic, json.dumps(state), retain=False)
+
     def publish_availability(self, device_id, state):
         topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/availability"
         self.client.publish(topic, state, retain=False)

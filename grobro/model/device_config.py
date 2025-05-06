@@ -9,7 +9,8 @@ LOG = logging.getLogger(__name__)
 
 
 class DeviceState(BaseModel):
-    name: Optional[str]
+    variable_name: str
+    name: Optional[str] = None
     device_class: Optional[str] = None
     state_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None

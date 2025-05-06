@@ -179,14 +179,9 @@ def on_message(client, userdata, msg: MQTTMessage):
             ha_lookup = {}
             for reg in modbus_input_register_descriptions:
                 if reg.get("ha"):
-                    name = reg["variable_name"]
-                    ha = reg["ha"]
-                    ha_lookup[name] = model.DeviceState(
-                        name=name,
-                        device_class =ha.get("device_class"),
-                        state_class =ha.get("state_class"),
-                        unit_of_measurement =ha.get("unit_of_measurement"),
-                        icon =ha.get("icon"),
+                    ha_lookup[reg["variable_name"]] = model.DeviceState(
+                        variable_name = reg["variable_name"],
+                        **reg["ha"],
                     )
             parsed = parse_modbus_type(unscrambled, modbus_input_register_descriptions)
             device_id = parsed.get("device_id")
@@ -201,7 +196,7 @@ def on_message(client, userdata, msg: MQTTMessage):
             publish_state(device_id, all_registers)
             for reg in all_registers:
                 ha = ha_lookup.get(reg['name'], {})
-                ha_client.publish_discovery(device_id, reg['name'], ha)
+                ha_client.publish_discovery(device_id, ha)
             LOG.info(f"Published state for {device_id} with {len(all_registers)} registers")
     except Exception as e:
         LOG.error(f"Error processing message: {e}")
