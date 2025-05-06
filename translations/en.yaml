@@ -47,3 +47,6 @@ configuration:
   DUMP_DIR:
     name: DUMP_DIR
     description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share
+  DEVICE_TIMEOUT:
+    name: DEVICE_TIMEOUT
+    description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.

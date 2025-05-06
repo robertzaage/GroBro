@@ -11,9 +11,12 @@ import threading
 import logging
 from .grobro import unscramble, parse_modbus_type, load_modbus_input_register_file, parse_config_type, find_config_offset # TODO avoid relative import with more refactoring
 import grobro.ha as ha
+import time
+from threading import Timer
 
 Forwarding_Clients = {}
 ha_lookup = {}
+device_timers = {}
 
 # Configuration from environment variables
 SOURCE_MQTT_HOST = os.getenv("SOURCE_MQTT_HOST", "localhost")
@@ -34,6 +37,7 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
+DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
 
 # Setup Logger
 try:
@@ -127,7 +131,10 @@ def publish_state(device_id, registers):
         for reg in registers
     }
     LOG.info(f"Device {device_id} matched {len(registers)} registers after filtering.")
+    if DEVICE_TIMEOUT > 0:
+        reset_device_timer(device_id)
     ha_client.publish_state(device_id, payload)
+    ha_client.publish_availability(device_id, "online")
 
 def dump_message_binary(topic, payload):
     try:
@@ -241,6 +248,21 @@ def connect_to_growatt_server(client_id):
         forward_thread = threading.Thread(target=Forwarding_Clients[f"forward_client_{client_id}"].loop_forever)
         forward_thread.start()
     return Forwarding_Clients[f"forward_client_{client_id}"]
+
+# Set the device state to unavailable in Home Assistant.
+def set_device_unavailable(device_id):
+    LOG.warning(f"Device {device_id} timed out. Setting to unavailable.")
+    ha_client.publish_availability(device_id, "offline")
+    
+# Reset the timeout timer for a device.
+def reset_device_timer(device_id):
+    if device_id in device_timers:
+        device_timers[device_id].cancel()  # Cancel the existing timer
+    
+    timer = Timer(DEVICE_TIMEOUT, set_device_unavailable, args=[device_id])  # Pass function reference and arguments
+    device_timers[device_id] = timer
+    timer.start()
+
 # Setup source MQTT client for subscribing
 source_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-source")
 if SOURCE_MQTT_USER and SOURCE_MQTT_PASS:

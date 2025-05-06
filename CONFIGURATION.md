@@ -115,6 +115,7 @@ docker run --detach \
 | `ACTIVATE_COMMUNICATION_GROWATT_SERVER` | ❌ No    | Set to `true` to redirect messages to and from the Growatt Server. This is turned off by default. |
 | `LOG_LEVEL` | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
+| `DEVICE_TIMEOUT`      | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds. |
 
 # Example Setup with DuckDNS and HA-MQTT
 

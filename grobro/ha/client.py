@@ -75,6 +75,7 @@ class Client:
         payload = {
             "name": ha.get("name", variable),
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+            "availability_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
             "value_template": f"{{{{ value_json['{variable}'] }}}}",
             "unique_id": f"grobro_{device_id}_{variable}",
             "object_id": f"{device_id}_{variable}",
@@ -88,3 +89,6 @@ class Client:
     def publish_state(self, device_id, state):
         topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
         self.client.publish(topic, json.dumps(state), retain=False)
+    def publish_availability(self, device_id, state):
+        topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/availability"
+        self.client.publish(topic, state, retain=False)

@@ -47,3 +47,6 @@ configuration:
   DUMP_DIR:
     name: DUMP_DIR
     description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.
+  DEVICE_TIMEOUT:
+    name: DEVICE_TIMEOUT
+    description: Legt den Timeout in Sekunden fest, wann das Gerät als Nicht Verfügbar angezeigt wird. Default ist 0 (deaktiviert). Empfehlung 300+ Sekunden.
