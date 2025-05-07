@@ -230,7 +230,7 @@ def on_message_forward_client(client, userdata, msg: MQTTMessage):
     try:
         if ACTIVATE_COMMUNICATION_GROWATT_SERVER:
             # We need to publish the messages from Growatt on the Topic s/33/{deviceid}. Growatt sends them on Topic s/{deviceid}
-            LOG.debug("msg from Growatt")
+            LOG.debug(f"msg from Growatt for client {msg.topic.split("/")[-1]}")
             source_client.publish(msg.topic.split("/")[0] + "/33/" + msg.topic.split("/")[-1], payload=msg.payload, qos=msg.qos, retain=msg.retain)
     except Exception as e:
         LOG.error(f"Error processing message: {e}")
@@ -243,7 +243,7 @@ def connect_to_growatt_server(client_id):
         Forwarding_Clients[f"forward_client_{client_id}"].tls_insecure_set(True)
         Forwarding_Clients[f"forward_client_{client_id}"].on_message = on_message_forward_client
         Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
-        Forwarding_Clients[f"forward_client_{client_id}"].subscribe("#")
+        Forwarding_Clients[f"forward_client_{client_id}"].subscribe(f"+/33/{client_id}")
         LOG.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
         forward_thread = threading.Thread(target=Forwarding_Clients[f"forward_client_{client_id}"].loop_forever)
         forward_thread.start()
