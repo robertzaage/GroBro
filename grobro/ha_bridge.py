@@ -243,7 +243,7 @@ def connect_to_growatt_server(client_id):
         Forwarding_Clients[f"forward_client_{client_id}"].tls_insecure_set(True)
         Forwarding_Clients[f"forward_client_{client_id}"].on_message = on_message_forward_client
         Forwarding_Clients[f"forward_client_{client_id}"].connect(FORWARD_MQTT_HOST, FORWARD_MQTT_PORT, 60)
-        Forwarding_Clients[f"forward_client_{client_id}"].subscribe(f"+/33/{client_id}")
+        Forwarding_Clients[f"forward_client_{client_id}"].subscribe(f"+/{client_id}")
         LOG.info(f"Connected to Forwarding Server at {FORWARD_MQTT_HOST}:{FORWARD_MQTT_PORT} with ClientId{client_id}, listening on 's/#'")
         forward_thread = threading.Thread(target=Forwarding_Clients[f"forward_client_{client_id}"].loop_forever)
         forward_thread.start()
