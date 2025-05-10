@@ -4,8 +4,16 @@ import json
 from typing import Optional
 import os
 from pydantic import BaseModel
+from enum import Enum
 
 LOG = logging.getLogger(__name__)
+
+class DeviceAlias(str, Enum):
+    NEO600 = "NEO600"
+    NEO800 = "NEO800"
+    NEO1000 = "NEO1000"
+    NOAH = "NOAH"
+    
 
 
 class DeviceState(BaseModel):

@@ -1,1 +1,2 @@
-from .device_config import DeviceConfig, DeviceState
+from .device_config import DeviceConfig, DeviceState, DeviceAlias
+from .mqtt_config import MQTTConfig
