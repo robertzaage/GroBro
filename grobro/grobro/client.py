@@ -61,7 +61,7 @@ MQTT_PROP_FORWARD_GROWATT = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
 MQTT_PROP_FORWARD_GROWATT.UserProperty = [("forwarded-for", "growatt")]
 # property to flag messages forwarded from ha
 MQTT_PROP_FORWARD_HA = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
-MQTT_PROP_FORWARD_HA = [("forwarded-for", "ha")]
+MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
 
 
 class Client:
