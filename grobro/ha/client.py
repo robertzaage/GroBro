@@ -36,6 +36,8 @@ class Client:
             )
             with file.open("r") as f:
                 for variable_name, state in json.load(f).items():
+                    if " " in variable_name:
+                        LOG.warning("sttate '%s' contains illegal whitespace")
                     self._known_states[device_type][variable_name] = model.DeviceState(
                         variable_name=variable_name, **state
                     )

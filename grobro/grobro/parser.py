@@ -5,9 +5,12 @@ import struct
 import json
 import sys
 import os
+import logging
 import grobro.model as model
 from itertools import cycle
 import importlib.resources as resources
+
+LOG = logging.getLogger(__name__)
 
 def hexdump(data: bytes, width: int = 16):
     for i in range(0, len(data), width):
@@ -80,12 +83,17 @@ def parse_modbus_block(data, offset, modbus_input_register_descriptions: list):
             options = reg_desc["value_options"]
             value = options.get(str(value), value)
 
+        reg_name = reg_desc['variable_name']
+        if ' ' in reg_name:
+            LOG.warning("register '%s' contains illegal whitespace", reg_name)
+
         input_registers.append({
             'register_no': reg_desc['register_no'],
-            'name': reg_desc['variable_name'],
+            'name': reg_name,
             'unit': reg_desc['unit'],
             'value': value
         })
+
     offset += qty * 2
 
     return {'start': start, 'end': end_val, 'qty': qty, 'registers': input_registers}, offset
