@@ -2,8 +2,8 @@
   "input_registers": [
     {
       "register_no": 3000,
-      "variable_name": "Inverter Status (mode)",
-      "description": "Inverter run state",
+      "variable_name": "Inverter_Status_Mode",
+      "description": "Inverter Status (mode), run state",
       "value_options": {
         "0": "Waiting mode",
         "1": "Self-test mode, optional",
@@ -23,7 +23,7 @@
     },
     {
       "register_no": 3000,
-      "variable_name": "Inverter Status",
+      "variable_name": "Inverter_Status",
       "description": "Inverter run state. Indicate the machine status (web page display)",
       "value_options": {
         "0": "StandbyStatus",
@@ -282,7 +282,7 @@
     },
     {
       "register_no": 3041,
-      "variable_name": "Ptouser total",
+      "variable_name": "Ptouser_total",
       "description": "Total forward power",
       "unit": "W",
       "note": "Total forward power",
@@ -291,7 +291,7 @@
     },
     {
       "register_no": 3043,
-      "variable_name": "Ptogrid total",
+      "variable_name": "Ptogrid_total",
       "description": "Total reverse power",
       "unit": "W",
       "note": "Total reverse power",
@@ -300,7 +300,7 @@
     },
     {
       "register_no": 3045,
-      "variable_name": "Ptoload total",
+      "variable_name": "Ptoload_total",
       "description": "Total load power",
       "unit": "W",
       "note": "Total load power",
@@ -309,7 +309,7 @@
     },
     {
       "register_no": 3047,
-      "variable_name": "Time total",
+      "variable_name": "Time_total",
       "description": "Work time total",
       "unit": "s",
       "note": null,
@@ -318,7 +318,7 @@
     },
     {
       "register_no": 3049,
-      "variable_name": "Eac today",
+      "variable_name": "Eac_today",
       "description": "Today generate energy",
       "unit": "kWh",
       "note": "Today generate energy",
@@ -327,7 +327,7 @@
     },
     {
       "register_no": 3051,
-      "variable_name": "Eac total",
+      "variable_name": "Eac_total",
       "description": "Total generate energy",
       "unit": "kWh",
       "note": "Total generate energy",
@@ -453,7 +453,7 @@
     },
     {
       "register_no": 3086,
-      "variable_name": "Derating Mode",
+      "variable_name": "Derating_Mode",
       "description": "Derating Mode",
       "value_options": {
         "0": "cNOTDerate",
@@ -481,7 +481,7 @@
     },
     {
       "register_no": 3087,
-      "variable_name": "PV ISO value",
+      "variable_name": "PV_ISO_value",
       "description": "PV ISO value",
       "unit": "KΩ",
       "note": null,
@@ -571,7 +571,7 @@
     },
     {
       "register_no": 3098,
-      "variable_name": "P Bus Voltage",
+      "variable_name": "P_Bus_Voltage",
       "description": "P Bus inside Voltage",
       "unit": "V",
       "note": null,
@@ -580,7 +580,7 @@
     },
     {
       "register_no": 3099,
-      "variable_name": "N Bus Voltage",
+      "variable_name": "N_Bus_Voltage",
       "description": "N Bus inside Voltage",
       "unit": "V",
       "note": null,
@@ -633,7 +633,7 @@
     },
     {
       "register_no": 3105,
-      "variable_name": "Fault code",
+      "variable_name": "Fault_code",
       "description": "Inverter fault code",
       "unit": null,
       "note": null,
@@ -642,7 +642,7 @@
     },
     {
       "register_no": 3106,
-      "variable_name": "Warning code",
+      "variable_name": "Warning_code",
       "description": "Inverter Warning code",
       "unit": null,
       "note": null,
@@ -651,7 +651,7 @@
     },
     {
       "register_no": 3107,
-      "variable_name": "Systemfault word0",
+      "variable_name": "Systemfault_word0",
       "description": "System fault word0",
       "unit": null,
       "note": "bitfield",
@@ -660,7 +660,7 @@
     },
     {
       "register_no": 3108,
-      "variable_name": "Systemfault word1",
+      "variable_name": "Systemfault_word1",
       "description": "System fault word1",
       "unit": null,
       "note": "bitfield",
@@ -669,7 +669,7 @@
     },
     {
       "register_no": 3109,
-      "variable_name": "Systemfault word2",
+      "variable_name": "Systemfault_word2",
       "description": "System fault word2",
       "unit": null,
       "note": "bitfield",
@@ -678,7 +678,7 @@
     },
     {
       "register_no": 3110,
-      "variable_name": "Systemfault word3",
+      "variable_name": "Systemfault_word3",
       "description": "System fault word3",
       "unit": null,
       "note": null,
@@ -687,7 +687,7 @@
     },
     {
       "register_no": 3111,
-      "variable_name": "Systemfault word4",
+      "variable_name": "Systemfault_word4",
       "description": "System fault word4",
       "unit": null,
       "note": null,
@@ -696,7 +696,7 @@
     },
     {
       "register_no": 3112,
-      "variable_name": "Systemfault word5",
+      "variable_name": "Systemfault_word5",
       "description": "System fault word5",
       "unit": null,
       "note": null,
@@ -705,7 +705,7 @@
     },
     {
       "register_no": 3113,
-      "variable_name": "Systemfault word6",
+      "variable_name": "Systemfault_word6",
       "description": "System fault word6",
       "unit": null,
       "note": null,
@@ -714,7 +714,7 @@
     },
     {
       "register_no": 3114,
-      "variable_name": "Systemfault word7",
+      "variable_name": "Systemfault_word7",
       "description": "System fault word7",
       "unit": null,
       "note": null,
@@ -723,7 +723,7 @@
     },
     {
       "register_no": 3115,
-      "variable_name": "inv start delay time",
+      "variable_name": "inv_start_delay_time",
       "description": "inv start delay time",
       "unit": "s",
       "note": null,
@@ -814,7 +814,7 @@
     },
     {
       "register_no": 3144,
-      "variable_name": "Priority Word Mode",
+      "variable_name": "Priority_Word_Mode",
       "description": "Priority Word Mode",
       "value_options": {
         "0": "LoadFirst",
@@ -828,7 +828,7 @@
     },
     {
       "register_no": 3145,
-      "variable_name": "EPS Fac",
+      "variable_name": "EPS_Fac",
       "description": "UPS frequency",
       "unit": "Hz",
       "note": null,
@@ -837,7 +837,7 @@
     },
     {
       "register_no": 3146,
-      "variable_name": "EPS Vac1",
+      "variable_name": "EPS_Vac1",
       "description": "UPS phase R output voltage",
       "unit": "V",
       "note": null,
@@ -846,7 +846,7 @@
     },
     {
       "register_no": 3147,
-      "variable_name": "EPS Iac1",
+      "variable_name": "EPS_Iac1",
       "description": "UPS phase R output current",
       "unit": "A",
       "note": null,
@@ -855,7 +855,7 @@
     },
     {
       "register_no": 3148,
-      "variable_name": "EPS Pac1",
+      "variable_name": "EPS_Pac1",
       "description": "UPS phase R output power",
       "unit": "VA",
       "note": null,
@@ -864,7 +864,7 @@
     },
     {
       "register_no": 3150,
-      "variable_name": "EPS Vac2",
+      "variable_name": "EPS_Vac2",
       "description": "UPS phase S output voltage",
       "unit": "V",
       "note": null,
@@ -873,7 +873,7 @@
     },
     {
       "register_no": 3151,
-      "variable_name": "EPS Iac2",
+      "variable_name": "EPS_Iac2",
       "description": "UPS phase S output current",
       "unit": "A",
       "note": null,
@@ -882,7 +882,7 @@
     },
     {
       "register_no": 3152,
-      "variable_name": "EPS Pac2",
+      "variable_name": "EPS_Pac2",
       "description": "UPS phase S output power",
       "unit": "VA",
       "note": null,
@@ -891,7 +891,7 @@
     },
     {
       "register_no": 3154,
-      "variable_name": "EPS Vac3",
+      "variable_name": "EPS_Vac3",
       "description": "UPS phase T output voltage",
       "unit": "V",
       "note": null,
@@ -900,7 +900,7 @@
     },
     {
       "register_no": 3155,
-      "variable_name": "EPS Iac3",
+      "variable_name": "EPS_Iac3",
       "description": "UPS phase T output current",
       "unit": "A",
       "note": null,
@@ -909,7 +909,7 @@
     },
     {
       "register_no": 3156,
-      "variable_name": "EPS Pac3",
+      "variable_name": "EPS_Pac3",
       "description": "UPS phase T output power",
       "unit": "VA",
       "note": null,
@@ -918,7 +918,7 @@
     },
     {
       "register_no": 3158,
-      "variable_name": "EPS Pac",
+      "variable_name": "EPS_Pac",
       "description": "UPS output power",
       "unit": "VA",
       "note": null,
@@ -927,7 +927,7 @@
     },
     {
       "register_no": 3160,
-      "variable_name": "Load Percent",
+      "variable_name": "Load_Percent",
       "description": "Load percent of UPS ouput",
       "unit": "%",
       "note": null,
