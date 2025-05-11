@@ -147,8 +147,6 @@ class Client:
                 )
             unscrambled = parser.unscramble(msg.payload)
             msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-            unscrambled = parser.unscramble(msg.payload)
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
 
             # NOAH=387 NEO=340
             if msg_type in (387, 340):
