@@ -13,8 +13,10 @@ from typing import Callable
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 
+from grobro import model
 from grobro.grobro import parser
-from grobro.model import DeviceAlias, DeviceConfig, MQTTConfig
+from grobro.grobro.builder import scramble
+from grobro.grobro.builder import append_crc
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -24,11 +26,11 @@ ACTIVATE_COMMUNICATION_GROWATT_SERVER = (
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
 REGISTER_FILTER_ENV = os.getenv("REGISTER_FILTER", "")
-REGISTER_FILTER: dict[str, DeviceAlias] = {}
+REGISTER_FILTER: dict[str, model.DeviceAlias] = {}
 for entry in REGISTER_FILTER_ENV.split(","):
     if ":" in entry:
         serial, alias = entry.split(":", 1)
-        REGISTER_FILTER[serial] = DeviceAlias(alias)
+        REGISTER_FILTER[serial] = model.DeviceAlias(alias)
 
 # fmt: off
 # Register filter configuration
@@ -50,10 +52,10 @@ NOAH_REGISTERS = [
 ]
 # fmt: on
 ALIAS_TO_REGISTERS = {
-    DeviceAlias.NEO600: NEO_SP2_REGISTERS,
-    DeviceAlias.NEO800: NEO_SP2_REGISTERS,
-    DeviceAlias.NEO1000: NEO_SP2_REGISTERS,
-    DeviceAlias.NOAH: NOAH_REGISTERS,
+    model.DeviceAlias.NEO600: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NEO800: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NEO1000: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NOAH: NOAH_REGISTERS,
 }
 
 # property to flag messages forwarded from growatt cloud
@@ -65,17 +67,17 @@ MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
 
 
 class Client:
-    on_config: Callable[[DeviceConfig], None]
+    on_config: Callable[[model.DeviceConfig], None]
     on_state: Callable[[str, dict], None]
 
     _client: mqtt.Client
-    _forward_mqtt_config: MQTTConfig
+    _forward_mqtt_config: model.MQTTConfig
     _forward_clients = {}
 
     def __init__(
         self,
-        grobro_mqtt: MQTTConfig,
-        forward_mqtt: MQTTConfig,
+        grobro_mqtt: model.MQTTConfig,
+        forward_mqtt: model.MQTTConfig,
     ):
         LOG.info(f"connecting to HA mqtt '{grobro_mqtt.host}:{grobro_mqtt.port}'")
         self._client = mqtt.Client(
@@ -104,6 +106,22 @@ class Client:
         for key, client in self._forward_clients.items():
             client.loop_stop()
             client.disconnect()
+
+    def send_command(self, cmd: model.Command):
+        LOG.debug("send command: %s", cmd)
+        scrambled = scramble(cmd.build_grobro())
+        final_payload = append_crc(scrambled)
+
+        topic = f"s/33/{cmd.device_id}"
+
+        result = self._client.publish(
+            topic,
+            final_payload,
+            properties=MQTT_PROP_FORWARD_HA,
+        )
+        status = result[0]
+        if status != 0:
+            LOG.warning("sent failed: %s", result)
 
     def __on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
