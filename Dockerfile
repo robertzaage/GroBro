@@ -1,7 +1,7 @@
 ARG BUILD_FROM=python:3.11-alpine
 FROM $BUILD_FROM
 
-RUN apk add --no-cache python3
+RUN apk add --no-cache python3 jq
 
 COPY requirements.txt /tmp
 ENV PATH="/venv/bin:$PATH"
