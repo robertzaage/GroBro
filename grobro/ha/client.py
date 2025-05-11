@@ -182,9 +182,14 @@ class Client:
             )
             cmd = None
             if cmd_type == "number" and cmd_name == "smart_power":
-                cmd = model.SmartPowerCommand(
+                cmd = model.NoahSmartPowerCommand(
                     device_id=device_id,
                     power_diff=int(msg.payload.decode()),
+                )
+            elif cmd_type == "number" and cmd_name == "set_wirk":
+                cmd = model.NeoSetWirkCommand(
+                    device_id=device_id,
+                    value=int(msg.payload.decode()),
                 )
             else:
                 LOG.warning(
@@ -231,6 +236,22 @@ class Client:
                     "unit_of_measurement": "W",
                     "min": -800,
                     "max": 800,
+                    "step": 1,
+                    "device": {
+                        "identifiers": [device_id],
+                    },
+                },
+            ],
+            "inverter": [
+                {
+                    "variable_name": "set_wirk",
+                    "name": "Set Wirkentwas TODO",  # TODO clean up
+                    "command_topic": f"{HA_BASE_TOPIC}/number/grobro/{device_id}/set_wirk/set",
+                    "unique_id": f"grobro_{device_id}_cmd_set_wirk",
+                    "object_id": f"{device_id}_cmd_set_wirk",
+                    "unit_of_measurement": "%",
+                    "min": 0,
+                    "max": 100,
                     "step": 1,
                     "device": {
                         "identifiers": [device_id],
