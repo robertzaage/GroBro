@@ -79,8 +79,11 @@ if __name__ == "__main__":
     ha_client = ha.Client(HA_MQTT_CONFIG)
     grobro_client = grobro.Client(GROBRO_MQTT_CONFIG, FORWARD_MQTT_CONFIG)
 
+    # setup com: grobro -> ha
     grobro_client.on_state = ha_client.publish_state
     grobro_client.on_config = ha_client.set_config
+    # setup com: ha -> grobro
+    ha_client.on_command = grobro_client.send_command
 
     RUNNING = True
     signal_handler = SignalHandler()

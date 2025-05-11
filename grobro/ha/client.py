@@ -1,4 +1,3 @@
-import paho.mqtt.client as mqtt
 import os
 import ssl
 import json
@@ -6,6 +5,9 @@ import logging
 import grobro.model as model
 import importlib.resources as resources
 from threading import Timer
+from typing import Callable
+
+import paho.mqtt.client as mqtt
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
@@ -13,6 +15,8 @@ LOG = logging.getLogger(__name__)
 
 
 class Client:
+    on_command: None | Callable[model.Command, None]
+
     _client: mqtt.Client
 
     _config_cache: dict[str, model.DeviceConfig] = {}
@@ -52,6 +56,11 @@ class Client:
             self._client.tls_insecure_set(True)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
+        for cmd_type in ["number"]:
+            topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/set"
+            self._client.subscribe(topic)
+        self._client.on_message = self.__on_message
+
         for fname in os.listdir("."):
             if fname.startswith("config_") and fname.endswith(".json"):
                 config = model.DeviceConfig.from_file(fname)
@@ -59,7 +68,6 @@ class Client:
                     self._config_cache[config.device_id] = config
 
     def start(self):
-        self._client.subscribe("c/#")
         self._client.loop_start()
 
     def stop(self):
@@ -157,8 +165,35 @@ class Client:
             for variable_name in state.keys():
                 state = state_lookup[variable_name]
                 self.publish_discovery(device_id, state)
+
+            self.__publish_commands(device_id, device_type)
         except Exception as e:
             LOG.error(f"Publish device state: {e}")
+
+    def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
+        parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
+        if len(parts) == 5 and parts[0] in ["number"]:
+            cmd_type, _, device_id, cmd_name, _ = parts
+            LOG.debug(
+                "received %s command %s for device %s",
+                cmd_type,
+                cmd_name,
+                device_id,
+            )
+            cmd = None
+            if cmd_type == "number" and cmd_name == "smart_power":
+                cmd = model.SmartPowerCommand(
+                    device_id=device_id,
+                    power_diff=int(msg.payload.decode()),
+                )
+            else:
+                LOG.warning(
+                    "received unknown command %s: %s",
+                    msg.topic,
+                    msg.payload,
+                )
+            if cmd and self.on_command:
+                self.on_command(cmd)
 
     # Reset the timeout timer for a device.
     def __reset_device_timer(self, device_id):
@@ -183,3 +218,34 @@ class Client:
             "online" if online else "offline",
             retain=False,
         )
+
+    def __publish_commands(self, device_id, device_type):
+        commands = {
+            "noah": [
+                {
+                    "name": "smart_power",
+                    "display_name": "Smart Power",
+                    "command_topic": f"{HA_BASE_TOPIC}/number/grobro/{device_id}/smart_power/set",
+                    "unique_id": f"grobro_{device_id}_cmd_smart_power",
+                    "object_id": f"{device_id}_cmd_smart_power",
+                    "unit_of_measurement": "W",
+                    "min": -800,
+                    "max": 800,
+                    "step": 1,
+                    "device": {
+                        "identifiers": [device_id],
+                    },
+                },
+            ],
+        }
+        for cmd in commands.get(device_type, []):
+            cmd_name = cmd["name"]
+            if cmd_name in self._discovery_cache.get(device_id, []):
+                continue  # already published
+            topic = f"{HA_BASE_TOPIC}/number/grobro/{device_id}_{cmd_name}/config"
+            LOG.debug("announce command %s under %s: %s", cmd_name, topic, cmd)
+            self._client.publish(
+                topic,
+                json.dumps(cmd),
+                retain=True,
+            )
