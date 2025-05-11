@@ -223,8 +223,8 @@ class Client:
         commands = {
             "noah": [
                 {
-                    "name": "smart_power",
-                    "display_name": "Smart Power",
+                    "variable_name": "smart_power",
+                    "name": "Smart Power Diff",
                     "command_topic": f"{HA_BASE_TOPIC}/number/grobro/{device_id}/smart_power/set",
                     "unique_id": f"grobro_{device_id}_cmd_smart_power",
                     "object_id": f"{device_id}_cmd_smart_power",
@@ -239,7 +239,7 @@ class Client:
             ],
         }
         for cmd in commands.get(device_type, []):
-            cmd_name = cmd["name"]
+            cmd_name = cmd["variable_name"]
             if cmd_name in self._discovery_cache.get(device_id, []):
                 continue  # already published
             topic = f"{HA_BASE_TOPIC}/number/grobro/{device_id}_{cmd_name}/config"
