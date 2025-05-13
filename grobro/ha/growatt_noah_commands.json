@@ -1,0 +1,9 @@
+{
+  "smart_power": {
+          "name": "Smart Power Diff",
+          "unit_of_measurement": "W",
+          "min": -800,
+          "max": 800,
+          "step": 1
+  }
+}
