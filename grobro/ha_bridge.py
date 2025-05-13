@@ -82,6 +82,7 @@ if __name__ == "__main__":
     # setup com: grobro -> ha
     grobro_client.on_state = ha_client.publish_state
     grobro_client.on_config = ha_client.set_config
+    grobro_client.on_message = ha_client.publish_message
     # setup com: ha -> grobro
     ha_client.on_command = grobro_client.send_command
 

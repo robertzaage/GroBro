@@ -1,3 +1,5 @@
+from grobro.model.neo_messages import NeoOutputPowerLimit
+
 """
 Client for the grobro mqtt side, handling messages from/to
 * growatt cloud
@@ -12,6 +14,7 @@ from typing import Callable
 
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
+from grobro.model.neo_messages import NeoMessageTypes
 
 from grobro import model
 from grobro.grobro import parser
@@ -68,6 +71,7 @@ MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
 class Client:
     on_config: Callable[[model.DeviceConfig], None]
     on_state: Callable[[str, dict], None]
+    on_message: Callable[any, None]
 
     _client: mqtt.Client
     _forward_mqtt_config: model.MQTTConfig
@@ -103,7 +107,7 @@ class Client:
             client.disconnect()
 
     def send_command(self, cmd: model.Command):
-        LOG.debug("send command: %s", cmd)
+        LOG.debug("send command: %s: %s", type(cmd).__name__, cmd)
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
 
@@ -150,6 +154,7 @@ class Client:
                 config_offset = parser.find_config_offset(unscrambled)
                 config = parser.parse_config_type(unscrambled, config_offset)
                 self.on_config(device_id=device_id, config=config)
+                return
             # NOAH=323 NEO=577
             elif msg_type in (323, 577):
                 # Modbus message
@@ -173,6 +178,15 @@ class Client:
                 LOG.info(
                     f"Published state for {device_id} with {len(all_registers)} registers"
                 )
+                return
+
+            for neo_msg_type in NeoMessageTypes:
+                if neo_msg_type.grobro_type == msg_type:
+                    LOG.debug("got message: %s", neo_msg_type.name)
+                    self.on_message(neo_msg_type.model.parse_grobro(unscrambled))
+                    return
+
+            LOG.debug("unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
             LOG.error(f"Processing message: {e}")
 

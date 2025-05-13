@@ -1,0 +1,14 @@
+{
+  "output_power_limit": {
+          "name": "Output Power Limit",
+          "type": "number",
+          "unit_of_measurement": "%",
+          "min": 0,
+          "max": 100,
+          "step": 1
+  },
+  "output_power_limit_read": {
+          "name": "Output Power Limit Read",
+          "type": "button"
+  }
+}
