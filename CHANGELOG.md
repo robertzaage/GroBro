@@ -1,3 +1,7 @@
+## v1.7.3
+
++ Fix #52: missing ssl import in ha client
+
 ## v1.7.2
 
 + Fix broken shebang in run.sh
