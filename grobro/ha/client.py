@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import os
+import ssl
 import json
 import logging
 import grobro.model as model
