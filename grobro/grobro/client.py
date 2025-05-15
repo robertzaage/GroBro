@@ -107,11 +107,11 @@ class Client:
             client.disconnect()
 
     def send_command(self, cmd: model.Command):
-        LOG.debug("send command: %s: %s", type(cmd).__name__, cmd)
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
 
         topic = f"s/33/{cmd.device_id}"
+        LOG.debug("send command: %s: %s: %s", type(cmd).__name__, topic, cmd)
 
         result = self._client.publish(
             topic,

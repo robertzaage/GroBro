@@ -164,7 +164,9 @@ class Client:
             if isinstance(msg, NeoOutputPowerLimit):
                 msg_type = NeoCommandTypes.OUTPUT_POWER_LIMIT
                 topic = f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/{msg.device_id}/{msg_type.ha_name}/get"
-                LOG.debug("forward message: %s to %s: %s", type(msg).__name__, topic, msg)
+                LOG.debug(
+                    "forward message: %s to %s: %s", type(msg).__name__, topic, msg
+                )
                 self._client.publish(topic, msg.value, retain=False)
         except Exception as e:
             LOG.error(f"ha: publish msg: {e}")
@@ -200,20 +202,15 @@ class Client:
         cmd_type, device_id, cmd_name = None, None, None
         if len(parts) == 5 and parts[0] in ["number"]:
             cmd_type, _, device_id, cmd_name, _ = parts
-            LOG.debug(
-                "received %s command %s for device %s",
-                cmd_type,
-                cmd_name,
-                device_id,
-            )
         if len(parts) == 5 and parts[0] in ["button"]:
             cmd_type, _, device_id, cmd_name, _ = parts
-            LOG.debug(
-                "received %s command %s for device %s",
-                cmd_type,
-                cmd_name,
-                device_id,
-            )
+
+        LOG.debug(
+            "received %s command %s for device %s",
+            cmd_type,
+            cmd_name,
+            device_id,
+        )
 
         cmd = None
         for noah_cmd_type in NoahCommandTypes:
