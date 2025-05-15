@@ -1,4 +1,4 @@
-import paho.mqtt.client as mqtt
+from grobro.model.neo_messages import NeoOutputPowerLimit
 import os
 import ssl
 import json
@@ -6,6 +6,14 @@ import logging
 import grobro.model as model
 import importlib.resources as resources
 from threading import Timer
+from typing import Callable
+
+import paho.mqtt.client as mqtt
+from grobro.model.neo_command import NeoReadOutputPowerLimit
+from grobro.model.neo_command import NeoSetOutputPowerLimit
+from grobro.model.noah_command import NoahSmartPower
+from grobro.model.neo_command import NeoCommandTypes
+from grobro.model.noah_command import NoahCommandTypes
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
@@ -13,6 +21,8 @@ LOG = logging.getLogger(__name__)
 
 
 class Client:
+    on_command: None | Callable[model.Command, None]
+
     _client: mqtt.Client
     _aliases: dict[str, model.DeviceAlias]
 
@@ -21,6 +31,8 @@ class Client:
     _device_timers: dict[str, Timer] = {}
     # device_type -> variable_name -> DeviceState
     _known_states: dict[str, dict[str, model.DeviceState]] = {}
+    # device_type -> variable_name -> Command
+    _known_commands: dict[str, dict[str, dict]] = {}
 
     def __init__(
         self,
@@ -32,17 +44,23 @@ class Client:
         # load possible device states
         for device_type in ["inverter", "noah"]:
             self._known_states[device_type] = {}
-            file = resources.files(__package__).joinpath(
+            states_file = resources.files(__package__).joinpath(
                 f"growatt_{device_type}_states.json"
             )
-            with file.open("r") as f:
+            with states_file.open("r") as f:
                 for variable_name, state in json.load(f).items():
                     if " " in variable_name:
                         LOG.warning("sttate '%s' contains illegal whitespace")
                     self._known_states[device_type][variable_name] = model.DeviceState(
                         variable_name=variable_name, **state
                     )
-
+            self._known_commands[device_type] = {}
+            cmd_file = resources.files(__package__).joinpath(
+                f"growatt_{device_type}_commands.json"
+            )
+            with cmd_file.open("r") as f:
+                for variable_name, cmd in json.load(f).items():
+                    self._known_commands[device_type][variable_name] = cmd
         # Setup target MQTT client for publishing
         LOG.info(f"connecting to HA mqtt '{mqtt_config.host}:{mqtt_config.port}'")
         self._client = mqtt.Client(
@@ -55,6 +73,11 @@ class Client:
             self._client.tls_insecure_set(True)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
+        for cmd_type in ["number", "button"]:
+            topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/set"
+            self._client.subscribe(topic)
+        self._client.on_message = self.__on_message
+
         for fname in os.listdir("."):
             if fname.startswith("config_") and fname.endswith(".json"):
                 config = model.DeviceConfig.from_file(fname)
@@ -62,7 +85,6 @@ class Client:
                     self._config_cache[config.device_id] = config
 
     def start(self):
-        self._client.subscribe("c/#")
         self._client.loop_start()
 
     def stop(self):
@@ -140,6 +162,18 @@ class Client:
             self._discovery_cache[device_id] = []
         self._discovery_cache[device_id].append(ha.variable_name)
 
+    def publish_message(self, msg):
+        try:
+            if isinstance(msg, NeoOutputPowerLimit):
+                msg_type = NeoCommandTypes.OUTPUT_POWER_LIMIT
+                topic = f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/{msg.device_id}/{msg_type.ha_name}/get"
+                LOG.debug(
+                    "forward message: %s to %s: %s", type(msg).__name__, topic, msg
+                )
+                self._client.publish(topic, msg.value, retain=False)
+        except Exception as e:
+            LOG.error(f"ha: publish msg: {e}")
+
     def publish_state(self, device_id, state):
         try:
             # update state
@@ -159,8 +193,45 @@ class Client:
             for variable_name in state.keys():
                 state = state_lookup[variable_name]
                 self.publish_discovery(device_id, state)
+
+            self.__publish_commands(device_id, device_type)
         except Exception as e:
             LOG.error(f"ha: publish state: {e}")
+
+    def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
+        parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
+
+        cmd_type, device_id, cmd_name = None, None, None
+        if len(parts) == 5 and parts[0] in ["number"]:
+            cmd_type, _, device_id, cmd_name, _ = parts
+        if len(parts) == 5 and parts[0] in ["button"]:
+            cmd_type, _, device_id, cmd_name, _ = parts
+
+        LOG.debug(
+            "received %s command %s for device %s",
+            cmd_type,
+            cmd_name,
+            device_id,
+        )
+
+        cmd = None
+        for noah_cmd_type in NoahCommandTypes:
+            if noah_cmd_type.matches(cmd_name, cmd_type):
+                cmd = noah_cmd_type.parse_ha(device_id, msg.payload)
+                break
+        for neo_cmd_type in NeoCommandTypes:
+            if neo_cmd_type.matches(cmd_name, cmd_type):
+                cmd = neo_cmd_type.model.parse_ha(device_id, msg.payload)
+                break
+
+        if cmd and self.on_command:
+            self.on_command(cmd)
+        else:
+            LOG.warning(
+                "received unknown command %s: %s",
+                msg.topic,
+                msg.payload,
+            )
 
     # Reset the timeout timer for a device.
     def __reset_device_timer(self, device_id):
@@ -185,3 +256,25 @@ class Client:
             "online" if online else "offline",
             retain=False,
         )
+
+    def __publish_commands(self, device_id, device_type):
+        for cmd_name, cmd in self._known_commands[device_type].items():
+            if cmd_name in self._discovery_cache.get(device_id, []):
+                continue  # already published
+            cmd_type = cmd["type"]
+            cmd_full = {
+                "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
+                "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
+                "unique_id": f"grobro_{device_id}_cmd_{cmd_name}",
+                "object_id": f"{device_id}_cmd_{cmd_name}",
+                "device": {
+                    "identifiers": [device_id],
+                },
+                **cmd,
+            }
+            LOG.debug("announce command %s: %s", cmd_name, cmd_full)
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
+                json.dumps(cmd_full),
+                retain=True,
+            )

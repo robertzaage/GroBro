@@ -1,3 +1,5 @@
+from grobro.model.neo_messages import NeoOutputPowerLimit
+
 """
 Client for the grobro mqtt side, handling messages from/to
 * growatt cloud
@@ -12,9 +14,12 @@ from typing import Callable
 
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
+from grobro.model.neo_messages import NeoMessageTypes
 
+from grobro import model
 from grobro.grobro import parser
-from grobro.model import DeviceAlias, DeviceConfig, MQTTConfig
+from grobro.grobro.builder import scramble
+from grobro.grobro.builder import append_crc
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -24,11 +29,11 @@ ACTIVATE_COMMUNICATION_GROWATT_SERVER = (
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
 REGISTER_FILTER_ENV = os.getenv("REGISTER_FILTER", "")
-REGISTER_FILTER: dict[str, DeviceAlias] = {}
+REGISTER_FILTER: dict[str, model.DeviceAlias] = {}
 for entry in REGISTER_FILTER_ENV.split(","):
     if ":" in entry:
         serial, alias = entry.split(":", 1)
-        REGISTER_FILTER[serial] = DeviceAlias(alias)
+        REGISTER_FILTER[serial] = model.DeviceAlias(alias)
 
 # fmt: off
 # Register filter configuration
@@ -50,10 +55,10 @@ NOAH_REGISTERS = [
 ]
 # fmt: on
 ALIAS_TO_REGISTERS = {
-    DeviceAlias.NEO600: NEO_SP2_REGISTERS,
-    DeviceAlias.NEO800: NEO_SP2_REGISTERS,
-    DeviceAlias.NEO1000: NEO_SP2_REGISTERS,
-    DeviceAlias.NOAH: NOAH_REGISTERS,
+    model.DeviceAlias.NEO600: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NEO800: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NEO1000: NEO_SP2_REGISTERS,
+    model.DeviceAlias.NOAH: NOAH_REGISTERS,
 }
 
 # property to flag messages forwarded from growatt cloud
@@ -65,17 +70,18 @@ MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
 
 
 class Client:
-    on_config: Callable[[DeviceConfig], None]
+    on_config: Callable[[model.DeviceConfig], None]
     on_state: Callable[[str, dict], None]
+    on_message: Callable[any, None]
 
     _client: mqtt.Client
-    _forward_mqtt_config: MQTTConfig
+    _forward_mqtt_config: model.MQTTConfig
     _forward_clients = {}
 
     def __init__(
         self,
-        grobro_mqtt: MQTTConfig,
-        forward_mqtt: MQTTConfig,
+        grobro_mqtt: model.MQTTConfig,
+        forward_mqtt: model.MQTTConfig,
     ):
         LOG.info(f"connecting to HA mqtt '{grobro_mqtt.host}:{grobro_mqtt.port}'")
         self._client = mqtt.Client(
@@ -105,6 +111,22 @@ class Client:
             client.loop_stop()
             client.disconnect()
 
+    def send_command(self, cmd: model.Command):
+        scrambled = scramble(cmd.build_grobro())
+        final_payload = append_crc(scrambled)
+
+        topic = f"s/33/{cmd.device_id}"
+        LOG.debug("send command: %s: %s: %s", type(cmd).__name__, topic, cmd)
+
+        result = self._client.publish(
+            topic,
+            final_payload,
+            properties=MQTT_PROP_FORWARD_HA,
+        )
+        status = result[0]
+        if status != 0:
+            LOG.warning("sent failed: %s", result)
+
     def __on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
         props = msg.properties.json().get("UserProperty", [])
@@ -129,8 +151,6 @@ class Client:
                 )
             unscrambled = parser.unscramble(msg.payload)
             msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-            unscrambled = parser.unscramble(msg.payload)
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
 
             # NOAH=387 NEO=340
             if msg_type in (387, 340):
@@ -138,6 +158,7 @@ class Client:
                 config_offset = parser.find_config_offset(unscrambled)
                 config = parser.parse_config_type(unscrambled, config_offset)
                 self.on_config(device_id=device_id, config=config)
+                return
             # NOAH=323 NEO=577
             elif msg_type in (323, 577):
                 # Modbus message
@@ -166,6 +187,15 @@ class Client:
                 LOG.info(
                     f"Published state for {device_id} with {len(all_registers)} registers"
                 )
+                return
+
+            for neo_msg_type in NeoMessageTypes:
+                if neo_msg_type.grobro_type == msg_type:
+                    LOG.debug("got message: %s", neo_msg_type.name)
+                    self.on_message(neo_msg_type.model.parse_grobro(unscrambled))
+                    return
+
+            LOG.debug("unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
             LOG.error(f"processing message: {e}")
 
