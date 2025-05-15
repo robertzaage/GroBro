@@ -161,6 +161,7 @@ class Client:
 
     def publish_message(self, msg):
         try:
+            LOG.debug("ha: publish: %s", msg)
             if isinstance(msg, NeoOutputPowerLimit):
                 msg_type = NeoCommandTypes.OUTPUT_POWER_LIMIT
                 topic = f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/{msg.device_id}/{msg_type.ha_name}/get"
@@ -276,3 +277,6 @@ class Client:
                 json.dumps(cmd_full),
                 retain=True,
             )
+            if device_id not in self._discovery_cache:
+                self._discovery_cache[device_id] = []
+            self._discovery_cache[device_id].append(cmd_name)
