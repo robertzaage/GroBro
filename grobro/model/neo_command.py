@@ -52,7 +52,7 @@ class NeoSetOutputPowerLimit(BaseModel):
 
     @staticmethod
     def parse_ha(device_id, payload) -> "NeoReadOutputPowerLimit":
-        return NeoReadOutputPowerLimit(
+        return NeoSetOutputPowerLimit(
             device_id=device_id,
             value=int(payload.decode()),
         )
