@@ -199,6 +199,8 @@ class Client:
         if device_id in self._discovery_cache:
             return  # already pulished
 
+        self.__migrate_entity_discovery(device_id, device_type)
+
         topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
 
         # unpublish device first to get rid of old entities
@@ -253,6 +255,29 @@ class Client:
             retain=True,
         )
         self._discovery_cache.append(device_id)
+
+    def __migrate_entity_discovery(self, device_id, device_type):
+        old_entities = [
+            ("set_wirk", "number"),
+        ]
+        for e_name, e_type in old_entities:
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/{e_type}/grobro/{device_id}_{e_name}/config",
+                json.dumps({"migrate_discovery": True}),
+                retain=True,
+            )
+        for cmd_name, cmd in self._known_commands[device_type].items():
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/{cmd["type"]}/grobro/{device_id}_{cmd_name}/config",
+                json.dumps({"migrate_discovery": True}),
+                retain=True,
+            )
+        for state_name, state in self._known_states[device_type].items():
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state.variable_name}/config",
+                json.dumps({"migrate_discovery": True}),
+                retain=True,
+            )
 
     def __device_info_from_config(self, device_id):
         # Find matching config
