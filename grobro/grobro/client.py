@@ -1,5 +1,3 @@
-from grobro.model.neo_messages import NeoOutputPowerLimit
-
 """
 Client for the grobro mqtt side, handling messages from/to
 * growatt cloud
@@ -12,14 +10,15 @@ import logging
 import ssl
 from typing import Callable
 
+
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
-from grobro.model.neo_messages import NeoMessageTypes
 
 from grobro import model
 from grobro.grobro import parser
 from grobro.grobro.builder import scramble
 from grobro.grobro.builder import append_crc
+from grobro.model.neo_messages import NeoOutputPowerLimit
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -146,6 +145,7 @@ class Client:
                     )
 
             unscrambled = parser.unscramble(msg.payload)
+            LOG.debug(f"received: {msg.topic} {unscrambled.hex(" ")}")
             msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
 
             # NOAH=387 NEO=340
@@ -180,10 +180,11 @@ class Client:
                 )
                 return
 
-            for neo_msg_type in NeoMessageTypes:
-                if neo_msg_type.grobro_type == msg_type:
-                    LOG.debug("got message: %s", neo_msg_type.name)
-                    self.on_message(neo_msg_type.model.parse_grobro(unscrambled))
+            for neo_msg_type in [NeoOutputPowerLimit]:
+                parsed = neo_msg_type.parse_grobro(unscrambled)
+                if parsed:
+                    LOG.debug("got message %s: %s", neo_msg_type.__name__, parsed)
+                    self.on_message(parsed)
                     return
 
             LOG.debug("unknown msg_type %s: %s", msg_type, unscrambled.hex())
