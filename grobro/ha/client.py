@@ -26,7 +26,7 @@ class Client:
     _client: mqtt.Client
 
     _config_cache: dict[str, model.DeviceConfig] = {}
-    _discovery_cache: dict[str, list[str]] = {}
+    _discovery_cache: list[str] = []
     _device_timers: dict[str, Timer] = {}
     # device_type -> variable_name -> DeviceState
     _known_states: dict[str, dict[str, model.DeviceState]] = {}
@@ -59,7 +59,7 @@ class Client:
                 for variable_name, cmd in json.load(f).items():
                     self._known_commands[device_type][variable_name] = cmd
         # Setup target MQTT client for publishing
-        LOG.info(f"Connecting to MQTT broker at '{mqtt_config.host}:{mqtt_config.port}'")
+        LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
         self._client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-ha"
         )
@@ -99,66 +99,6 @@ class Client:
             LOG.debug(f"No config change for {config.device_id}")
         self._config_cache[config.device_id] = config
 
-    def publish_discovery(self, device_id: str, ha: model.DeviceState):
-        if ha.variable_name in self._discovery_cache.get(device_id, []):
-            return  # already published
-
-        topic = f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{ha.variable_name}/config"
-        # Find matching config
-        config = self._config_cache.get(device_id)
-        config_path = f"config_{device_id}.json"
-        # Fallback: try loading from file
-        if not config:
-            config = model.DeviceConfig.from_file(config_path)
-            self._config_cache[device_id] = config
-            LOG.info(f"Loaded cached config for {device_id} from file (fallback)")
-        # Fallback 2: save minimal config if it was neither in cache nor on disk
-        if not config:
-            config = model.DeviceConfig(serial_number=device_id)
-            config.to_file(config_path)
-            self._config_cache[device_id] = config
-            LOG.info(f"Saved minimal config for new device: {config}")
-
-        device_info = {
-            "identifiers": [device_id],
-            "name": f"Growatt {device_id}",
-            "manufacturer": "Growatt",
-            "serial_number": device_id,
-        }
-        known_model_id = {
-            "55": "NEO-series",
-            "72": "NEXA-series",
-            "61": "NOAH-series",
-        }.get(config.device_type)
-
-        if known_model_id:
-            device_info["model"] = known_model_id
-        elif config.model_id:
-            device_info["model"] = config.model_id
-        if config.sw_version:
-            device_info["sw_version"] = config.sw_version
-        if config.hw_version:
-            device_info["hw_version"] = config.hw_version
-        if config.mac_address:
-            device_info["connections"] = [["mac", config.mac_address]]
-        payload = {
-            "name": ha.name,
-            "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
-            "availability_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
-            "value_template": f"{{{{ value_json['{ha.variable_name}'] }}}}",
-            "unique_id": f"grobro_{device_id}_{ha.variable_name}",
-            "object_id": f"{device_id}_{ha.variable_name}",
-            "device": device_info,
-            "device_class": ha.device_class,
-            "state_class": ha.state_class,
-            "unit_of_measurement": ha.unit_of_measurement,
-            "icon": ha.icon,
-        }
-        self._client.publish(topic, json.dumps(payload), retain=True)
-        if device_id not in self._discovery_cache:
-            self._discovery_cache[device_id] = []
-        self._discovery_cache[device_id].append(ha.variable_name)
-
     def publish_message(self, msg):
         try:
             LOG.debug("ha: publish: %s", msg)
@@ -174,26 +114,24 @@ class Client:
 
     def publish_state(self, device_id, state):
         try:
-            # Update state
-            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
-            self._client.publish(topic, json.dumps(state), retain=False)
-
-            if DEVICE_TIMEOUT > 0:
-                self.__reset_device_timer(device_id)
-            # Update availability
-            self.__publish_availability(device_id, True)
-
+            # send discovery
             if device_id.startswith("QMN"):
                 device_type = "neo"
             if device_id.startswith("0PVP"):
                 device_type = "noah"
             state_lookup = self._known_states[device_type]
 
-            for variable_name in state.keys():
-                state = state_lookup[variable_name]
-                self.publish_discovery(device_id, state)
+            self.__publish_device_discovery(device_id, device_type)
 
-            self.__publish_commands(device_id, device_type)
+            # update availability
+            self.__publish_availability(device_id, True)
+            if DEVICE_TIMEOUT > 0:
+                self.__reset_device_timer(device_id)
+
+            # update state
+            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+            self._client.publish(topic, json.dumps(state), retain=False)
+
         except Exception as e:
             LOG.error(f"Publish device state: {e}")
 
@@ -250,33 +188,109 @@ class Client:
         timer.start()
 
     def __publish_availability(self, device_id, online: bool):
+        LOG.debug("set device %s availability: %s", device_id, online)
         self._client.publish(
             f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
             "online" if online else "offline",
             retain=False,
         )
 
-    def __publish_commands(self, device_id, device_type):
+    def __publish_device_discovery(self, device_id, device_type):
+        if device_id in self._discovery_cache:
+            return  # already pulished
+
+        topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+
+        # unpublish device first to get rid of old entities
+        self._client.publish(topic, "", retain=True)
+
+        # prepare discovery payload
+        payload = {
+            "dev": self.__device_info_from_config(device_id),
+            "avty_t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
+            "o": {
+                "name": "grobro",
+                "url": "https://github.com/robertzaage/GroBro",
+            },
+            "cmps": {},
+        }
+
         for cmd_name, cmd in self._known_commands[device_type].items():
-            if cmd_name in self._discovery_cache.get(device_id, []):
-                continue  # already published
+            unique_id = f"grobro_{device_id}_cmd_{cmd_name}"
             cmd_type = cmd["type"]
-            cmd_full = {
+            payload["cmps"][unique_id] = {
                 "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
                 "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
-                "unique_id": f"grobro_{device_id}_cmd_{cmd_name}",
-                "object_id": f"{device_id}_cmd_{cmd_name}",
-                "device": {
-                    "identifiers": [device_id],
-                },
+                "platform": cmd_type,
+                "unique_id": unique_id,
                 **cmd,
             }
-            LOG.debug("announce command %s: %s", cmd_name, cmd_full)
-            self._client.publish(
-                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
-                json.dumps(cmd_full),
-                retain=True,
-            )
-            if device_id not in self._discovery_cache:
-                self._discovery_cache[device_id] = []
-            self._discovery_cache[device_id].append(cmd_name)
+
+        for state_name, state in self._known_states[device_type].items():
+            unique_id = f"grobro_{device_id}_{state_name}"
+            payload["cmps"][unique_id] = {
+                "platform": "sensor",
+                "name": state.name,
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "value_template": f"{{{{ value_json['{state.variable_name}'] }}}}",
+                "unique_id": unique_id,
+                "object_id": f"{device_id}_{state.variable_name}",
+                "device_class": state.device_class,
+                "state_class": state.state_class,
+                "unit_of_measurement": state.unit_of_measurement,
+                "icon": state.icon,
+            }
+        # homeassistant/device/0AFFD2/config
+        LOG.debug(
+            "announce device %s under %s: %s",
+            device_id,
+            topic,
+            json.dumps(payload, indent=2),
+        )
+        self._client.publish(
+            topic,
+            json.dumps(payload),
+            retain=True,
+        )
+        self._discovery_cache.append(device_id)
+
+    def __device_info_from_config(self, device_id):
+        # Find matching config
+        config = self._config_cache.get(device_id)
+        config_path = f"config_{device_id}.json"
+        # Fallback: try loading from file
+        if not config:
+            config = model.DeviceConfig.from_file(config_path)
+            self._config_cache[device_id] = config
+            LOG.info(f"Loaded cached config for {device_id} from file (fallback)")
+        # Fallback 2: save minimal config if it was neither in cache nor on disk
+        if not config:
+            config = model.DeviceConfig(serial_number=device_id)
+            config.to_file(config_path)
+            self._config_cache[device_id] = config
+            LOG.info(f"saved minimal config for unknown device: {config}")
+
+        device_info = {
+            "identifiers": [device_id],
+            "name": f"Growatt {device_id}",
+            "manufacturer": "Growatt",
+            "serial_number": device_id,
+        }
+        known_model_id = {
+            "55": "NEO-series",
+            "72": "NEXA-series",
+            "61": "NOAH-series",
+        }.get(config.device_type)
+
+        if known_model_id:
+            device_info["model"] = known_model_id
+        elif config.model_id:
+            device_info["model"] = config.model_id
+        if config.sw_version:
+            device_info["sw_version"] = config.sw_version
+        if config.hw_version:
+            device_info["hw_version"] = config.hw_version
+        if config.mac_address:
+            device_info["connections"] = [["mac", config.mac_address]]
+
+        return device_info
