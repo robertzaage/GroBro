@@ -267,8 +267,9 @@ class Client:
                 retain=True,
             )
         for cmd_name, cmd in self._known_commands[device_type].items():
+            cmd_type = cmd["type"]
             self._client.publish(
-                f"{HA_BASE_TOPIC}/{cmd["type"]}/grobro/{device_id}_{cmd_name}/config",
+                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )

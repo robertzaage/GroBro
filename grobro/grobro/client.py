@@ -145,7 +145,7 @@ class Client:
                     )
 
             unscrambled = parser.unscramble(msg.payload)
-            LOG.debug(f"received: {msg.topic} {unscrambled.hex(" ")}")
+            LOG.debug(f"received: %s %s", msg.topic, unscrambled.hex(" "))
             msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
 
             # NOAH=387 NEO=340

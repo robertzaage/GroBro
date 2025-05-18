@@ -36,7 +36,6 @@ class NeoOutputPowerLimit(BaseModel):
                 ">HHHH16s14BHHH",
                 buffer[0:44],
             )
-            print(unpacked, unpacked[2], unpacked[20])
             if unpacked[2] != 38:
                 return None  # msq_type doesn't fit
             if unpacked[20] != 3:
