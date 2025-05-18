@@ -19,6 +19,7 @@ from grobro.grobro import parser
 from grobro.grobro.builder import scramble
 from grobro.grobro.builder import append_crc
 from grobro.model.neo_messages import NeoOutputPowerLimit
+from grobro.model.mqtt_config import MQTTConfig
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -159,7 +160,7 @@ class Client:
             elif msg_type in (323, 577):
                 # Modbus message
                 if device_id.startswith("QMN"):
-                    regfile = "growatt_inverter_registers.json"
+                    regfile = "growatt_neo_registers.json"
                 elif device_id.startswith("0PVP"):
                     regfile = "growatt_noah_registers.json"
 
