@@ -247,7 +247,7 @@ class Client:
             "announce device %s under %s: %s",
             device_id,
             topic,
-            json.dumps(payload, indent=2),
+            json.dumps(payload),
         )
         self._client.publish(
             topic,
