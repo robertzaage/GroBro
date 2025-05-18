@@ -35,8 +35,8 @@ configuration:
   REGISTER_FILTER:
     name: REGISTER_FILTER
     description: Comma-separated list of serial:alias pairs (e.g. 123456789:NOAH,987654321:NEO800). Allows specifying which register set to apply per device. Defaults to inverter register map if not set.
-  ACTIVATE_COMMUNICATION_GROWATT_SERVER:
-    name: ACTIVATE_COMMUNICATION_GROWATT_SERVER
+  GROWATT_CLOUD:
+    name: GROWATT_CLOUD
     description: Set to True to redirect messages to and from the Growatt Server. Default is False
   LOG_LEVEL:
     name: LOG_LEVEL

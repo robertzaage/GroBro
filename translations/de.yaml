@@ -35,8 +35,8 @@ configuration:
   REGISTER_FILTER:
     name: REGISTER_FILTER
     description: Kommagetrennte Liste von Serial:Alias-Paaren (z.B. 123456789:NOAH,987654321:NEO800). Ermöglicht die Angabe, welcher Registersatz pro Gerät angewendet werden soll. Standardmäßig wird die Wechselrichter-Registerkarte verwendet, wenn nicht gesetzt.
-  ACTIVATE_COMMUNICATION_GROWATT_SERVER:
-    name: ACTIVATE_COMMUNICATION_GROWATT_SERVER
+  GROWATT_CLOUD:
+    name: GROWATT_CLOUD
     description: Auf True setzen, um Nachrichten zum und vom Growatt-Server umzuleiten. Standard ist False
   LOG_LEVEL:
     name: LOG_LEVEL
