@@ -1,837 +1,970 @@
 {
   "Inverter_Status_Mode": {
     "name": "Inverter run state",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Inverter_Status": {
     "name": "Inverter run state. Indicate the machine status (web page display)",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Ppv": {
     "name": "PV total power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Vpv1": {
     "name": "PV1 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Ipv1": {
     "name": "PV1 input current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": true
   },
   "Ppv1": {
     "name": "PV1 power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Vpv2": {
     "name": "PV2 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Ipv2": {
     "name": "PV2 input current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": true
   },
   "Ppv2": {
     "name": "PV2 power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Vpv3": {
     "name": "PV3 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ipv3": {
     "name": "PV3 input current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "Ppv3": {
     "name": "PV3 power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Vpv4": {
     "name": "PV4 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ipv4": {
     "name": "PV4 input current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "Ppv4": {
     "name": "PV4 power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Pac": {
     "name": "Output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Fac": {
     "name": "Grid frequency",
     "state_class": "measurement",
     "device_class": "frequency",
     "unit_of_measurement": "Hz",
-    "icon": "mdi:sine-wave"
+    "icon": "mdi:sine-wave",
+    "enabled_by_default": true
   },
   "Vac1": {
     "name": "Three or single phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Iac1": {
     "name": "Three or single phase grid output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": true
   },
   "Pac1": {
     "name": "Three or single phase grid output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Vac2": {
     "name": "Three phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Iac2": {
     "name": "Three phase grid output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "Pac2": {
     "name": "Three phase grid output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Vac3": {
     "name": "Three phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Iac3": {
     "name": "Three phase grid output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "Pac3": {
     "name": "Three phase grid output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Vac_RS": {
     "name": "Three phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "Vac_ST": {
     "name": "Three phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Vac_TR": {
     "name": "Three phase grid voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ptouser_total": {
     "name": "Total forward power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ptogrid_total": {
     "name": "Total reverse power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ptoload_total": {
     "name": "Total load power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Time_total": {
     "name": "Work time total",
     "state_class": "measurement",
     "unit_of_measurement": "s",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": true
   },
   "Eac_today": {
     "name": "Today generate energy",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Eac_total": {
     "name": "Total generate energy",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv_total": {
     "name": "PV energy total",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv1_today": {
     "name": "PV1 energy today",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv1_total": {
     "name": "PV1 energy total",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv2_today": {
     "name": "PV2 energy today",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv2_total": {
     "name": "PV2 energy total",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": true
   },
   "Epv3_today": {
     "name": "PV3 energy today",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Epv3_total": {
     "name": "PV3 energy total",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Etouser_today": {
     "name": "Today energy to user",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Etouser_total": {
     "name": "Total energy to user",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Etogrid_today": {
     "name": "Today energy to grid",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Etogrid_total": {
     "name": "Total energy to grid",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Eload_today": {
     "name": "Today energy of user load",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Eload_total": {
     "name": "Total energy of user load",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Derating_Mode": {
     "name": "Derating Mode",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "PV_ISO_value": {
     "name": "PV ISO value",
     "state_class": "measurement",
-    "unit_of_measurement": "kΩ",
-    "icon": "mdi:omega"
+    "unit_of_measurement": "k\u03a9",
+    "icon": "mdi:omega",
+    "enabled_by_default": true
   },
   "DCI_R": {
     "name": "R DCI Curr",
     "state_class": "measurement",
     "unit_of_measurement": "ma",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "DCI_S": {
     "name": "S DCI Curr",
     "state_class": "measurement",
     "unit_of_measurement": "ma",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "DCI_T": {
     "name": "T DCI Curr",
     "state_class": "measurement",
     "unit_of_measurement": "ma",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "GFCI": {
     "name": "GFCI Curr",
     "state_class": "measurement",
     "unit_of_measurement": "ma",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "Temp1": {
     "name": "Inverter temperature",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": true
   },
   "Temp2": {
     "name": "The inside IPM in inverter temperature",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": true
   },
   "Temp3": {
     "name": "Boost temperature",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": true
   },
   "Temp4": {
     "name": "Reserved",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": true
   },
   "Temp5": {
     "name": "Commmunication broad temperature",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": false
   },
   "P_Bus_Voltage": {
     "name": "P Bus inside Voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": true
   },
   "N_Bus_Voltage": {
     "name": "N Bus inside Voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "IPF": {
     "name": "Inverter output PF now",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": true
   },
   "RealOPPercent": {
     "name": "Real Output power",
     "state_class": "measurement",
     "unit_of_measurement": "%",
-    "icon": "mdi:percent"
+    "icon": "mdi:percent",
+    "enabled_by_default": true
   },
   "OPFullwatt": {
     "name": "Output Maxpower Limited",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "StandbyFlag": {
     "name": "Inverter standby flag",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "Fault_code": {
     "name": "Inverter fault code",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Warning_code": {
     "name": "Inverter Warning code",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "Systemfault_word0": {
     "name": "System fault word0",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word1": {
     "name": "System fault word1",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word2": {
     "name": "System fault word2",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word3": {
     "name": "System fault word3",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word4": {
     "name": "System fault word4",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word5": {
     "name": "System fault word5",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word6": {
     "name": "System fault word6",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "Systemfault_word7": {
     "name": "System fault word7",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "inv_start_delay_time": {
     "name": "inv start delay time",
     "state_class": "measurement",
     "unit_of_measurement": "s",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": true
   },
   "BDC_OnOffState": {
     "name": "BDC connect state",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "DryContactState": {
     "name": "Current status of DryContact",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "Edischr_today": {
     "name": "Today discharge energy",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Edischr_total": {
     "name": "Discharge total energy of storge device",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Echr_today": {
     "name": "Charge energy today",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Echr_total": {
     "name": "Charge total energy of storge device",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Eacchr_today": {
     "name": "Today energy of AC charge",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Eacchr_total": {
     "name": "Total energy of AC charge",
     "state_class": "total_increasing",
     "device_class": "energy",
     "unit_of_measurement": "kWh",
-    "icon": "mdi:solar-power"
+    "icon": "mdi:solar-power",
+    "enabled_by_default": false
   },
   "Priority_Word_Mode": {
     "name": "Priority Word Mode",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "EPS_Fac": {
     "name": "UPS frequency",
     "state_class": "measurement",
     "device_class": "frequency",
     "unit_of_measurement": "Hz",
-    "icon": "mdi:sine-wave"
+    "icon": "mdi:sine-wave",
+    "enabled_by_default": false
   },
   "EPS_Vac1": {
     "name": "UPS phase R output voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Iac1": {
     "name": "UPS phase R output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "EPS_Pac1": {
     "name": "UPS phase R output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Vac2": {
     "name": "UPS phase S output voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Iac2": {
     "name": "UPS phase S output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "EPS_Pac2": {
     "name": "UPS phase S output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Vac3": {
     "name": "UPS phase T output voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Iac3": {
     "name": "UPS phase T output current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "EPS_Pac3": {
     "name": "UPS phase T output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "EPS_Pac": {
     "name": "UPS output power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Load_Percent": {
     "name": "Load of UPS ouput",
     "state_class": "measurement",
     "unit_of_measurement": "%",
-    "icon": "mdi:percent"
+    "icon": "mdi:percent",
+    "enabled_by_default": false
   },
   "PF": {
     "name": "Power factor",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "DCV": {
     "name": "DC voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "SysState_Mode": {
     "name": "System work State and mode",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "FaultCode": {
     "name": "Storge device fault code",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "WarnCode": {
     "name": "Storge device warning code",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "Vbat": {
     "name": "Battery voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ibat": {
     "name": "Battery current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "SOC": {
     "name": "State of charge Capacity",
     "state_class": "measurement",
     "device_class": "battery",
     "unit_of_measurement": "%",
-    "icon": "mdi:battery"
+    "icon": "mdi:battery",
+    "enabled_by_default": false
   },
   "Vbus1": {
     "name": "BUS1 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Vbus2": {
     "name": "BUS2 voltage",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Ibb": {
     "name": "BUCK-BOOST Current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "Illc": {
     "name": "LLC Current",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "TempA": {
     "name": "Temperture A",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": false
   },
   "TempB": {
     "name": "Temperture B",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": false
   },
   "Pdischr": {
     "name": "Discharge power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "Pchr": {
     "name": "Charge power",
     "state_class": "measurement",
     "device_class": "power",
     "unit_of_measurement": "W",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "BDC1_Flag": {
     "name": "BDC mark (charge and discharge, fault alarm code)",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BDC2_Flag": {
     "name": "BDC mark (charge and discharge, fault alarm code)",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_Status": {
     "name": "Status from BMS",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": false
   },
   "BMS_Error": {
     "name": "Error information from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_WarnInfo": {
     "name": "Warning information from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_SOC": {
     "name": "SOC from BMS",
     "state_class": "measurement",
     "device_class": "battery",
     "unit_of_measurement": "%",
-    "icon": "mdi:battery"
+    "icon": "mdi:battery",
+    "enabled_by_default": false
   },
   "BMS_BatteryVolt": {
     "name": "Battery voltage from BMS",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "BMS_BatteryCurr": {
     "name": "Battery current from BMS",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "BMS_BatteryTemp": {
     "name": "Battery temperature from BMS",
     "state_class": "measurement",
     "device_class": "temperature",
-    "unit_of_measurement": "°C",
-    "icon": "mdi:thermometer"
+    "unit_of_measurement": "\u00b0C",
+    "icon": "mdi:thermometer",
+    "enabled_by_default": false
   },
   "BMS_MaxCurr": {
     "name": "Max. charge or discharge current from BMS (pylon)",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "BMS_DeltaVolt": {
     "name": "Delta V from BMS",
     "state_class": "measurement",
     "device_class": "current",
     "unit_of_measurement": "A",
-    "icon": "mdi:current-ac"
+    "icon": "mdi:current-ac",
+    "enabled_by_default": false
   },
   "BMS_CycleCnt": {
     "name": "Cycle Count from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_SOH": {
     "name": "SOH from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_ConstantVolt": {
     "name": "CV voltage from BMS",
     "state_class": "measurement",
     "device_class": "voltage",
     "unit_of_measurement": "V",
-    "icon": "mdi:flash"
+    "icon": "mdi:flash",
+    "enabled_by_default": false
   },
   "BMS_BMSInfo": {
     "name": "BMSInformation from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_PackInfo": {
     "name": "Pack Information from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_UsingCap": {
     "name": "Using Cap from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_FW": {
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMS_MCUVersio": {
     "name": "MCU Software version from BMS",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   },
   "BMSCommType": {
     "name": "BMS Communication Type",
     "state_class": "measurement",
-    "icon": "mdi:information-outline"
+    "icon": "mdi:information-outline",
+    "enabled_by_default": false
   }
 }

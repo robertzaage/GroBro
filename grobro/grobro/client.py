@@ -39,26 +39,6 @@ else:
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
 
-# fmt: off
-# Register filter configuration
-NEO_REGISTERS = [
-    3001, 3003, 3004, 3005, 3007, 3008, 3009,
-    3023, 3025, 3026, 3027, 3028, 3038, 3047,
-    3049, 3051, 3053, 3055, 3057, 3059, 3061,
-    3087, 3093, 3094, 3095, 3096, 3098, 3100,
-    3101, 3115
-]
-
-# TODO: Add additional registers based on battery count
-NOAH_REGISTERS = [
-     2,   7,   8,  10,  11,  12,  13,
-    21,  23,  25,  27,  29,  72,  74,
-    76,  78,  90,  91,  92,  93,  94,
-    95,  96,  97,  99, 100, 101, 102,
-   109,  65,  53,  41
-]
-# fmt: on
-
 # Property to flag messages forwarded from growatt cloud
 MQTT_PROP_FORWARD_GROWATT = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
 MQTT_PROP_FORWARD_GROWATT.UserProperty = [("forwarded-for", "growatt")]
@@ -193,16 +173,6 @@ class Client:
             LOG.error(f"Processing message: {e}")
 
     def __publish_state(self, device_id, registers):
-        if device_id.startswith("QMN"):
-            allowed_registers = NEO_REGISTERS
-        elif device_id.startswith("0PVP"):
-            allowed_registers = NOAH_REGISTERS
-        if allowed_registers:
-            registers = [
-                reg
-                for reg in registers
-                if "register_no" in reg and reg["register_no"] in allowed_registers
-            ]
         for reg in registers:
             apply_conversion(reg)
         payload = {

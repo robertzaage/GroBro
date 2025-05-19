@@ -3,190 +3,222 @@
     "name": "Battery 2 SoC",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "bat_3_soc_pct": {
     "name": "Battery 3 SoC",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "bat_4_soc_pct": {
     "name": "Battery 4 SoC",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "priority_mode": {
     "name": "Priority Mode",
-    "icon": "mdi:alert-circle"
+    "icon": "mdi:alert-circle",
+    "enabled_by_default": true
   },
   "bat_sysstate": {
     "name": "Battery System State",
-    "icon": "mdi:battery-sync"
+    "icon": "mdi:battery-sync",
+    "enabled_by_default": true
   },
   "tot_bat_soc_pct": {
     "name": "Total Battery SoC",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
     "state_class": "measurement",
-    "device_class": "battery"
+    "device_class": "battery",
+    "enabled_by_default": true
   },
   "Vpv1": {
     "name": "PV1 voltage",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "voltage"
+    "device_class": "voltage",
+    "enabled_by_default": true
   },
   "Vpv2": {
     "name": "PV2 voltage",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "voltage"
+    "device_class": "voltage",
+    "enabled_by_default": true
   },
   "out_power": {
     "name": "Output power",
     "unit_of_measurement": "W",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "power"
+    "device_class": "power",
+    "enabled_by_default": true
   },
   "out_voltage": {
     "name": "Output voltage",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "temp2": {
     "name": "Temperature 2",
-    "unit_of_measurement": "°C",
+    "unit_of_measurement": "\u00b0C",
     "icon": "mdi:thermometer",
     "state_class": "measurement",
-    "device_class": "temperature"
+    "device_class": "temperature",
+    "enabled_by_default": true
   },
   "maxcvbat1": {
     "name": "Battery 1 max. Cell Voltage",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "voltage"
+    "device_class": "voltage",
+    "enabled_by_default": true
   },
   "mincvbat1": {
     "name": "Battery 1 min. Cell Voltage",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "voltage"
+    "device_class": "voltage",
+    "enabled_by_default": true
   },
   "pv_tot_power": {
     "name": "PV total power",
     "unit_of_measurement": "W",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "power"
+    "device_class": "power",
+    "enabled_by_default": true
   },
   "charging_discharging": {
     "name": "Charging Power",
     "unit_of_measurement": "W",
     "icon": "mdi:flash",
     "state_class": "measurement",
-    "device_class": "power"
+    "device_class": "power",
+    "enabled_by_default": true
   },
   "pv_eng_today": {
     "name": "PV energy today",
     "unit_of_measurement": "kWh",
     "icon": "mdi:solar-power",
     "state_class": "total_increasing",
-    "device_class": "energy"
+    "device_class": "energy",
+    "enabled_by_default": true
   },
   "pv_eng_month": {
     "name": "PV energy month",
     "unit_of_measurement": "kWh",
     "icon": "mdi:solar-power",
     "state_class": "total_increasing",
-    "device_class": "energy"
+    "device_class": "energy",
+    "enabled_by_default": true
   },
   "ser_part_1": {
     "name": "Serial Part 1",
-    "icon": "mdi:identifier"
+    "icon": "mdi:identifier",
+    "enabled_by_default": true
   },
   "pv_eng_year": {
     "name": "PV energy year",
     "unit_of_measurement": "kWh",
     "icon": "mdi:solar-power",
     "state_class": "total_increasing",
-    "device_class": "energy"
+    "device_class": "energy",
+    "enabled_by_default": true
   },
   "eng_out_device": {
     "name": "Energy output device",
     "unit_of_measurement": "kWh",
     "icon": "mdi:solar-power",
     "state_class": "total_increasing",
-    "device_class": "energy"
+    "device_class": "energy",
+    "enabled_by_default": true
   },
   "ser_part_3": {
     "name": "Serial Part 3",
-    "icon": "mdi:identifier"
+    "icon": "mdi:identifier",
+    "enabled_by_default": true
   },
   "ser_part_2": {
     "name": "Serial Part 2",
-    "icon": "mdi:identifier"
+    "icon": "mdi:identifier",
+    "enabled_by_default": true
   },
   "ser_part_4": {
     "name": "Serial Part 4",
-    "icon": "mdi:identifier"
+    "icon": "mdi:identifier",
+    "enabled_by_default": true
   },
   "bat_1_soc_pct": {
     "name": "Battery 1 SoC",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "discharge_limit": {
     "name": "Discharge Limit",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "charge_limit": {
     "name": "Charge Limit",
     "unit_of_measurement": "%",
     "icon": "mdi:percent",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "temp1": {
     "name": "Temperature 1",
-    "unit_of_measurement": "°C",
+    "unit_of_measurement": "\u00b0C",
     "icon": "mdi:thermometer",
     "state_class": "measurement",
-    "device_class": "temperature"
+    "device_class": "temperature",
+    "enabled_by_default": true
   },
   "Ipv1": {
     "name": "PV1 input current",
     "unit_of_measurement": "A",
     "icon": "mdi:current-ac",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "Ipv2": {
     "name": "PV2 input current",
     "unit_of_measurement": "A",
     "icon": "mdi:current-ac",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   },
   "bat_cnt": {
     "name": "Battery Count",
-    "icon": "mdi:information"
+    "icon": "mdi:information",
+    "enabled_by_default": true
   },
   "bat_cyclecnt": {
     "name": "Battery Cycle Count",
-    "icon": "mdi:counter"
+    "icon": "mdi:counter",
+    "enabled_by_default": true
   },
   "register_102": {
     "name": "Register No 102",
     "unit_of_measurement": "V",
     "icon": "mdi:flash",
-    "state_class": "measurement"
+    "state_class": "measurement",
+    "enabled_by_default": true
   }
 }
