@@ -121,7 +121,7 @@ class Client:
                 device_type = "noah"
             state_lookup = self._known_states[device_type]
 
-            self.__publish_device_discovery(device_id, device_type)
+            self.__publish_device_discovery(device_id, device_type, state.keys())
 
             # update availability
             self.__publish_availability(device_id, True)
@@ -195,7 +195,7 @@ class Client:
             retain=False,
         )
 
-    def __publish_device_discovery(self, device_id, device_type):
+    def __publish_device_discovery(self, device_id, device_type, available_states):
         if device_id in self._discovery_cache:
             return  # already pulished
 
@@ -229,6 +229,8 @@ class Client:
             }
 
         for state_name, state in self._known_states[device_type].items():
+            if state_name not in available_states:
+                continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
