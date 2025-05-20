@@ -10,5 +10,13 @@
   "output_power_limit_read": {
           "name": "Output Power Limit Read",
           "type": "button"
+  },
+  "datalogger_intervall": {
+          "name": "Datalogger Intervall",
+          "type": "number",
+          "unit_of_measurement": "minutes",
+          "min": 1,
+          "max": 10,
+          "step": 1
   }
 }

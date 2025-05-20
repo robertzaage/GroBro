@@ -81,6 +81,49 @@ class NeoSetOutputPowerLimit(BaseModel):
             value=unpacked[-1],
         )
 
+class NeoSetDataloggerIntervall(BaseModel):
+    """
+    Represents a message that can be sent to the inverter
+    to set the datalogger intervall.
+    """
+
+    device_id: str
+    value: int
+
+    @staticmethod
+    def parse_ha(device_id, payload) -> "NeoSetDataloggerIntervall":
+        return NeoSetDataloggerIntervall(
+            device_id=device_id,
+            value=int(payload.decode()),
+        )
+
+    def build_grobro(self) -> bytes:
+        # Header wie im Beispiel: >HHHH16s8B
+        header = struct.pack(
+            ">HHHH16s16B",
+            1,      # unknown, fixed header?
+            7,      # unknown, fixed header?
+            41,     # msg_len
+            0x0118, # msg_type
+            self.device_id.encode("ascii").ljust(16, b"\x00"),
+            *([0] * 15),1
+        )
+        # TLV: Register 5, idk=4, Length=1, Value als ASCII
+        value_bytes = str(self.value).encode("ascii")
+        tlv = struct.pack(">HHH", 5, 4, len(value_bytes)) + value_bytes
+        return header + tlv
+
+    @staticmethod
+    def parse_grobro(buffer) -> "NeoSetDataloggerIntervall":
+        unpacked = struct.unpack(
+            ">HHHH16s14BHH",
+            buffer[0:42],
+        )
+        return NeoSetDataloggerIntervall(
+            device_id=unpacked[4],
+            value=unpacked[-1],
+        )
+
 
 class NeoCommandTypes(Enum):
     OUTPUT_POWER_LIMIT = (
@@ -92,6 +135,11 @@ class NeoCommandTypes(Enum):
         "output_power_limit_read",
         "button",
         NeoReadOutputPowerLimit,
+    )
+    DATALOGGER_INTERVALL = (
+        "datalogger_intervall",
+        "number",
+        NeoSetDataloggerIntervall,
     )
 
     def __init__(self, name, ha_type, model):
