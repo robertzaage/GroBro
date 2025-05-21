@@ -77,7 +77,9 @@ class Client:
     _forward_clients = {}
 
     def __init__(self, grobro_mqtt: MQTTConfig, forward_mqtt: MQTTConfig):
-        LOG.info(f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'")
+        LOG.info(
+            f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
+        )
         self._client = mqtt.Client(
             client_id="grobro-grobro",
             callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
@@ -174,9 +176,10 @@ class Client:
                     unscrambled, modbus_input_register_descriptions
                 )
 
-                all_registers = parsed.get("modbus1", {}).get("registers", []) + \
-                                parsed.get("modbus2", {}).get("registers", [])
-                
+                all_registers = parsed.get("modbus1", {}).get(
+                    "registers", []
+                ) + parsed.get("modbus2", {}).get("registers", [])
+
                 self.__publish_state(device_id, all_registers)
                 LOG.info(
                     f"Published state for {device_id} with {len(all_registers)} registers"
@@ -207,14 +210,23 @@ class Client:
             ]
         for reg in registers:
             apply_conversion(reg)
-        payload = {
-            reg["name"]: (
-                round(reg["value"], 3)
-                if isinstance(reg["value"], float)
-                else reg["value"]
-            )
-            for reg in registers
-        }
+
+        payload = {}
+        for reg in registers:
+            name = reg["name"]
+            value = reg["value"]
+
+            # TODO: this is a workaround for broken messages sent by neo inverters at night.
+            # They emmit state updates with incredible high wattage, which spoils HA statistics.
+            # Assuming no one runs a balkony plant with more than a million peak wattage, we drop such messages.
+            if name == "Ppv" and value > 1000000:
+                LOG.debug("dropping bad payload: %s", device_id)
+                return
+
+            if isinstance(value, float):
+                payload[name] = round(value, 3)
+            else:
+                payload[name] = value
         LOG.info(
             f"Device {device_id} matched {len(registers)} registers after filtering."
         )
@@ -228,7 +240,10 @@ class Client:
             if not GROWATT_CLOUD_ENABLED:
                 return
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:
-                LOG.debug("Dropping Growatt message for device %s not in GROWATT_CLOUD filter", device_id)
+                LOG.debug(
+                    "Dropping Growatt message for device %s not in GROWATT_CLOUD filter",
+                    device_id,
+                )
                 return
             LOG.debug("Forwarding message from Growatt for client %s", device_id)
             # We need to publish the messages from Growatt on the Topic
