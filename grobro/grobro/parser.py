@@ -262,6 +262,40 @@ def load_modbus_input_register_file(filepath):
     return data["input_registers"]
 
 
+def tlv_parse(buf: bytes):
+    out, off, end = [], 0, len(buf)
+    while off + 4 <= end:
+        reg, vlen = struct.unpack_from(">HH", buf, off)
+        if 0 < vlen <= end - off - 4:
+            raw = buf[off + 4 : off + 4 + vlen]
+            try:
+                val = int(raw.decode()) if raw.decode().isdigit() else raw.decode()
+            except UnicodeDecodeError:
+                val = raw.hex()
+            out.append({"register": reg, "value": val})
+            off += 4 + vlen
+        else:
+            off += 1
+    return out
+
+
+def decode_register(payload: bytes) -> dict | None:
+    tlvs = tlv_parse(payload)
+    if not tlvs:
+        return None
+    first = tlvs[0]
+    first["type"] = "response"
+    return first
+
+
+def decode_payload(device_id: str, mtype: int, payload: bytes):
+    if mtype == 280: # write-ack
+        return {"tlvs": tlv_parse(payload[40:])}
+    if mtype == 281: # read-reply
+        return decode_register(payload[40:])
+    return None
+
+
 if __name__ == "__main__":
     register_file = sys.argv[1]
     modbus_input_register_descriptions = load_modbus_input_register_file(register_file)
