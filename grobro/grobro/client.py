@@ -16,9 +16,10 @@ from paho.mqtt.client import MQTTMessage
 
 from grobro import model
 from grobro.grobro import parser
-from grobro.grobro.builder import scramble
-from grobro.grobro.builder import append_crc
+from grobro.grobro.builder import scramble, append_crc
+
 from grobro.model.neo_messages import NeoOutputPowerLimit
+from grobro.model.neo_register import NeoSetRegister
 from grobro.model.mqtt_config import MQTTConfig
 
 LOG = logging.getLogger(__name__)
@@ -108,9 +109,8 @@ class Client:
     def send_command(self, cmd: model.Command):
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
-
         topic = f"s/33/{cmd.device_id}"
-        LOG.debug("send command: %s: %s: %s", type(cmd).__name__, topic, cmd)
+        LOG.debug("Sent command: %s: %s: %s", type(cmd).__name__, topic, cmd)
 
         result = self._client.publish(
             topic,
@@ -119,7 +119,7 @@ class Client:
         )
         status = result[0]
         if status != 0:
-            LOG.warning("sent failed: %s", result)
+            LOG.warning("Sent failed: %s", result)
 
     def __on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
@@ -145,8 +145,9 @@ class Client:
                     )
 
             unscrambled = parser.unscramble(msg.payload)
-            LOG.debug(f"received: %s %s", msg.topic, unscrambled.hex(" "))
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
+            LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
+            msg_type = struct.unpack_from(">H", unscrambled, 4)[0] # word @ offset 4
+            msg_type_alt = struct.unpack_from(">H", unscrambled, 6)[0]# word @ offset 6
 
             # NOAH=387 NEO=340,341
             if msg_type in (387, 340, 341):
@@ -176,21 +177,37 @@ class Client:
 
                 all_registers = parsed.get("modbus1", {}).get("registers", []) + \
                                 parsed.get("modbus2", {}).get("registers", [])
-                
+
                 self.__publish_state(device_id, all_registers)
                 LOG.info(
                     f"Published state for {device_id} with {len(all_registers)} registers"
                 )
                 return
 
-            for neo_msg_type in [NeoOutputPowerLimit]:
-                parsed = neo_msg_type.parse_grobro(unscrambled)
-                if parsed:
-                    LOG.debug("got message %s: %s", neo_msg_type.__name__, parsed)
-                    self.on_message(parsed)
+            # NEO 280 = write-ack, 281 = read-reply
+            elif msg_type_alt in (280, 281):
+                decoded = parser.decode_payload(device_id, msg_type_alt, unscrambled)
+                if decoded:
+                    nsr = NeoSetRegister(
+                        device_id=device_id,
+                        register=decoded["register"],
+                        value=decoded["value"],
+                        param=decoded["register"],
+                    )
+                    LOG.debug("Got register value %s", nsr)
+                    self.on_message(nsr)
                     return
 
-            LOG.debug("unknown msg_type %s: %s", msg_type, unscrambled.hex())
+            # TODO better detection
+            parsed = NeoOutputPowerLimit.parse_grobro(unscrambled)
+            if parsed:
+                LOG.debug("Got message NeoOutputPowerLimit: %s", parsed)
+                self.on_message(parsed)
+                return
+
+            LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
+
+
         except Exception as e:
             LOG.error(f"Processing message: {e}")
 
@@ -230,7 +247,7 @@ class Client:
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:
                 LOG.debug("Dropping Growatt message for device %s not in GROWATT_CLOUD filter", device_id)
                 return
-            LOG.debug("Forwarding message from Growatt for client %s", device_id)
+            LOG.debug("Forwarding message from Growatt for device %s", device_id)
             # We need to publish the messages from Growatt on the Topic
             # s/33/{deviceid}. Growatt sends them on Topic s/{deviceid}
             self._client.publish(
