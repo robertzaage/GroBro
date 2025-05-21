@@ -1,7 +1,7 @@
 import struct
 from pydantic import BaseModel
 from enum import Enum
-
+from .neo_register import NeoSetRegister, NeoReadRegister
 
 class NeoReadOutputPowerLimit(BaseModel):
     """
@@ -92,6 +92,17 @@ class NeoCommandTypes(Enum):
         "output_power_limit_read",
         "button",
         NeoReadOutputPowerLimit,
+    )
+
+    MQTT_PORT = (
+        "mqtt_port",
+        "number",
+        NeoSetRegister,
+    )
+    MQTT_PORT_READ = (
+        "mqtt_port_read",
+        "button",
+        NeoReadRegister,
     )
 
     def __init__(self, name, ha_type, model):

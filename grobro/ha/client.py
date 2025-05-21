@@ -11,6 +11,9 @@ from typing import Callable
 import paho.mqtt.client as mqtt
 from grobro.model.neo_command import NeoReadOutputPowerLimit
 from grobro.model.neo_command import NeoSetOutputPowerLimit
+
+from grobro.model.neo_register import NeoSetRegister, NeoReadRegister
+
 from grobro.model.noah_command import NoahSmartPower
 from grobro.model.neo_command import NeoCommandTypes
 from grobro.model.noah_command import NoahCommandTypes
@@ -30,7 +33,7 @@ class Client:
     _device_timers: dict[str, Timer] = {}
     # device_type -> variable_name -> DeviceState
     _known_states: dict[str, dict[str, model.DeviceState]] = {}
-    # device_type -> variable_name -> Command
+    # device_type -> variable_name -> Command meta-data
     _known_commands: dict[str, dict[str, dict]] = {}
 
     def __init__(
@@ -58,6 +61,7 @@ class Client:
             with cmd_file.open("r") as f:
                 for variable_name, cmd in json.load(f).items():
                     self._known_commands[device_type][variable_name] = cmd
+
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
         self._client = mqtt.Client(
@@ -70,7 +74,8 @@ class Client:
             self._client.tls_insecure_set(True)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
-        for cmd_type in ["number", "button"]:
+        # Subscribe also to the new JSON entity
+        for cmd_type in ["number", "button", "json"]:
             topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/set"
             self._client.subscribe(topic)
         self._client.on_message = self.__on_message
@@ -104,13 +109,27 @@ class Client:
             LOG.debug("ha: publish: %s", msg)
             if isinstance(msg, NeoOutputPowerLimit):
                 msg_type = NeoCommandTypes.OUTPUT_POWER_LIMIT
-                topic = f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/{msg.device_id}/{msg_type.ha_name}/get"
+                topic = (
+                    f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/"
+                    f"{msg.device_id}/{msg_type.ha_name}/get"
+                )
                 LOG.debug(
-                    "forward message: %s to %s: %s", type(msg).__name__, topic, msg
+                    "Forward message: %s to %s: %s", type(msg).__name__, topic, msg
                 )
                 self._client.publish(topic, msg.value, retain=False)
+
+            # TODO: register map?
+            elif isinstance(msg, NeoSetRegister) and msg.param == msg.register:
+                topic = (
+                    f"{HA_BASE_TOPIC}/number/grobro/{msg.device_id}/mqtt_port/get"
+                    if msg.register == 18
+                    else None
+                )
+                if topic:
+                    self._client.publish(topic, msg.value, retain=False)
+
         except Exception as e:
-            LOG.error(f"ha: publish msg: {e}")
+            LOG.error(f"HA: publish message: {e}")
 
     def publish_state(self, device_id, state):
         try:
@@ -139,33 +158,55 @@ class Client:
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
 
         cmd_type, device_id, cmd_name = None, None, None
-        if len(parts) == 5 and parts[0] in ["number"]:
+        if len(parts) == 5 and parts[0] in ["number", "json"]:
             cmd_type, _, device_id, cmd_name, _ = parts
         if len(parts) == 5 and parts[0] in ["button"]:
             cmd_type, _, device_id, cmd_name, _ = parts
 
         LOG.debug(
-            "received %s command %s for device %s",
+            "Received %s command %s for device %s",
             cmd_type,
             cmd_name,
             device_id,
         )
 
+        register_hint = None
+        if device_id:
+            if device_id.startswith("QMN"):
+                device_type = "neo"
+            elif device_id.startswith("0PVP"):
+                device_type = "noah"
+            else:
+                device_type = None
+
+            if device_type:
+                meta = self._known_commands[device_type].get(cmd_name)
+                if meta:
+                    register_hint = meta.get("register")
+
         cmd = None
+
+        def _parse(cmd_cls, *args, **kwargs):
+            """Call cmd_cls.parse_ha, but pass register_hint only if accepted."""
+            try:
+                return cmd_cls.parse_ha(*args, **kwargs, register_hint=register_hint)
+            except TypeError:
+                return cmd_cls.parse_ha(*args, **kwargs)
+
         for noah_cmd_type in NoahCommandTypes:
             if noah_cmd_type.matches(cmd_name, cmd_type):
-                cmd = noah_cmd_type.parse_ha(device_id, msg.payload)
+                cmd = _parse(noah_cmd_type, device_id, msg.payload)
                 break
         for neo_cmd_type in NeoCommandTypes:
             if neo_cmd_type.matches(cmd_name, cmd_type):
-                cmd = neo_cmd_type.model.parse_ha(device_id, msg.payload)
+                cmd = _parse(neo_cmd_type.model, device_id, msg.payload)
                 break
 
         if cmd and self.on_command:
             self.on_command(cmd)
         else:
             LOG.warning(
-                "received unknown command %s: %s",
+                "Received unknown command %s: %s",
                 msg.topic,
                 msg.payload,
             )
@@ -296,7 +337,7 @@ class Client:
             config = model.DeviceConfig(serial_number=device_id)
             config.to_file(config_path)
             self._config_cache[device_id] = config
-            LOG.info(f"saved minimal config for unknown device: {config}")
+            LOG.info(f"Saved minimal config for unknown device: {config}")
 
         device_info = {
             "identifiers": [device_id],
