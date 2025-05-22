@@ -163,10 +163,18 @@ class Client:
             # NOAH=323 NEO=577
             elif msg_type in (323, 577):
                 # Modbus message
+                regfile = None
                 if device_id.startswith("QMN"):
                     regfile = "growatt_neo_registers.json"
                 elif device_id.startswith("0PVP"):
                     regfile = "growatt_noah_registers.json"
+                if not regfile:
+                    LOG.warning(
+                        "unrecognized device prefix %s for device %s",
+                        device_id[0:2],
+                        device_id,
+                    )
+                    return
 
                 modbus_input_register_descriptions = (
                     parser.load_modbus_input_register_file(regfile)
