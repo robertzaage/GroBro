@@ -66,6 +66,10 @@ MQTT_PROP_FORWARD_GROWATT.UserProperty = [("forwarded-for", "growatt")]
 MQTT_PROP_FORWARD_HA = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
 MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
 
+# Property to flag messages as dry-run for debugging purposes
+MQTT_PROP_DRY_RUN = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
+MQTT_PROP_DRY_RUN.UserProperty = [("dry-run", "true")]
+
 
 class Client:
     on_config: Callable[[model.DeviceConfig], None]
@@ -125,11 +129,10 @@ class Client:
 
     def __on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
-        props = msg.properties.json().get("UserProperty", [])
-        for key, value in props:
-            if key == "forwarded-for" and value in ["ha", "growatt"]:
-                LOG.debug("Message forwarded from %s. Skipping...", value)
-                return
+        forwarded_for = get_property(msg, "forwarded-for")
+        if forwarded_for and forwarded_for in ["ha", "growatt"]:
+            LOG.debug("Message forwarded from %s. Skipping...", forwarded_for)
+            return
 
         LOG.debug(f"Received message: {msg.topic} {msg.payload}")
         if DUMP_MESSAGES:
@@ -187,6 +190,14 @@ class Client:
                 all_registers = parsed.get("modbus1", {}).get(
                     "registers", []
                 ) + parsed.get("modbus2", {}).get("registers", [])
+
+                if get_property(msg, "dry-run") == "true":
+                    LOG.info(
+                        "message flagged as dry-run. logging registers in debug level"
+                    )
+                    for reg in all_registers:
+                        LOG.debug(reg)
+                    return
 
                 self.__publish_state(device_id, all_registers)
                 LOG.info(
@@ -331,3 +342,11 @@ def dump_message_binary(topic, payload):
             f.write(payload)
     except Exception as e:
         LOG.error(f"Failed to dump message for topic {topic}: {e}")
+
+
+def get_property(msg, prop) -> str:
+    props = msg.properties.json().get("UserProperty", [])
+    for key, value in props:
+        if key == prop:
+            return value
+    return None
