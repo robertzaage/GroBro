@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Allow files and folders with a pattern starting with !
+!assets
+!grobro
+!translations
+!config.yaml
+!requirements.txt
+!run.sh
