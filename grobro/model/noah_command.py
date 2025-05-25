@@ -13,10 +13,10 @@ class NoahSmartPower(BaseModel):
     power_diff: int
 
     @staticmethod
-    def parse_ha(device_id, payload) -> "NeoReadOutputPowerLimit":
-        return NeoReadOutputPowerLimit(
+    def parse_ha(device_id, payload) -> "NoahSmartPower":
+        return NoahSmartPower(
             device_id=device_id,
-            value=int(payload.decode()),
+            power_diff=int(payload.decode()),
         )
 
     def build_grobro(self) -> bytes:

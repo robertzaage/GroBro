@@ -154,7 +154,7 @@ class Client:
         cmd = None
         for noah_cmd_type in NoahCommandTypes:
             if noah_cmd_type.matches(cmd_name, cmd_type):
-                cmd = noah_cmd_type.parse_ha(device_id, msg.payload)
+                cmd = noah_cmd_type.model.parse_ha(device_id, msg.payload)
                 break
         for neo_cmd_type in NeoCommandTypes:
             if neo_cmd_type.matches(cmd_name, cmd_type):
