@@ -632,6 +632,10 @@
     "unit_of_measurement": "V",
     "icon": "mdi:flash"
   },
+  "SysState_State": {
+    "name": "System work State and mode",
+    "icon": "mdi:alert-circle"
+  },
   "SysState_Mode": {
     "name": "System work State and mode",
     "icon": "mdi:alert-circle"
@@ -821,6 +825,7 @@
     "icon": "mdi:information-outline"
   },
   "BMS_FW": {
+    "name": "BMS Firmware",
     "state_class": "measurement",
     "icon": "mdi:information-outline"
   },

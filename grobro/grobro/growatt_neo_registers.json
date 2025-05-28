@@ -627,7 +627,7 @@
         "bitfield bit3~bit7": "Reserved"
       },
       "unit": null,
-      "note": null,
+      "note": "bitfield",
       "size": 2,
       "multiplier": 1
     },
@@ -954,20 +954,30 @@
     },
     {
       "register_no": 3166,
+      "offset": 0,
+      "size": 1,
       "variable_name": "SysState_Mode",
-      "description": "System work State and mode",
+      "description": "System work Mode",
       "value_options": {
-        "高 8 位表示模式": {
           "0": "No charge and discharge",
           "1": "charge",
           "2": "Discharge"
-        },
-        "低 8 位表示状态": {
+      },
+      "unit": null,
+      "note": "BDC1",
+      "multiplier": 1
+    },
+    {
+      "register_no": 3166,
+      "offset": 1,
+      "size": 1,
+      "variable_name": "SysState_State",
+      "description": "System work State",
+      "value_options": {
           "0": "StandbyStatus",
           "1": "NormalStatus",
           "2": "FaultStatus",
           "3": "FlashStatus"
-        }
       },
       "unit": null,
       "note": "BDC1",
@@ -1121,30 +1131,39 @@
         "Bit12~15": "FaultSubCode; BDC sub-error code"
       },
       "unit": null,
-      "note": null,
+      "note": "bitfield",
       "size": 2,
       "multiplier": 1
     },
     {
       "register_no": 3189,
+      "offset": 0,
+      "size": 1,
       "variable_name": "SysState_Mode",
-      "description": "System work State and mode",
+      "description": "System work Mode",
       "value_options": {
-        "高 8 位表示模式": {
           "0": "No charge and discharge",
           "1": "charge",
           "2": "Discharge"
-        },
-        "低 8 位表示状态": {
+      },
+      "unit": null,
+      "note": "BDC2",
+      "multiplier": 1
+    },
+    {
+      "register_no": 3189,
+      "offset": 1,
+      "size": 1,
+      "variable_name": "SysState_Mode",
+      "description": "System work State",
+      "value_options": {
           "0": "StandbyStatus",
           "1": "NormalStatus",
           "2": "FaultStatus",
           "3": "FlashStatus"
-        }
       },
       "unit": null,
       "note": "BDC2",
-      "size": 2,
       "multiplier": 1
     },
     {
@@ -1294,7 +1313,7 @@
         "Bit12~15": "FaultSubCode; BDC sub-error code"
       },
       "unit": null,
-      "note": null,
+      "note": "bitfield",
       "size": 2,
       "multiplier": 1
     },
