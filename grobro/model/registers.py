@@ -3,6 +3,7 @@ from enum import Enum
 from pydantic import BaseModel
 import importlib.resources as resources
 import json
+import struct
 
 
 class GrowattRegisterDataTypes(str, Enum):
@@ -30,6 +31,30 @@ class GrowattRegisterDataType(BaseModel):
     data_type: GrowattRegisterDataTypes
     float_options: Optional[GrowattRegisterFloatOptions] = None
     enum_options: Optional[GrowattRegisterEnumOptions] = None
+
+    def parse(self, data_raw: bytes):
+        if not data_raw:
+            return None
+        unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
+        if self.data_type == GrowattRegisterDataTypes.FLOAT:
+            opts = self.float_options
+            value = struct.unpack(unpack_type, data_raw)[0]
+            value *= opts.multiplier
+            value += opts.delta
+            return round(value, 3)
+        elif self.data_type == GrowattRegisterDataTypes.ENUM:
+            opts = self.enum_options
+            value = struct.unpack(unpack_type, data_raw)[0]
+            if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
+                return None  # TODO: implement
+            elif opts.enum_type == GrowattRegisterEnumTypes.INT_MAP:
+                enum_value = opts.values.get(int(value), None)
+                if not enum_value:
+                    return None
+                return value
+        elif self.data_type == GrowattRegisterDataTypes.STRING:
+            value = data_raw.decode("ascii", errors="ignore").strip("\x00")
+            return value
 
 
 class GrowattRegisterPosition(BaseModel):
@@ -88,7 +113,7 @@ class HomeAssistantHoldingRegisterInput(BaseModel):
     payload: list[HomeAssistantHoldingRegisterValue] = []
 
 
-class HomeAssistantState(BaseModel):
+class HomeAssistantInputRegister(BaseModel):
     device_id: str
     payload: dict[str, Union[str, float]] = {}
 

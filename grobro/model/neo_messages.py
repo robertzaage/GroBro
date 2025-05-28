@@ -31,18 +31,16 @@ class GrowattModbusBlock(BaseModel):
 
     @staticmethod
     def parse_grobro(buffer) -> Optional["GrowattModbusBlock"]:
-        (start, end) = struct.unpack(">HH", buffer[0:4])
-        num_blocks = end - start + 1
-        result = GrowattModbusBlock(
-            start=start, end=end, values=buffer[4 : 4 + num_blocks * 2]
-        )
-        assert len(result.values) == num_blocks * 2
-        return result
-        values = bytearray(num_blocks * 2)
-        for i in range(num_blocks):
-            offset = 4 + i * 2
-            values[i : i + 2] = struct.unpack("2s", buffer[offset : offset + 2])[0]
-        return GrowattModbusBlock(start=start, end=end, values=bytes(values))
+        try:
+            (start, end) = struct.unpack(">HH", buffer[0:4])
+            num_blocks = end - start + 1
+            result = GrowattModbusBlock(
+                start=start, end=end, values=buffer[4 : 4 + num_blocks * 2]
+            )
+            assert len(result.values) == num_blocks * 2
+            return result
+        except Exception as e:
+            LOG.warn("Parsing GrowattModbusBlock: %s", e)
 
     def build_grobro(self) -> bytes:
         result = struct.pack(">HH", self.start, self.end) + self.values
@@ -138,41 +136,47 @@ class GrowattModbusMessage(BaseModel):
             if block.start > pos.register_no or block.end < pos.register_no:
                 continue
             block_pos = (pos.register_no - block.start) * 2 + pos.offset
-            return block.values[block_pos:block_pos+pos.size]
+            return block.values[block_pos : block_pos + pos.size]
         return None
-
 
     @staticmethod
     def parse_grobro(buffer) -> Optional["GrowattModbusMessage"]:
-        (unknown, constant_7, msg_len, constant_1, function, device_id_raw) = (
-            struct.unpack(
-                HEADER_STRUCT,
-                buffer[0:38],
+        try:
+            (unknown, constant_7, msg_len, constant_1, function, device_id_raw) = (
+                struct.unpack(
+                    HEADER_STRUCT,
+                    buffer[0:38],
+                )
             )
-        )
-        if msg_len != len(buffer[8:]):
-            return None
-        device_id = device_id_raw.decode("ascii", errors="ignore").strip("\x00")
-        register_blocks = []
-        offset = 38
+            if msg_len != len(buffer[8:]):
+                return None
+            device_id = device_id_raw.decode("ascii", errors="ignore").strip("\x00")
+            if function not in GrowattModbusFunction:
+                LOG.info("unknown modbus function for %s: %s", device_id, function)
+                return None
 
-        metadata = None
-        if function == GrowattModbusFunction.READ_INPUT_REGISTER:
-            metadata = GrowattMetadata.parse_grobro(buffer[offset:])
-            offset += metadata.size()
+            register_blocks = []
+            offset = 38
 
-        while len(buffer) > offset + 6:
-            block = GrowattModbusBlock.parse_grobro(buffer[offset:])
-            register_blocks.append(block)
-            offset += block.size()
+            metadata = None
+            if function == GrowattModbusFunction.READ_INPUT_REGISTER:
+                metadata = GrowattMetadata.parse_grobro(buffer[offset:])
+                offset += metadata.size()
 
-        return GrowattModbusMessage(
-            unknown=unknown,
-            metadata=metadata,
-            device_id=device_id,
-            function=function,
-            register_blocks=register_blocks,
-        )
+            while len(buffer) > offset + 6:
+                block = GrowattModbusBlock.parse_grobro(buffer[offset:])
+                register_blocks.append(block)
+                offset += block.size()
+
+            return GrowattModbusMessage(
+                unknown=unknown,
+                metadata=metadata,
+                device_id=device_id,
+                function=function,
+                register_blocks=register_blocks,
+            )
+        except Exception as e:
+            LOG.warn("parsing GrowattModbusMessage: %s", e)
 
     def build_grobro(self) -> bytes:
         result = struct.pack(

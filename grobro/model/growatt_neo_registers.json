@@ -1592,7 +1592,16 @@
           "data_type": "ENUM",
           "enum_options": {
             "enum_type": "BITFIELD",
-            "values": {}
+            "values": {
+              0: "turn off Order",
+              1: "PV Low",
+              2: "AC Volt Freq out of scope",
+              3: "Reserved 3",
+              4: "Reserved 4",
+              5: "Reserved 5",
+              6: "Reserved 6",
+              7: "Reserved 7"
+            }
           }
         }
       },
@@ -2757,7 +2766,24 @@
           "data_type": "ENUM",
           "enum_options": {
             "enum_type": "BITFIELD",
-            "values": {}
+            "values": {
+              0: "ChargeEn; BDC allows charging",
+              1: "DischargeEn; BDC allows discharge",
+              2: "Resvd; reserved",
+              3: "Resvd; reserved",
+              4: "Resvd; reserved",
+              5: "Resvd; reserved",
+              6: "Resvd; reserved",
+              7: "Resvd; reserved",
+              8: "WarnSubCode; BDC sub-warning code",
+              9: "WarnSubCode; BDC sub-warning code",
+              10: "WarnSubCode; BDC sub-warning code",
+              11: "WarnSubCode; BDC sub-warning code",
+              12: "FaultSubCode; BDC sub-error code",
+              13: "FaultSubCode; BDC sub-error code",
+              14: "FaultSubCode; BDC sub-error code",
+              15: "FaultSubCode; BDC sub-error code"
+            }
           }
         }
       },
@@ -2779,7 +2805,24 @@
           "data_type": "ENUM",
           "enum_options": {
             "enum_type": "BITFIELD",
-            "values": {}
+            "values": {
+              0: "ChargeEn; BDC allows charging",
+              1: "DischargeEn; BDC allows discharge",
+              2: "Reserved",
+              3: "Reserved",
+              4: "Reserved",
+              5: "Reserved",
+              6: "Reserved",
+              7: "Reserved",
+              8: "WarnSubCode; BDC sub-warning code",
+              9: "WarnSubCode; BDC sub-warning code",
+              10: "WarnSubCode; BDC sub-warning code",
+              11: "WarnSubCode; BDC sub-warning code",
+              12: "FaultSubCode; BDC sub-error code",
+              13: "FaultSubCode; BDC sub-error code",
+              14: "FaultSubCode; BDC sub-error code",
+              15: "FaultSubCode; BDC sub-error code"
+            }
           }
         }
       },

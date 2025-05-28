@@ -1,4 +1,4 @@
-from grobro.model.registers import HomeAssistantState
+from grobro.model.registers import HomeAssistantInputRegister
 from grobro.model.registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
 from grobro.model.neo_messages import NeoOutputPowerLimit
 import os
@@ -107,7 +107,7 @@ class Client:
             LOG.debug(f"No config change for {config.device_id}")
         self._config_cache[config.device_id] = config
 
-    def publish_input_register(self, state: HomeAssistantState):
+    def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("ha: publish: %s", state)
         # publish discovery
         self.__publish_device_discovery(state.device_id)
