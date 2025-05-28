@@ -81,6 +81,8 @@ if __name__ == "__main__":
 
     # setup com: grobro -> ha
     grobro_client.on_input_register = ha_client.publish_input_register
+    grobro_client.on_holding_register_input = ha_client.publish_holding_register_input
+
     grobro_client.on_state = ha_client.publish_state
     grobro_client.on_config = ha_client.set_config
     grobro_client.on_message = ha_client.publish_message

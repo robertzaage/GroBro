@@ -42,6 +42,23 @@ class GrowattInputRegister(BaseModel):
     position: GrowattRegisterPosition
     data: GrowattRegisterDataType
 
+class GrowattHoldingRegister(BaseModel):
+    input: Optional[GrowattInputRegister] = None
+
+class HomeAssistantHoldingRegister(BaseModel):
+    name: str
+    publish: bool
+    type: str
+    min: Optional[float] = None
+    max: Optional[float] = None
+    step: Optional[float] = None
+    state_class: Optional[str] = None
+    device_class: Optional[str] = None
+    unit_of_measurement: Optional[str] = None
+    icon: Optional[str] = None
+
+    class Config:
+        extra = "forbid"
 
 class HomeassistantInputRegister(BaseModel):
     name: str
@@ -49,10 +66,16 @@ class HomeassistantInputRegister(BaseModel):
     state_class: Optional[str] = None
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
-    icon: str
+    icon: Optional[str] = None
 
-    class Config:
-        extra = "forbid"
+class HomeAssistantHoldingRegisterValue(BaseModel):
+    name: str
+    value: Union[str, float]
+    register: HomeAssistantHoldingRegister
+
+class HomeAssistantHoldingRegisterInput(BaseModel):
+    device_id: str
+    payload: list[HomeAssistantHoldingRegisterValue] = []
 
 
 class HomeAssistantState(BaseModel):
@@ -64,9 +87,13 @@ class GroBroInputRegister(BaseModel):
     growatt: GrowattInputRegister
     homeassistant: HomeassistantInputRegister
 
+class GroBroHoldingRegister(BaseModel):
+    growatt: GrowattHoldingRegister
+    homeassistant: HomeAssistantHoldingRegister
 
 class GroBroRegisters(BaseModel):
     input_registers: dict[str, GroBroInputRegister]
+    holding_registers: dict[str, GroBroHoldingRegister]
 
 
 with resources.files(__package__).joinpath("growatt_neo_registers.json").open(

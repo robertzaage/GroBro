@@ -15,6 +15,7 @@ from grobro.model.neo_command import NeoSetOutputPowerLimit
 from grobro.model.noah_command import NoahSmartPower
 from grobro.model.neo_command import NeoCommandTypes
 from grobro.model.noah_command import NoahCommandTypes
+from grobro.model.registers import HomeAssistantHoldingRegisterInput
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
@@ -110,6 +111,17 @@ class Client:
         # update state
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         self._client.publish(topic, json.dumps(state.payload), retain=False)
+
+    def publish_holding_register_input(
+        self, ha_input: HomeAssistantHoldingRegisterInput
+    ):
+        try:
+            LOG.debug("ha: publish: %s", ha_input)
+            for value in ha_input.payload:
+                topic = f"{HA_BASE_TOPIC}/{value.register.type}/grobro/{ha_input.device_id}/{value.name}/get"
+                self._client.publish(topic, value.value, retain=False)
+        except Exception as e:
+            LOG.error(f"ha: publish msg: {e}")
 
     def publish_message(self, msg):
         try:

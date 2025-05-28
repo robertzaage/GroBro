@@ -1,4 +1,3 @@
-from bin.merge_register import GrowattRegisterPosition
 from rope.base import serializer
 from typing import Optional
 from datetime import datetime
@@ -7,6 +6,7 @@ import logging
 from pydantic.main import BaseModel
 from enum import Enum
 from pylint.checkers.base import register
+from grobro.model.registers import GrowattRegisterPosition
 
 LOG = logging.getLogger(__name__)
 

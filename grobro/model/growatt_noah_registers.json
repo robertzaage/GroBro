@@ -1,4 +1,5 @@
 {
+  "holding_registers": {},
   "input_registers": {
     "bat_2_soc_pct": {
       "growatt": {

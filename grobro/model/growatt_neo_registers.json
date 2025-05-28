@@ -1,4 +1,41 @@
 {
+  "holding_registers": {
+    "output_power_limit": {
+      "growatt": {
+        "input": {
+          "position": {
+            "register_no": 3,
+            "offset": 0,
+            "size": 2
+          },
+          "data": {
+            "data_type": "FLOAT",
+            "float_options": {
+              "delta": 0.0,
+              "multiplier": 1
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Output Power Limit",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    },
+    "output_power_limit_read": {
+      "growatt": {},
+      "homeassistant": {
+        "publish": true,
+        "name": "Output Power Limit Read",
+        "type": "button"
+      }
+    }
+  },
   "input_registers": {
     "Inverter_Status_Mode": {
       "growatt": {

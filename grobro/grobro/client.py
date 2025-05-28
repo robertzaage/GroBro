@@ -1,5 +1,6 @@
 from grobro.model.registers import GrowattRegisterEnumTypes
 from grobro.model.registers import GrowattRegisterDataTypes
+from grobro.model.registers import GrowattRegisterDataType
 from grobro.model.neo_messages import GrowattModbusFunction
 
 """
@@ -22,6 +23,8 @@ from grobro import model
 from grobro.grobro import parser
 from dis import Positions
 from grobro.model.registers import HomeAssistantState
+from grobro.model.registers import HomeAssistantHoldingRegisterInput
+from grobro.model.registers import HomeAssistantHoldingRegisterValue
 from grobro.grobro.builder import scramble
 from grobro.grobro.builder import append_crc
 from grobro.model.neo_messages import NeoOutputPowerLimit
@@ -83,7 +86,9 @@ class Client:
     on_config: Callable[[model.DeviceConfig], None]
     on_state: Callable[[str, dict], None]
     on_message: Callable[any, None]
+
     on_input_register: Callable[HomeAssistantState, None]
+    on_holding_register_input: Callable[HomeAssistantHoldingRegisterInput, None]
 
     _client: mqtt.Client
     _forward_mqtt_config: model.MQTTConfig
@@ -163,7 +168,6 @@ class Client:
 
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             if modbus_message:
-                state = HomeAssistantState(device_id=device_id)
                 known_registers = None
                 if device_id.startswith("QMN"):
                     known_registers = KNOWN_NEO_REGISTERS
@@ -173,40 +177,40 @@ class Client:
                     LOG.info("modbus message from unknown device type: %s", device_id)
                     return
                 LOG.debug("received modbus message: %s", modbus_message)
+                if (
+                    modbus_message.function
+                    == GrowattModbusFunction.READ_SINGLE_REGISTER
+                ):
+                    state = HomeAssistantHoldingRegisterInput(device_id=device_id)
+                    for name, register in known_registers.holding_registers.items():
+                        if not register.growatt.input:
+                            continue
+                        data_raw = modbus_message.get_data(
+                            register.growatt.input.position
+                        )
+                        data_type = register.growatt.input.data
+                        value = map_register_value(data_raw, data_type)
+                        state.payload.append(
+                            HomeAssistantHoldingRegisterValue(
+                                name=name,
+                                value=value,
+                                register=register.homeassistant,
+                            )
+                        )
+                    self.on_holding_register_input(state)
+
                 if modbus_message.function == GrowattModbusFunction.READ_INPUT_REGISTER:
+                    state = HomeAssistantState(device_id=device_id)
                     for name, register in known_registers.input_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
-                        unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
                         data_type = register.growatt.data
-                        if not data_raw:
-                            continue
-                        if data_type.data_type == GrowattRegisterDataTypes.FLOAT:
-                            opts = data_type.float_options
-                            value = struct.unpack(unpack_type, data_raw)[0]
-                            value *= opts.multiplier
-                            value += opts.delta
-                            # TODO: this is a workaround for broken messages sent by neo inverters at night.
-                            # They emmit state updates with incredible high wattage, which spoils HA statistics.
-                            # Assuming no one runs a balkony plant with more than a million peak wattage, we drop such messages.
-                            if name == "Ppv" and value > 1000000:
-                                LOG.debug("dropping bad payload: %s", device_id)
-                                continue
-                            state.payload[name] = round(value, 3)
-                        elif data_type.data_type == GrowattRegisterDataTypes.ENUM:
-                            opts = data_type.enum_options
-                            value = struct.unpack(unpack_type, data_raw)[0]
-                            if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
-                                continue  # TODO: implement
-                            elif opts.enum_type == GrowattRegisterEnumTypes.INT_MAP:
-                                enum_value = opts.values.get(int(value), None)
-                                if not enum_value:
-                                    continue
-                                state.payload[name] = value
-                        elif data_type.data_type == GrowattRegisterDataTypes.STRING:
-                            value = data_raw.decode("ascii", errors="ignore").strip(
-                                "\x00"
-                            )
-                            state.payload[name] = value
+                        # TODO: this is a workaround for broken messages sent by neo inverters at night.
+                        # They emmit state updates with incredible high wattage, which spoils HA statistics.
+                        # Assuming no one runs a balkony plant with more than a million peak wattage, we drop such messages.
+                        if name == "Ppv" and value > 1000000:
+                            LOG.debug("dropping bad payload: %s", device_id)
+                            return
+                        state.payload[name] = map_register_value(data_raw, data_type)
                     self.on_input_register(state)
                     return
 
@@ -258,7 +262,6 @@ class Client:
                         LOG.debug(reg)
                     return
 
-                print(all_registers)
                 self.__publish_state(device_id, all_registers)
                 LOG.info(
                     f"Published state for {device_id} with {len(all_registers)} registers"
@@ -410,3 +413,28 @@ def get_property(msg, prop) -> str:
         if key == prop:
             return value
     return None
+
+
+def map_register_value(data_raw: bytes, data_type: GrowattRegisterDataType):
+    if not data_raw:
+        return None
+    unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
+    if data_type.data_type == GrowattRegisterDataTypes.FLOAT:
+        opts = data_type.float_options
+        value = struct.unpack(unpack_type, data_raw)[0]
+        value *= opts.multiplier
+        value += opts.delta
+        return round(value, 3)
+    elif data_type.data_type == GrowattRegisterDataTypes.ENUM:
+        opts = data_type.enum_options
+        value = struct.unpack(unpack_type, data_raw)[0]
+        if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
+            return None  # TODO: implement
+        elif opts.enum_type == GrowattRegisterEnumTypes.INT_MAP:
+            enum_value = opts.values.get(int(value), None)
+            if not enum_value:
+                return None
+            return value
+    elif data_type.data_type == GrowattRegisterDataTypes.STRING:
+        value = data_raw.decode("ascii", errors="ignore").strip("\x00")
+        return value
