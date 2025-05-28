@@ -1,7 +1,7 @@
-from grobro.model.registers import HomeAssistantInputRegister
-from grobro.model.registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
-from grobro.model.neo_messages import NeoOutputPowerLimit
+from grobro.model.growatt_registers import HomeAssistantInputRegister
+from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
 import os
+import struct
 import ssl
 import json
 import logging
@@ -11,16 +11,12 @@ from threading import Timer
 from typing import Callable
 
 import paho.mqtt.client as mqtt
-from grobro.model.neo_command import NeoReadOutputPowerLimit
-from grobro.model.neo_command import NeoSetOutputPowerLimit
-from grobro.model.noah_command import NoahSmartPower
-from grobro.model.neo_command import NeoCommandTypes
-from grobro.model.noah_command import NoahCommandTypes
-from grobro.model.registers import HomeAssistantHoldingRegisterInput
-from grobro.model.registers import GroBroRegisters
+from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
+from grobro.model.growatt_registers import GroBroRegisters
 from typing import Optional
-from grobro.model.neo_command import GrowattModbusCommand
-from grobro.model.neo_messages import GrowattModbusFunction
+from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.model.modbus_message import GrowattModbusFunction
+from grobro.model.modbus_function import GrowattModbusFunctionMultiple
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
@@ -28,43 +24,17 @@ LOG = logging.getLogger(__name__)
 
 
 class Client:
-    on_command: None | Callable[model.Command, None]
+    on_command: Optional[Callable[GrowattModbusFunctionSingle, None]]
 
     _client: mqtt.Client
-
     _config_cache: dict[str, model.DeviceConfig] = {}
     _discovery_cache: list[str] = []
     _device_timers: dict[str, Timer] = {}
-    # device_type -> variable_name -> DeviceState
-    _known_states: dict[str, dict[str, model.DeviceState]] = {}
-    # device_type -> variable_name -> Command
-    _known_commands: dict[str, dict[str, dict]] = {}
 
     def __init__(
         self,
         mqtt_config: model.MQTTConfig,
     ):
-
-        # Load possible device states
-        for device_type in ["neo", "noah"]:
-            self._known_states[device_type] = {}
-            states_file = resources.files(__package__).joinpath(
-                f"growatt_{device_type}_states.json"
-            )
-            with states_file.open("r") as f:
-                for variable_name, state in json.load(f).items():
-                    if " " in variable_name:
-                        LOG.warning("State '%s' contains illegal whitespace")
-                    self._known_states[device_type][variable_name] = model.DeviceState(
-                        variable_name=variable_name, **state
-                    )
-            self._known_commands[device_type] = {}
-            cmd_file = resources.files(__package__).joinpath(
-                f"growatt_{device_type}_commands.json"
-            )
-            with cmd_file.open("r") as f:
-                for variable_name, cmd in json.load(f).items():
-                    self._known_commands[device_type][variable_name] = cmd
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
         self._client = mqtt.Client(
@@ -131,35 +101,6 @@ class Client:
         except Exception as e:
             LOG.error(f"ha: publish msg: {e}")
 
-    def publish_message(self, msg):
-        try:
-            LOG.debug("ha: publish: %s", msg)
-            if isinstance(msg, NeoOutputPowerLimit):
-                msg_type = NeoCommandTypes.OUTPUT_POWER_LIMIT
-                topic = f"{HA_BASE_TOPIC}/{msg_type.ha_type}/grobro/{msg.device_id}/{msg_type.ha_name}/get"
-                LOG.debug(
-                    "forward message: %s to %s: %s", type(msg).__name__, topic, msg
-                )
-                self._client.publish(topic, msg.value, retain=False)
-        except Exception as e:
-            LOG.error(f"ha: publish msg: {e}")
-
-    def publish_state(self, device_id, state):
-        try:
-            self.__publish_device_discovery(device_id)
-
-            # update availability
-            self.__publish_availability(device_id, True)
-            if DEVICE_TIMEOUT > 0:
-                self.__reset_device_timer(device_id)
-
-            # update state
-            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
-            self._client.publish(topic, json.dumps(state), retain=False)
-
-        except Exception as e:
-            LOG.error(f"Publish device state: {e}")
-
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
 
@@ -186,47 +127,44 @@ class Client:
             LOG.info("unknown device type: %s", device_id)
             return
 
-        register_no = known_registers.holding_registers[
-            cmd_name
-        ].growatt.output.position.register_no
-
         if cmd_type == "button" and action == "read":
+            pos = known_registers.holding_registers[cmd_name].growatt.position
             self.on_command(
-                GrowattModbusCommand(
+                GrowattModbusFunctionSingle(
                     device_id=device_id,
                     function=GrowattModbusFunction.READ_SINGLE_REGISTER,
-                    register=register_no,
-                    value=register_no,
+                    register=pos.register_no,
+                    value=pos.register_no,
                 )
             )
         if cmd_type == "number" and action == "set":
-            pub = GrowattModbusCommand(
-                device_id=device_id,
-                function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
-                register=register_no,
-                value=int(msg.payload.decode()),
-            )
-            print(pub)
-            self.on_command(pub)
-        return
+            # TODO: find a way to pack multi-register commands only by json declaration
+            if cmd_name == "smart_power":
+                value = int(msg.payload.decode())
+                setup, setdown = 0, 0
+                if value < 0:
+                    setdown = -value
+                else:
+                    setup = value
+                self.on_command(
+                    GrowattModbusFunctionMultiple(
+                        device_id=device_id,
+                        function=GrowattModbusFunction.PRESET_MULTIPLE_REGISTER,
+                        start=310,
+                        end=312,
+                        values=struct.pack(">HHH", setup, setdown, 1),
+                    )
+                )
+                return
 
-        cmd = None
-        for noah_cmd_type in NoahCommandTypes:
-            if noah_cmd_type.matches(cmd_name, cmd_type):
-                cmd = noah_cmd_type.model.parse_ha(device_id, msg.payload)
-                break
-        for neo_cmd_type in NeoCommandTypes:
-            if neo_cmd_type.matches(cmd_name, cmd_type):
-                cmd = neo_cmd_type.model.parse_ha(device_id, msg.payload)
-                break
-
-        if cmd and self.on_command:
-            self.on_command(cmd)
-        else:
-            LOG.warning(
-                "received unknown command %s: %s",
-                msg.topic,
-                msg.payload,
+            pos = known_registers.holding_registers[cmd_name].growatt.position
+            self.on_command(
+                GrowattModbusFunctionSingle(
+                    device_id=device_id,
+                    function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                    register=pos.register_no,
+                    value=int(msg.payload.decode()),
+                )
             )
 
     # Reset the timeout timer for a device.
@@ -297,12 +235,13 @@ class Client:
                 "unique_id": unique_id,
                 **cmd.homeassistant.dict(exclude_none=True),
             }
-            payload["cmps"][f"{unique_id}_read"] = {
-                "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/read",
-                "platform": "button",
-                "unique_id": f"{unique_id}_read",
-                "name": f"{cmd.homeassistant.name} Read",
-            }
+            if cmd.growatt:
+                payload["cmps"][f"{unique_id}_read"] = {
+                    "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/read",
+                    "platform": "button",
+                    "unique_id": f"{unique_id}_read",
+                    "name": f"{cmd.homeassistant.name} Read",
+                }
 
         for state_name, state in known_registers.input_registers.items():
             if not state.homeassistant.publish:
@@ -347,6 +286,11 @@ class Client:
             cmd_type = cmd.homeassistant.type
             self._client.publish(
                 f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
+                json.dumps({"migrate_discovery": True}),
+                retain=True,
+            )
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}_read/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
@@ -396,4 +340,5 @@ class Client:
         if config.mac_address:
             device_info["connections"] = [["mac", config.mac_address]]
 
+        return device_info
         return device_info

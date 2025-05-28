@@ -1,5 +1,17 @@
 {
-  "holding_registers": {},
+  "holding_registers": {
+    "smart_power": {
+      "homeassistant": {
+        "publish": true,
+        "name": "Smart Power Diff",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": -800,
+        "max": 800,
+        "step": 1
+      }
+    }
+  },
   "input_registers": {
     "bat_2_soc_pct": {
       "growatt": {

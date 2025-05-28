@@ -68,15 +68,6 @@ class GrowattInputRegister(BaseModel):
     data: GrowattRegisterDataType
 
 
-class GrowattHoldingOutputRegister(BaseModel):
-    position: GrowattRegisterPosition
-
-
-class GrowattHoldingRegister(BaseModel):
-    input: Optional[GrowattInputRegister] = None
-    output: Optional[GrowattHoldingOutputRegister] = None
-
-
 class HomeAssistantHoldingRegister(BaseModel):
     name: str
     publish: bool
@@ -124,7 +115,7 @@ class GroBroInputRegister(BaseModel):
 
 
 class GroBroHoldingRegister(BaseModel):
-    growatt: GrowattHoldingRegister
+    growatt: Optional[GrowattInputRegister] = None
     homeassistant: HomeAssistantHoldingRegister
 
 

@@ -1,8 +1,3 @@
-from grobro.model.registers import GrowattRegisterEnumTypes
-from grobro.model.registers import GrowattRegisterDataTypes
-from grobro.model.registers import GrowattRegisterDataType
-from grobro.model.neo_messages import GrowattModbusFunction
-
 """
 Client for the grobro mqtt side, handling messages from/to
 * growatt cloud
@@ -22,16 +17,20 @@ from paho.mqtt.client import MQTTMessage
 from grobro import model
 from grobro.grobro import parser
 from dis import Positions
-from grobro.model.registers import HomeAssistantInputRegister
-from grobro.model.registers import HomeAssistantHoldingRegisterInput
-from grobro.model.registers import HomeAssistantHoldingRegisterValue
-from grobro.model.neo_command import GrowattModbusCommand
-from grobro.grobro.builder import scramble
 from grobro.grobro.builder import append_crc
-from grobro.model.neo_messages import NeoOutputPowerLimit
+from grobro.grobro.builder import scramble
+from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.model.modbus_message import GrowattModbusFunction
+from grobro.model.modbus_message import GrowattModbusMessage
 from grobro.model.mqtt_config import MQTTConfig
-from grobro.model.neo_messages import GrowattModbusMessage
-from grobro.model.registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
+from grobro.model.growatt_registers import GrowattRegisterDataType
+from grobro.model.growatt_registers import GrowattRegisterDataTypes
+from grobro.model.growatt_registers import GrowattRegisterEnumTypes
+from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
+from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
+from grobro.model.growatt_registers import HomeAssistantInputRegister
+from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
+
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -104,7 +103,7 @@ class Client:
             client.loop_stop()
             client.disconnect()
 
-    def send_command(self, cmd: GrowattModbusCommand):
+    def send_command(self, cmd: GrowattModbusFunctionSingle):
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
 
@@ -163,12 +162,8 @@ class Client:
                 ):
                     state = HomeAssistantHoldingRegisterInput(device_id=device_id)
                     for name, register in known_registers.holding_registers.items():
-                        if not register.growatt.input:
-                            continue
-                        data_raw = modbus_message.get_data(
-                            register.growatt.input.position
-                        )
-                        value = register.growatt.input.data.parse(data_raw)
+                        data_raw = modbus_message.get_data(register.growatt.position)
+                        value = register.growatt.data.parse(data_raw)
 
                         state.payload.append(
                             HomeAssistantHoldingRegisterValue(
