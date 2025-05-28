@@ -15,6 +15,11 @@
               "multiplier": 1
             }
           }
+        },
+        "output":{
+          "position": {
+            "register_no": 3
+          }
         }
       },
       "homeassistant": {
@@ -25,14 +30,6 @@
         "min": 0,
         "max": 100,
         "step": 1
-      }
-    },
-    "output_power_limit_read": {
-      "growatt": {},
-      "homeassistant": {
-        "publish": true,
-        "name": "Output Power Limit Read",
-        "type": "button"
       }
     }
   },

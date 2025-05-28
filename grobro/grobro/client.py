@@ -25,6 +25,7 @@ from dis import Positions
 from grobro.model.registers import HomeAssistantState
 from grobro.model.registers import HomeAssistantHoldingRegisterInput
 from grobro.model.registers import HomeAssistantHoldingRegisterValue
+from grobro.model.neo_command import GrowattModbusCommand
 from grobro.grobro.builder import scramble
 from grobro.grobro.builder import append_crc
 from grobro.model.neo_messages import NeoOutputPowerLimit
@@ -125,7 +126,7 @@ class Client:
             client.loop_stop()
             client.disconnect()
 
-    def send_command(self, cmd: model.Command):
+    def send_command(self, cmd: GrowattModbusCommand):
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
 
@@ -204,6 +205,7 @@ class Client:
                     for name, register in known_registers.input_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
                         data_type = register.growatt.data
+                        value = map_register_value(data_raw, data_type)
                         # TODO: this is a workaround for broken messages sent by neo inverters at night.
                         # They emmit state updates with incredible high wattage, which spoils HA statistics.
                         # Assuming no one runs a balkony plant with more than a million peak wattage, we drop such messages.

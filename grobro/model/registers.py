@@ -42,8 +42,15 @@ class GrowattInputRegister(BaseModel):
     position: GrowattRegisterPosition
     data: GrowattRegisterDataType
 
+
+class GrowattHoldingOutputRegister(BaseModel):
+    position: GrowattRegisterPosition
+
+
 class GrowattHoldingRegister(BaseModel):
     input: Optional[GrowattInputRegister] = None
+    output: Optional[GrowattHoldingOutputRegister] = None
+
 
 class HomeAssistantHoldingRegister(BaseModel):
     name: str
@@ -60,6 +67,7 @@ class HomeAssistantHoldingRegister(BaseModel):
     class Config:
         extra = "forbid"
 
+
 class HomeassistantInputRegister(BaseModel):
     name: str
     publish: bool
@@ -68,10 +76,12 @@ class HomeassistantInputRegister(BaseModel):
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
 
+
 class HomeAssistantHoldingRegisterValue(BaseModel):
     name: str
     value: Union[str, float]
     register: HomeAssistantHoldingRegister
+
 
 class HomeAssistantHoldingRegisterInput(BaseModel):
     device_id: str
@@ -87,9 +97,11 @@ class GroBroInputRegister(BaseModel):
     growatt: GrowattInputRegister
     homeassistant: HomeassistantInputRegister
 
+
 class GroBroHoldingRegister(BaseModel):
     growatt: GrowattHoldingRegister
     homeassistant: HomeAssistantHoldingRegister
+
 
 class GroBroRegisters(BaseModel):
     input_registers: dict[str, GroBroInputRegister]

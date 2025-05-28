@@ -1,4 +1,5 @@
 from grobro.model.registers import HomeAssistantState
+from grobro.model.registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
 from grobro.model.neo_messages import NeoOutputPowerLimit
 import os
 import ssl
@@ -16,6 +17,10 @@ from grobro.model.noah_command import NoahSmartPower
 from grobro.model.neo_command import NeoCommandTypes
 from grobro.model.noah_command import NoahCommandTypes
 from grobro.model.registers import HomeAssistantHoldingRegisterInput
+from grobro.model.registers import GroBroRegisters
+from typing import Optional
+from grobro.model.neo_command import GrowattModbusCommand
+from grobro.model.neo_messages import GrowattModbusFunction
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
@@ -73,8 +78,9 @@ class Client:
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         for cmd_type in ["number", "button"]:
-            topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/set"
-            self._client.subscribe(topic)
+            for action in ["set", "read"]:
+                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
+                self._client.subscribe(topic)
         self._client.on_message = self.__on_message
 
         for fname in os.listdir("."):
@@ -103,6 +109,8 @@ class Client:
 
     def publish_input_register(self, state: HomeAssistantState):
         LOG.debug("ha: publish: %s", state)
+        # publish discovery
+        self.__publish_device_discovery(state.device_id)
         # update availability
         self.__publish_availability(state.device_id, True)
         if DEVICE_TIMEOUT > 0:
@@ -138,14 +146,7 @@ class Client:
 
     def publish_state(self, device_id, state):
         try:
-            # send discovery
-            if device_id.startswith("QMN"):
-                device_type = "neo"
-            if device_id.startswith("0PVP"):
-                device_type = "noah"
-            state_lookup = self._known_states[device_type]
-
-            self.__publish_device_discovery(device_id, device_type, state.keys())
+            self.__publish_device_discovery(device_id)
 
             # update availability
             self.__publish_availability(device_id, True)
@@ -162,18 +163,52 @@ class Client:
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
 
-        cmd_type, device_id, cmd_name = None, None, None
+        cmd_type, device_id, cmd_name, action = None, None, None, None
         if len(parts) == 5 and parts[0] in ["number"]:
-            cmd_type, _, device_id, cmd_name, _ = parts
+            cmd_type, _, device_id, cmd_name, action = parts
         if len(parts) == 5 and parts[0] in ["button"]:
-            cmd_type, _, device_id, cmd_name, _ = parts
+            cmd_type, _, device_id, cmd_name, action = parts
 
         LOG.debug(
-            "received %s command %s for device %s",
+            "received %s %s command %s for device %s",
             cmd_type,
+            action,
             cmd_name,
             device_id,
         )
+
+        known_registers: Optional[GroBroRegisters] = None
+        if device_id.startswith("QMN"):
+            known_registers = KNOWN_NEO_REGISTERS
+        elif device_id.startswith("0PVP"):
+            known_registers = KNOWN_NOAH_REGISTERS
+        if not known_registers:
+            LOG.info("unknown device type: %s", device_id)
+            return
+
+        register_no = known_registers.holding_registers[
+            cmd_name
+        ].growatt.output.position.register_no
+
+        if cmd_type == "button" and action == "read":
+            self.on_command(
+                GrowattModbusCommand(
+                    device_id=device_id,
+                    function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    register=register_no,
+                    value=register_no,
+                )
+            )
+        if cmd_type == "number" and action == "set":
+            pub = GrowattModbusCommand(
+                device_id=device_id,
+                function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                register=register_no,
+                value=int(msg.payload.decode()),
+            )
+            print(pub)
+            self.on_command(pub)
+        return
 
         cmd = None
         for noah_cmd_type in NoahCommandTypes:
@@ -219,11 +254,20 @@ class Client:
             retain=False,
         )
 
-    def __publish_device_discovery(self, device_id, device_type, available_states):
+    def __publish_device_discovery(self, device_id):
         if device_id in self._discovery_cache:
             return  # already pulished
 
-        self.__migrate_entity_discovery(device_id, device_type)
+        known_registers: Optional[GroBroRegisters] = None
+        if device_id.startswith("QMN"):
+            known_registers = KNOWN_NEO_REGISTERS
+        elif device_id.startswith("0PVP"):
+            known_registers = KNOWN_NOAH_REGISTERS
+        if not known_registers:
+            LOG.info("unable to pubish unknown device type: %s", device_id)
+            return
+
+        self.__migrate_entity_discovery(device_id, known_registers)
 
         topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
 
@@ -241,34 +285,41 @@ class Client:
             "cmps": {},
         }
 
-        for cmd_name, cmd in self._known_commands[device_type].items():
+        for cmd_name, cmd in known_registers.holding_registers.items():
+            if not cmd.homeassistant.publish:
+                continue
             unique_id = f"grobro_{device_id}_cmd_{cmd_name}"
-            cmd_type = cmd["type"]
+            cmd_type = cmd.homeassistant.type
             payload["cmps"][unique_id] = {
                 "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
                 "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
                 "platform": cmd_type,
                 "unique_id": unique_id,
-                **cmd,
+                **cmd.homeassistant.dict(exclude_none=True),
+            }
+            payload["cmps"][f"{unique_id}_read"] = {
+                "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/read",
+                "platform": "button",
+                "unique_id": f"{unique_id}_read",
+                "name": f"{cmd.homeassistant.name} Read",
             }
 
-        for state_name, state in self._known_states[device_type].items():
-            if state_name not in available_states:
+        for state_name, state in known_registers.input_registers.items():
+            if not state.homeassistant.publish:
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
-                "name": state.name,
+                "name": state.homeassistant.name,
                 "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
-                "value_template": f"{{{{ value_json['{state.variable_name}'] }}}}",
+                "value_template": f"{{{{ value_json['{state_name}'] }}}}",
                 "unique_id": unique_id,
-                "object_id": f"{device_id}_{state.variable_name}",
-                "device_class": state.device_class,
-                "state_class": state.state_class,
-                "unit_of_measurement": state.unit_of_measurement,
-                "icon": state.icon,
+                "object_id": f"{device_id}_{state_name}",
+                "device_class": state.homeassistant.device_class,
+                "state_class": state.homeassistant.state_class,
+                "unit_of_measurement": state.homeassistant.unit_of_measurement,
+                "icon": state.homeassistant.icon,
             }
-        # homeassistant/device/0AFFD2/config
         LOG.debug(
             "announce device %s under %s: %s",
             device_id,
@@ -282,7 +333,7 @@ class Client:
         )
         self._discovery_cache.append(device_id)
 
-    def __migrate_entity_discovery(self, device_id, device_type):
+    def __migrate_entity_discovery(self, device_id, knwon_registers: GroBroRegisters):
         old_entities = [
             ("set_wirk", "number"),
         ]
@@ -292,16 +343,16 @@ class Client:
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
-        for cmd_name, cmd in self._known_commands[device_type].items():
-            cmd_type = cmd["type"]
+        for cmd_name, cmd in knwon_registers.holding_registers.items():
+            cmd_type = cmd.homeassistant.type
             self._client.publish(
                 f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
-        for state_name, state in self._known_states[device_type].items():
+        for state_name, state in knwon_registers.input_registers.items():
             self._client.publish(
-                f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state.variable_name}/config",
+                f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )

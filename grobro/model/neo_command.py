@@ -1,6 +1,68 @@
+from grobro.model.neo_messages import GrowattModbusFunction
 import struct
 from pydantic import BaseModel
 from enum import Enum
+from pylint.checkers.base import register
+from typing import Optional
+
+MODBUS_COMMAND_STRUCT = ">HHHBB30sHH"
+
+
+class GrowattModbusCommand(BaseModel):
+    """
+    Represents a message that can be sent to the inverter
+    to read or write holding registers.
+
+    Structure:
+        - H - 2 byte unknown
+        - H - 2 byte constant 7
+        - H - 2 byte message length (excluding register count, constant and message length)
+        - B - 1 byte modbus device address (seems to be constant 1 in mqtt)
+        - B - 1 byte function
+        - 30s - 30 byte zero-padded device id
+        - H - 2 byte register
+        - H - 2 byte either: register (again) for READ_SINGLE_REGISTER or value for PRESET_SINGLE_REGISTER
+    """
+
+    device_id: str
+    function: GrowattModbusFunction
+    register: int
+    value: int
+
+    @staticmethod
+    def parse_grobro(buffer) -> Optional["GrowattModbusMessage"]:
+        (
+            constant_1,
+            constant_7,
+            msg_len,
+            constant_1,
+            function,
+            device_id_raw,
+            register,
+            value,
+        ) = struct.unpack(MODBUS_COMMAND_STRUCT, buffer[0:42])
+
+        device_id = device_id_raw.decode("ascii", errors="ignore").strip("\x00")
+
+        return GrowattModbusCommand(
+            device_id=device_id,
+            function=function,
+            register=register,
+            value=value,
+        )
+
+    def build_grobro(self) -> bytes:
+        return struct.pack(
+            MODBUS_COMMAND_STRUCT,
+            1,
+            7,
+            36,
+            1,
+            self.function,
+            self.device_id.encode("ascii").ljust(30, b"\x00"),  # device_id
+            self.register,
+            self.value,
+        )
 
 
 class NeoReadOutputPowerLimit(BaseModel):
@@ -101,3 +163,18 @@ class NeoCommandTypes(Enum):
 
     def matches(self, name, ha_type) -> bool:
         return self.ha_name == name and self.ha_type == ha_type
+
+c1 = GrowattModbusCommand(
+    device_id="ADSF1234",
+    function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+    register=3,
+    value=42,
+)
+c2 = NeoSetOutputPowerLimit(
+    device_id="ADSF1234",
+    value=42,
+)
+
+print(c1.build_grobro().hex(" "))
+print(c2.build_grobro().hex(" "))
+
