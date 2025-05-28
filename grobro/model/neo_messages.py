@@ -1,3 +1,4 @@
+from bin.merge_register import GrowattRegisterPosition
 from rope.base import serializer
 from typing import Optional
 from datetime import datetime
@@ -132,6 +133,15 @@ class GrowattModbusMessage(BaseModel):
             result += block.size()
         return result
 
+    def get_data(self, pos: GrowattRegisterPosition):
+        for block in self.register_blocks:
+            if block.start > pos.register_no or block.end < pos.register_no:
+                continue
+            block_pos = (pos.register_no - block.start) * 2 + pos.offset
+            return block.values[block_pos:block_pos+pos.size]
+        return None
+
+
     @staticmethod
     def parse_grobro(buffer) -> Optional["GrowattModbusMessage"]:
         (unknown, constant_7, msg_len, constant_1, function, device_id_raw) = (
@@ -141,7 +151,7 @@ class GrowattModbusMessage(BaseModel):
             )
         )
         if msg_len != len(buffer[8:]):
-            raise Exception(f"invalid message len: {msg_len} != {len(buffer[8:])}")
+            return None
         device_id = device_id_raw.decode("ascii", errors="ignore").strip("\x00")
         register_blocks = []
         offset = 38

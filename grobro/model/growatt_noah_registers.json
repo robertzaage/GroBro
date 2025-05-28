@@ -8,12 +8,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 2 SoC",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -27,12 +31,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 3 SoC",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -46,12 +54,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 4 SoC",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -77,8 +89,8 @@
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Priority Mode",
+        "publish": true,
         "icon": "mdi:alert-circle"
       }
     },
@@ -102,8 +114,8 @@
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery System State",
+        "publish": true,
         "icon": "mdi:battery-sync"
       }
     },
@@ -115,12 +127,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Total Battery SoC",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
@@ -135,12 +151,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV1 voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -155,12 +175,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV2 voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -175,12 +199,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Output power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -195,12 +223,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Output voltage",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "V",
         "icon": "mdi:flash"
@@ -214,12 +246,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Temperature 2",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
@@ -234,12 +270,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.001
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 1 max. Cell Voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -254,12 +294,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.001
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 1 min. Cell Voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -274,12 +318,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV total power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -294,12 +342,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -30000.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Charging Power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -314,12 +366,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV energy today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -334,12 +390,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV energy month",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -354,16 +414,12 @@
           "size": 4
         },
         "data": {
-          "data_type": "STRING",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
+          "data_type": "STRING"
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Serial Part 1",
+        "publish": true,
         "icon": "mdi:identifier"
       }
     },
@@ -375,12 +431,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV energy year",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -395,12 +455,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Energy output device",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -415,16 +479,12 @@
           "size": 4
         },
         "data": {
-          "data_type": "STRING",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
+          "data_type": "STRING"
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Serial Part 3",
+        "publish": true,
         "icon": "mdi:identifier"
       }
     },
@@ -436,16 +496,12 @@
           "size": 4
         },
         "data": {
-          "data_type": "STRING",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
+          "data_type": "STRING"
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Serial Part 2",
+        "publish": true,
         "icon": "mdi:identifier"
       }
     },
@@ -457,16 +513,12 @@
           "size": 4
         },
         "data": {
-          "data_type": "STRING",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
+          "data_type": "STRING"
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Serial Part 4",
+        "publish": true,
         "icon": "mdi:identifier"
       }
     },
@@ -478,12 +530,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery 1 SoC",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -497,12 +553,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Discharge Limit",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -516,12 +576,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Charge Limit",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
@@ -535,12 +599,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Temperature 1",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
@@ -555,12 +623,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV1 input current",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
@@ -574,12 +646,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "PV2 input current",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
@@ -593,12 +669,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery Count",
+        "publish": true,
         "icon": "mdi:information"
       }
     },
@@ -610,12 +690,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Battery Cycle Count",
+        "publish": true,
         "icon": "mdi:counter"
       }
     },
@@ -627,12 +711,16 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT"
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
         }
       },
       "homeassistant": {
-        "publish": true,
         "name": "Register No 102",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "V",
         "icon": "mdi:flash"

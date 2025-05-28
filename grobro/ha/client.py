@@ -1,3 +1,4 @@
+from grobro.model.registers import HomeAssistantState
 from grobro.model.neo_messages import NeoOutputPowerLimit
 import os
 import ssl
@@ -98,6 +99,17 @@ class Client:
         else:
             LOG.debug(f"No config change for {config.device_id}")
         self._config_cache[config.device_id] = config
+
+    def publish_input_register(self, state: HomeAssistantState):
+        LOG.debug("ha: publish: %s", state)
+        # update availability
+        self.__publish_availability(state.device_id, True)
+        if DEVICE_TIMEOUT > 0:
+            self.__reset_device_timer(state.device_id)
+
+        # update state
+        topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
+        self._client.publish(topic, json.dumps(state.payload), retain=False)
 
     def publish_message(self, msg):
         try:

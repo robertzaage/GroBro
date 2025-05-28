@@ -1,17 +1,8 @@
-from typing import Optional
+from typing import Optional, Union
 from enum import Enum
 from pydantic import BaseModel
 import importlib.resources as resources
 import json
-
-with resources.files(__package__).joinpath("growatt_neo_registers.json").open(
-    "rb"
-) as f:
-    NEO_REGISTERS = json.load(f)
-with resources.files(__package__).joinpath("growatt_noah_registers.json").open(
-    "rb"
-) as f:
-    NOAH_REGISTERS = json.load(f)
 
 
 class GrowattRegisterDataTypes(str, Enum):
@@ -64,6 +55,11 @@ class HomeassistantInputRegister(BaseModel):
         extra = "forbid"
 
 
+class HomeAssistantState(BaseModel):
+    device_id: str
+    payload: dict[str, Union[str, float]] = {}
+
+
 class GroBroInputRegister(BaseModel):
     growatt: GrowattInputRegister
     homeassistant: HomeassistantInputRegister
@@ -71,3 +67,13 @@ class GroBroInputRegister(BaseModel):
 
 class GroBroRegisters(BaseModel):
     input_registers: dict[str, GroBroInputRegister]
+
+
+with resources.files(__package__).joinpath("growatt_neo_registers.json").open(
+    "rb"
+) as f:
+    KNOWN_NEO_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
+with resources.files(__package__).joinpath("growatt_noah_registers.json").open(
+    "rb"
+) as f:
+    KNOWN_NOAH_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
