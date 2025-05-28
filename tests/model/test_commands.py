@@ -3,9 +3,7 @@ import pytest
 import struct
 
 from grobro.grobro import parser
-from grobro.model.neo_command import NeoReadOutputPowerLimit, NeoSetOutputPowerLimit
-from grobro.model.neo_messages import (
-    NeoOutputPowerLimit,
+from grobro.model.modbus_message import (
     GrowattModbusMessage,
     GrowattModbusFunction,
     GrowattModbusBlock,
@@ -14,6 +12,7 @@ from grobro.model.neo_messages import (
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
 from datetime import datetime
+from grobro.model.modbus_function import GrowattModbusFunctionSingle
 
 TEST_DEVICE_ID = "QMN000ABC1D2E3FG"
 
@@ -21,10 +20,6 @@ TEST_DEVICE_ID = "QMN000ABC1D2E3FG"
 @pytest.mark.parametrize(
     ("want_msg", "file_name"),
     [
-        (
-            NeoOutputPowerLimit(device_id=TEST_DEVICE_ID, value=42),
-            "NeoOutputPowerLimit.bin",
-        ),
         (
             GrowattModbusMessage(
                 unknown=1,
@@ -41,11 +36,21 @@ TEST_DEVICE_ID = "QMN000ABC1D2E3FG"
             "NeoOutputPowerLimit.bin",
         ),
         (
-            NeoSetOutputPowerLimit(device_id=TEST_DEVICE_ID, value=42),
+            GrowattModbusFunctionSingle(
+                device_id=TEST_DEVICE_ID,
+                function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                register=3,
+                value=42,
+            ),
             "NeoSetOutputPowerLimit.bin",
         ),
         (
-            NeoReadOutputPowerLimit(device_id=TEST_DEVICE_ID),
+            GrowattModbusFunctionSingle(
+                device_id=TEST_DEVICE_ID,
+                function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                register=3,
+                value=3,
+            ),
             "NeoReadOutputPowerLimit.bin",
         ),
         (
