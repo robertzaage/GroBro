@@ -139,23 +139,19 @@ class Client:
             )
         if cmd_type == "number" and action == "set":
             # TODO: find a way to pack multi-register commands only by json declaration
-            if cmd_name == "smart_power":
+            if cmd_name == "slot1_power":
                 value = int(msg.payload.decode())
-                setup, setdown = 0, 0
-                if value < 0:
-                    setdown = -value
-                else:
-                    setup = value
                 self.on_command(
                     GrowattModbusFunctionMultiple(
                         device_id=device_id,
                         function=GrowattModbusFunction.PRESET_MULTIPLE_REGISTER,
-                        start=310,
-                        end=312,
-                        values=struct.pack(">HHH", setup, setdown, 1),
+                        start=254,
+                        end=258,
+                        values=struct.pack(">BBBBHHH", 0, 0, 23, 59, 0, value, 1),
                     )
                 )
                 return
+
 
             pos = known_registers.holding_registers[cmd_name].growatt.position
             self.on_command(

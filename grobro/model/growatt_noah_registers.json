@@ -1,12 +1,12 @@
 {
   "holding_registers": {
-    "smart_power": {
+    "slot1_power": {
       "homeassistant": {
         "publish": true,
-        "name": "Smart Power Diff",
+        "name": "Slot 1 Power",
         "unit_of_measurement": "W",
         "type": "number",
-        "min": -800,
+        "min": 0,
         "max": 800,
         "step": 1
       }

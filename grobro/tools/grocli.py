@@ -63,24 +63,19 @@ def build_slot(device_id: str, action: str, slot: int, start: str = None, end: s
     payload = dev_bytes
     payload += b"\x00" * 14  # Reserved padding
 
+    """
+    depending on the slot, we set the start and end register
+    """
     control_bytes = {
-        1: (0x01, 0x02, 0x00),  # (Unknown 1, Unknown 2, Unknown 3)
-        2: (0x03, 0x01, 0x07),
-        3: (0x08, 0x01, 0x0C),
-        4: (0x0D, 0x01, 0x11),
-        5: (0x12, 0x01, 0x16),
-    }
-
-    control1, control2, extra = control_bytes.get(slot, (0x01, 0x01, 0x00))
+            1: 0x00FE0102, # 254 - 258
+            2: 0x01030107, # 259 - 263
+            3: 0x0108010C, # 264 - 268
+            4: 0x010D0111, # 269 - 273
+            5: 0x01120116, # 274 - 278
+    }.get(slot, 0x01010100)
+    payload += control_bytes.to_bytes(4, byteorder='big')
 
     if action == "slot_create":
-        if slot == 1:
-            payload += b"\x00\xFE"
-            payload += struct.pack(">BB", control1, control2)
-        else:
-            payload += b"\x01"
-            payload += struct.pack(">BBB", control1, control2, extra)
-
         sh, sm = map(int, start.split(":"))
         eh, em = map(int, end.split(":"))
         payload += struct.pack(">BBBB", sh, sm, eh, em)
@@ -90,13 +85,6 @@ def build_slot(device_id: str, action: str, slot: int, start: str = None, end: s
         payload += b"\x00\x01"  # Fixed ending
 
     elif action == "slot_delete":
-        if slot == 1:
-            payload += b"\x00\xFE"
-            payload += struct.pack(">BB", control1, control2)
-        else:
-            payload += b"\x01"
-            payload += struct.pack(">BBB", control1, control2, extra)
-
         payload += b"\x00" * 4  # Clear times
         payload += b"\x00\x00"  # Reserved
         payload += b"\x00" * 4  # Clear power/flag
