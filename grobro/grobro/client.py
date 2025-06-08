@@ -29,7 +29,7 @@ from grobro.model.growatt_registers import GrowattRegisterEnumTypes
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
-from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
+from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS, KNOWN_NEXA_REGISTERS
 
 
 LOG = logging.getLogger(__name__)
@@ -145,6 +145,9 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"received: %s %s", msg.topic, unscrambled.hex(" "))
 
+            if DUMP_MESSAGES:
+                dump_message_binary("unscrambled/"+msg.topic, unscrambled)
+
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             LOG.debug("received modbus message: %s", modbus_message)
             if modbus_message:
@@ -153,14 +156,18 @@ class Client:
                     known_registers = KNOWN_NEO_REGISTERS
                 elif device_id.startswith("0PVP"):
                     known_registers = KNOWN_NOAH_REGISTERS
+                elif device_id.startswith("0HVR"):
+                    known_registers = KNOWN_NEXA_REGISTERS
                 if not known_registers:
                     LOG.info("modbus message from unknown device type: %s", device_id)
                     return
+
                 if (
                     modbus_message.function
                     == GrowattModbusFunction.READ_SINGLE_REGISTER
                 ):
                     state = HomeAssistantHoldingRegisterInput(device_id=device_id)
+                    
                     for name, register in known_registers.holding_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
                         value = register.growatt.data.parse(data_raw)
@@ -176,6 +183,7 @@ class Client:
 
                 if modbus_message.function == GrowattModbusFunction.READ_INPUT_REGISTER:
                     state = HomeAssistantInputRegister(device_id=device_id)
+                    
                     for name, register in known_registers.input_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
                         data_type = register.growatt.data

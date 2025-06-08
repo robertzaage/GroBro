@@ -1,5 +1,5 @@
 from grobro.model.growatt_registers import HomeAssistantInputRegister
-from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS
+from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS, KNOWN_NEXA_REGISTERS
 import os
 import struct
 import ssl
@@ -123,6 +123,8 @@ class Client:
             known_registers = KNOWN_NEO_REGISTERS
         elif device_id.startswith("0PVP"):
             known_registers = KNOWN_NOAH_REGISTERS
+        elif device_id.startswith("0HVR"):
+            known_registers = KNOWN_NEXA_REGISTERS
         if not known_registers:
             LOG.info("unknown device type: %s", device_id)
             return
@@ -197,6 +199,8 @@ class Client:
             known_registers = KNOWN_NEO_REGISTERS
         elif device_id.startswith("0PVP"):
             known_registers = KNOWN_NOAH_REGISTERS
+        elif device_id.startswith("0HVR"):
+            known_registers = KNOWN_NEXA_REGISTERS
         if not known_registers:
             LOG.info("unable to pubish unknown device type: %s", device_id)
             return

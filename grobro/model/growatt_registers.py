@@ -132,3 +132,8 @@ with resources.files(__package__).joinpath("growatt_noah_registers.json").open(
     "rb"
 ) as f:
     KNOWN_NOAH_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
+
+with resources.files(__package__).joinpath("growatt_nexa_registers.json").open(
+    "rb"
+) as f:
+    KNOWN_NEXA_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
