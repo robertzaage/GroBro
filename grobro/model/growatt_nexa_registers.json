@@ -877,7 +877,7 @@
         "name": "Register No 5",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "unit_of_measurement": "kWh",
         "icon": "mdi:flash"
       }
     },
@@ -915,7 +915,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -923,7 +923,7 @@
         "name": "Register No 30",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
     },
@@ -958,10 +958,14 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Value 1",
+              "1": "Value 2",
+              "2": "Value 3"
+            }
           }
         }
       },
@@ -984,7 +988,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -992,7 +996,7 @@
         "name": "Register No 106",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
     },
@@ -1007,7 +1011,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -1015,6 +1019,7 @@
         "name": "Register No 108",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "temperature",
         "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
@@ -1076,7 +1081,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -1084,7 +1089,8 @@
         "name": "Register No 112",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
     },
@@ -1099,7 +1105,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -1107,7 +1113,8 @@
         "name": "Register No 113",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "A",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
     },
@@ -1122,7 +1129,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.01
           }
         }
       },
@@ -1130,7 +1137,8 @@
         "name": "Register No 114",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "A",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
         "icon": "mdi:flash"
       }
     },
@@ -1153,7 +1161,7 @@
         "name": "Register No 116",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "unit_of_measurement": "kWh",
         "icon": "mdi:flash"
       }
     },
@@ -1176,7 +1184,7 @@
         "name": "Register No 117",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "V",
+        "unit_of_measurement": "kWh",
         "icon": "mdi:flash"
       }
     },
