@@ -923,8 +923,9 @@
         "name": "Register No 30",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_71": {
@@ -996,8 +997,9 @@
         "name": "Register No 106",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_108": {
@@ -1021,7 +1023,7 @@
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_110": {
@@ -1091,7 +1093,7 @@
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_113": {
@@ -1115,7 +1117,7 @@
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_114": {
@@ -1139,7 +1141,7 @@
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
-        "icon": "mdi:flash"
+        "icon": "mdi:thermometer"
       }
     },
     "register_116": {
