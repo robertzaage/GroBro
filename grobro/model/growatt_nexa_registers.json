@@ -773,7 +773,7 @@
     "Ipv3": {
       "growatt": {
         "position": {
-          "register_no": 102,
+          "register_no": 107,
           "offset": 0,
           "size": 2
         },
@@ -950,6 +950,29 @@
         "icon": "mdi:flash"
       }
     },
+    "register_102": {
+      "growatt": {
+        "position": {
+          "register_no": 102,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Register No 102",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
+      }
+    },
     "register_106": {
       "growatt": {
         "position": {
@@ -967,29 +990,6 @@
       },
       "homeassistant": {
         "name": "Register No 106",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "V",
-        "icon": "mdi:flash"
-      }
-    },
-    "register_107": {
-      "growatt": {
-        "position": {
-          "register_no": 107,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Register No 107",
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "V",
