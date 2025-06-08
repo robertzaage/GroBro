@@ -1012,7 +1012,7 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 107",
+        "name": "Register No 108",
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "°C",
