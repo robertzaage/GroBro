@@ -1013,7 +1013,6 @@
         "name": "Register No 111",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "W",
         "icon": "mdi:flash"
       }
     },
