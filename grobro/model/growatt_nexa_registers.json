@@ -13,6 +13,334 @@
     }
   },
   "input_registers": {
+    "pac": {
+      "growatt": {
+        "position": {
+          "register_no": 5,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -30000.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Register No 5",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "ppv": {
+      "growatt": {
+        "position": {
+          "register_no": 7,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV total power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "workMode": {
+      "growatt": {
+        "position": {
+          "register_no": 8,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Work Mode",
+        "publish": true,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "totalBatteryPackChargingStatus": {
+      "growatt": {
+        "position": {
+          "register_no": 10,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Idle",
+              "1": "Charging",
+              "2": "Discharging"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery Charging Status",
+        "publish": true,
+        "icon": "mdi:battery-sync"
+      }
+    },
+    "totalBatteryPackChargingPower": {
+      "growatt": {
+        "position": {
+          "register_no": 11,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -30000.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Charging Power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "batteryPackageQuantity": {
+      "growatt": {
+        "position": {
+          "register_no": 12,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery Count",
+        "publish": true,
+        "icon": "mdi:information"
+      }
+    },
+    "totalBatteryPackSoc": {
+      "growatt": {
+        "position": {
+          "register_no": 13,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Total Battery SoC",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "battery",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "totalHouseholdLoad": {
+      "growatt": {
+        "position": {
+          "register_no": 16,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Total Household Load",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "householdLoadApartFromGroplug": {
+      "growatt": {
+        "position": {
+          "register_no": 17,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Register No 17",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "ser_part_1": {
+      "growatt": {
+        "position": {
+          "register_no": 21,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Serial Part 1",
+        "publish": true,
+        "icon": "mdi:identifier"
+      }
+    },
+    "ser_part_2": {
+      "growatt": {
+        "position": {
+          "register_no": 23,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Serial Part 2",
+        "publish": true,
+        "icon": "mdi:identifier"
+      }
+    },
+    "ser_part_3": {
+      "growatt": {
+        "position": {
+          "register_no": 25,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Serial Part 3",
+        "publish": true,
+        "icon": "mdi:identifier"
+      }
+    },
+    "ser_part_4": {
+      "growatt": {
+        "position": {
+          "register_no": 27,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Serial Part 4",
+        "publish": true,
+        "icon": "mdi:identifier"
+      }
+    },
+    "battery1Soc": {
+      "growatt": {
+        "position": {
+          "register_no": 29,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 1 SoC",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "battery1Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 30,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Register No 30",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
     "battery2Soc": {
       "growatt": {
         "position": {
@@ -82,60 +410,10 @@
         "icon": "mdi:percent"
       }
     },
-    "workMode": {
+    "register_71": {
       "growatt": {
         "position": {
-          "register_no": 8,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "ENUM",
-          "enum_options": {
-            "enum_type": "INT_MAP",
-            "values": {
-              "0": "Load First",
-              "1": "Battery First",
-              "2": "Grid First"
-            }
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Work Mode",
-        "publish": true,
-        "icon": "mdi:alert-circle"
-      }
-    },
-    "totalBatteryPackChargingStatus": {
-      "growatt": {
-        "position": {
-          "register_no": 10,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "ENUM",
-          "enum_options": {
-            "enum_type": "INT_MAP",
-            "values": {
-              "0": "Idle",
-              "1": "Charging",
-              "2": "Discharging"
-            }
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Battery Charging Status",
-        "publish": true,
-        "icon": "mdi:battery-sync"
-      }
-    },
-    "totalBatteryPackSoc": {
-      "growatt": {
-        "position": {
-          "register_no": 13,
+          "register_no": 71,
           "offset": 0,
           "size": 2
         },
@@ -148,10 +426,149 @@
         }
       },
       "homeassistant": {
-        "name": "Total Battery SoC",
+        "name": "Register No 71",
+        "publish": true,
+        "icon": "mdi:flash"
+      }
+    },
+    "eacToday": {
+      "growatt": {
+        "position": {
+          "register_no": 72,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "eacMonth": {
+      "growatt": {
+        "position": {
+          "register_no": 74,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy month",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "eacYear": {
+      "growatt": {
+        "position": {
+          "register_no": 76,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy year",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "eacTotal": {
+      "growatt": {
+        "position": {
+          "register_no": 78,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "dischargeSocLimit": {
+      "growatt": {
+        "position": {
+          "register_no": 91,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Discharge Limit",
         "publish": true,
         "state_class": "measurement",
-        "device_class": "battery",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "chargeSocLimit": {
+      "growatt": {
+        "position": {
+          "register_no": 90,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Charge Limit",
+        "publish": true,
+        "state_class": "measurement",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -180,6 +597,53 @@
         "icon": "mdi:flash"
       }
     },
+    "pv1Current": {
+      "growatt": {
+        "position": {
+          "register_no": 93,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 input current",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "pv1Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 94,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Temperature PV1",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
     "pv2Voltage": {
       "growatt": {
         "position": {
@@ -204,10 +668,10 @@
         "icon": "mdi:flash"
       }
     },
-    "pv3Voltage": {
+    "pv2Current": {
       "growatt": {
         "position": {
-          "register_no": 103,
+          "register_no": 96,
           "offset": 0,
           "size": 2
         },
@@ -220,83 +684,11 @@
         }
       },
       "homeassistant": {
-        "name": "PV3 voltage",
+        "name": "PV2 input current",
         "publish": true,
         "state_class": "measurement",
-        "device_class": "voltage",
-        "unit_of_measurement": "V",
-        "icon": "mdi:flash"
-      }
-    },
-    "pv4Voltage": {
-      "growatt": {
-        "position": {
-          "register_no": 106,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV4 voltage",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "voltage",
-        "unit_of_measurement": "V",
-        "icon": "mdi:flash"
-      }
-    },
-    "totalHouseholdLoad": {
-      "growatt": {
-        "position": {
-          "register_no": 16,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Total Household Load",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "power",
-        "unit_of_measurement": "W",
-        "icon": "mdi:flash"
-      }
-    },
-    "onGridVoltage": {
-      "growatt": {
-        "position": {
-          "register_no": 115,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Output voltage (Grid)",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
       }
     },
     "pv2Temp": {
@@ -316,54 +708,6 @@
       },
       "homeassistant": {
         "name": "Temperature PV2",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "temperature",
-        "unit_of_measurement": "°C",
-        "icon": "mdi:thermometer"
-      }
-    },
-    "pv3Temp": {
-      "growatt": {
-        "position": {
-          "register_no": 105,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Temperature PV3",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "temperature",
-        "unit_of_measurement": "°C",
-        "icon": "mdi:thermometer"
-      }
-    },
-    "pv4Temp": {
-      "growatt": {
-        "position": {
-          "register_no": 108,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Temperature PV4",
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
@@ -419,10 +763,10 @@
         "icon": "mdi:flash"
       }
     },
-    "ppv": {
+    "batteryCycles": {
       "growatt": {
         "position": {
-          "register_no": 7,
+          "register_no": 101,
           "offset": 0,
           "size": 2
         },
@@ -435,339 +779,56 @@
         }
       },
       "homeassistant": {
-        "name": "PV total power",
+        "name": "Battery Cycle Count",
+        "publish": true,
+        "icon": "mdi:counter"
+      }
+    },
+    "batterySoh": {
+      "growatt": {
+        "position": {
+          "register_no": 102,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Register No 102",
         "publish": true,
         "state_class": "measurement",
-        "device_class": "power",
-        "unit_of_measurement": "W",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "pv3Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 103,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV3 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
         "icon": "mdi:flash"
-      }
-    },
-    "totalBatteryPackChargingPower": {
-      "growatt": {
-        "position": {
-          "register_no": 11,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Charging Power",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "power",
-        "unit_of_measurement": "W",
-        "icon": "mdi:flash"
-      }
-    },
-    "eacToday": {
-      "growatt": {
-        "position": {
-          "register_no": 72,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.1
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV energy today",
-        "publish": true,
-        "state_class": "total_increasing",
-        "device_class": "energy",
-        "unit_of_measurement": "kWh",
-        "icon": "mdi:solar-power"
-      }
-    },
-    "eacMonth": {
-      "growatt": {
-        "position": {
-          "register_no": 74,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.1
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV energy month",
-        "publish": true,
-        "state_class": "total_increasing",
-        "device_class": "energy",
-        "unit_of_measurement": "kWh",
-        "icon": "mdi:solar-power"
-      }
-    },
-    "ser_part_1": {
-      "growatt": {
-        "position": {
-          "register_no": 21,
-          "offset": 0,
-          "size": 4
-        },
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "name": "Serial Part 1",
-        "publish": true,
-        "icon": "mdi:identifier"
-      }
-    },
-    "eacYear": {
-      "growatt": {
-        "position": {
-          "register_no": 76,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.1
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV energy year",
-        "publish": true,
-        "state_class": "total_increasing",
-        "device_class": "energy",
-        "unit_of_measurement": "kWh",
-        "icon": "mdi:solar-power"
-      }
-    },
-    "eacTotal": {
-      "growatt": {
-        "position": {
-          "register_no": 78,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.1
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV energy total",
-        "publish": true,
-        "state_class": "total_increasing",
-        "device_class": "energy",
-        "unit_of_measurement": "kWh",
-        "icon": "mdi:solar-power"
-      }
-    },
-    "ser_part_3": {
-      "growatt": {
-        "position": {
-          "register_no": 25,
-          "offset": 0,
-          "size": 4
-        },
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "name": "Serial Part 3",
-        "publish": true,
-        "icon": "mdi:identifier"
-      }
-    },
-    "ser_part_2": {
-      "growatt": {
-        "position": {
-          "register_no": 23,
-          "offset": 0,
-          "size": 4
-        },
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "name": "Serial Part 2",
-        "publish": true,
-        "icon": "mdi:identifier"
-      }
-    },
-    "ser_part_4": {
-      "growatt": {
-        "position": {
-          "register_no": 27,
-          "offset": 0,
-          "size": 4
-        },
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "name": "Serial Part 4",
-        "publish": true,
-        "icon": "mdi:identifier"
-      }
-    },
-    "battery1Soc": {
-      "growatt": {
-        "position": {
-          "register_no": 29,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Battery 1 SoC",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
-      }
-    },
-    "dischargeSocLimit": {
-      "growatt": {
-        "position": {
-          "register_no": 91,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Discharge Limit",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
-      }
-    },
-    "chargeSocLimit": {
-      "growatt": {
-        "position": {
-          "register_no": 90,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Charge Limit",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
-      }
-    },
-    "pv1Temp": {
-      "growatt": {
-        "position": {
-          "register_no": 94,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Temperature PV1",
-        "publish": true,
-        "state_class": "measurement",
-        "device_class": "temperature",
-        "unit_of_measurement": "°C",
-        "icon": "mdi:thermometer"
-      }
-    },
-    "pv1Current": {
-      "growatt": {
-        "position": {
-          "register_no": 93,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV1 input current",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "A",
-        "icon": "mdi:current-ac"
-      }
-    },
-    "pv2Current": {
-      "growatt": {
-        "position": {
-          "register_no": 96,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "PV2 input current",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "A",
-        "icon": "mdi:current-ac"
       }
     },
     "pv3Current": {
@@ -793,6 +854,54 @@
         "icon": "mdi:current-ac"
       }
     },
+    "pv3Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 105,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Temperature PV3",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "pv4Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 106,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV4 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
+      }
+    },
     "pv4Current": {
       "growatt": {
         "position": {
@@ -816,98 +925,10 @@
         "icon": "mdi:current-ac"
       }
     },
-    "batteryPackageQuantity": {
+    "pv4Temp": {
       "growatt": {
         "position": {
-          "register_no": 12,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Battery Count",
-        "publish": true,
-        "icon": "mdi:information"
-      }
-    },
-    "batteryCycles": {
-      "growatt": {
-        "position": {
-          "register_no": 101,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Battery Cycle Count",
-        "publish": true,
-        "icon": "mdi:counter"
-      }
-    },
-    "pac": {
-      "growatt": {
-        "position": {
-          "register_no": 5,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Register No 5",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "W",
-        "icon": "mdi:flash"
-      }
-    },
-    "householdLoadApartFromGroplug": {
-      "growatt": {
-        "position": {
-          "register_no": 17,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Register No 17",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "W",
-        "icon": "mdi:flash"
-      }
-    },
-    "battery1Temp": {
-      "growatt": {
-        "position": {
-          "register_no": 30,
+          "register_no": 108,
           "offset": 0,
           "size": 2
         },
@@ -920,56 +941,12 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 30",
+        "name": "Temperature PV4",
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
         "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
-      }
-    },
-    "register_71": {
-      "growatt": {
-        "position": {
-          "register_no": 71,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Register No 71",
-        "publish": true,
-        "icon": "mdi:flash"
-      }
-    },
-    "batterySoh": {
-      "growatt": {
-        "position": {
-          "register_no": 102,
-          "offset": 0,
-          "size": 2
-        },
-        "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
-        }
-      },
-      "homeassistant": {
-        "name": "Register No 102",
-        "publish": true,
-        "state_class": "measurement",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
       }
     },
     "systemTemp": {
@@ -1082,6 +1059,29 @@
         "publish": true,
         "state_class": "measurement",
         "icon": "mdi:thermometer"
+      }
+    },
+    "onGridVoltage": {
+      "growatt": {
+        "position": {
+          "register_no": 115,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output voltage (Grid)",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
       }
     },
     "onGridPower": {
