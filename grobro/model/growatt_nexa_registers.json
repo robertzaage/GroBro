@@ -1072,7 +1072,7 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 0.01
+            "multiplier": 1.0
           }
         }
       },
@@ -1080,7 +1080,7 @@
         "name": "Register No 114",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:thermometer"
+        "icon": "mdi:flash"
       }
     },
     "onGridVoltage": {
