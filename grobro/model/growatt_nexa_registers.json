@@ -219,7 +219,7 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 17",
+        "name": "Household Load (excl. GroPlug)",
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "W",
