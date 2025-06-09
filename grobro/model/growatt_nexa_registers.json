@@ -715,6 +715,29 @@
         "icon": "mdi:thermometer"
       }
     },
+    "systemTemp": {
+      "growatt": {
+        "position": {
+          "register_no": 98,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -30000.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "System Temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
     "maxCellVoltage": {
       "growatt": {
         "position": {
@@ -949,7 +972,7 @@
         "icon": "mdi:thermometer"
       }
     },
-    "systemTemp": {
+    "register_110": {
       "growatt": {
         "position": {
           "register_no": 110,
@@ -965,10 +988,9 @@
         }
       },
       "homeassistant": {
-        "name": "System Temperature",
+        "name": "Register No 110",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
       }
     },
