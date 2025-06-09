@@ -29,7 +29,7 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 5",
+        "name": "Output power",
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "W",
@@ -333,7 +333,7 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 30",
+        "name": "Battery 1 Temperature",
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
@@ -823,7 +823,7 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 102",
+        "name": "Battery Health",
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
