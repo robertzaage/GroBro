@@ -1116,8 +1116,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": -30000.0,
-            "multiplier": 0.1
+            "delta": 0.0,
+            "multiplier": 1.0
           }
         }
       },
