@@ -1057,6 +1057,7 @@
         "name": "Register No 113",
         "publish": true,
         "state_class": "measurement",
+        "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
       }
     },
