@@ -773,7 +773,7 @@
     "Ipv3": {
       "growatt": {
         "position": {
-          "register_no": 107,
+          "register_no": 104,
           "offset": 0,
           "size": 2
         },
@@ -796,7 +796,7 @@
     "Ipv4": {
       "growatt": {
         "position": {
-          "register_no": 104,
+          "register_no": 107,
           "offset": 0,
           "size": 2
         },
