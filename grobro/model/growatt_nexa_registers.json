@@ -32,6 +32,7 @@
         "name": "Output power",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "power",
         "unit_of_measurement": "W",
         "icon": "mdi:flash"
       }
@@ -222,6 +223,7 @@
         "name": "Household Load (excl. GroPlug)",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "power",
         "unit_of_measurement": "W",
         "icon": "mdi:flash"
       }
@@ -313,6 +315,7 @@
         "name": "Battery 1 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -358,6 +361,7 @@
         "name": "Battery 2 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -381,6 +385,7 @@
         "name": "Battery 3 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -404,6 +409,7 @@
         "name": "Battery 4 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -614,6 +620,7 @@
         "name": "PV1 input current",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "current",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
       }
@@ -685,6 +692,7 @@
         "name": "PV2 input current",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "current",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
       }
@@ -872,6 +880,7 @@
         "name": "PV3 input current",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "current",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
       }
@@ -943,6 +952,7 @@
         "name": "PV4 input current",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "current",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
       }
@@ -1102,6 +1112,7 @@
         "name": "Output voltage (Grid)",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "voltage",
         "unit_of_measurement": "V",
         "icon": "mdi:flash"
       }
@@ -1125,6 +1136,7 @@
         "name": "Power (Grid)",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "power",
         "unit_of_measurement": "W",
         "icon": "mdi:flash"
       }
