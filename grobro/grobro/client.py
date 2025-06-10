@@ -145,9 +145,6 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"received: %s %s", msg.topic, unscrambled.hex(" "))
 
-            if DUMP_MESSAGES:
-                dump_message_binary("unscrambled/"+msg.topic, unscrambled)
-
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             LOG.debug("received modbus message: %s", modbus_message)
             if modbus_message:
