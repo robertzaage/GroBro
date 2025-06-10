@@ -317,7 +317,7 @@
         "icon": "mdi:percent"
       }
     },
-    "battery1Temp": {
+    "register_30": {
       "growatt": {
         "position": {
           "register_no": 30,
@@ -328,16 +328,14 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 0.01
+            "multiplier": 1.0
           }
         }
       },
       "homeassistant": {
-        "name": "Battery 1 Temperature",
+        "name": "Register No 30",
         "publish": true,
         "state_class": "measurement",
-        "device_class": "temperature",
-        "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
       }
     },
@@ -734,6 +732,7 @@
         "name": "System Temperature",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "temperature",
         "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
       }
@@ -1038,7 +1037,7 @@
         "icon": "mdi:thermometer"
       }
     },
-    "register_113": {
+    "battery1Temp": {
       "growatt": {
         "position": {
           "register_no": 113,
@@ -1054,9 +1053,10 @@
         }
       },
       "homeassistant": {
-        "name": "Register No 113",
+        "name": "Battery 1 Temperature",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "temperature",
         "unit_of_measurement": "°C",
         "icon": "mdi:thermometer"
       }
