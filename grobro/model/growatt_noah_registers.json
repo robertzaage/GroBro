@@ -1,6 +1,18 @@
 {
   "holding_registers": {
     "slot1_power": {
+      "growatt": {
+        "position": {
+          "register_no": 257 
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1
+          }
+        }
+      },
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Power",
@@ -12,6 +24,18 @@
       }
     },
     "default_power": {
+      "growatt": {
+        "position": {
+          "register_no": 252
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1
+          }
+        }
+      },
       "homeassistant": {
         "publish": true,
         "name": "Default Out Power",

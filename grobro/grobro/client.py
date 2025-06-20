@@ -168,6 +168,8 @@ class Client:
                     for name, register in known_registers.holding_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
                         value = register.growatt.data.parse(data_raw)
+                        if value is None:
+                            continue
 
                         state.payload.append(
                             HomeAssistantHoldingRegisterValue(
