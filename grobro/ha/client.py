@@ -48,7 +48,7 @@ class Client:
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         for cmd_type in ["number", "button"]:
-            for action in ["set", "read"]:
+            for action in ["set", "read", "press"]:
                 topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
         self._client.on_message = self.__on_message
@@ -144,6 +144,19 @@ class Client:
                     value=pos.register_no,
                 )
             )
+        if cmd_type == "button" and action == "press":
+            if cmd_name == "slot1_clear":
+                self.on_command(
+                    GrowattModbusFunctionMultiple(
+                        device_id=device_id,
+                        function=GrowattModbusFunction.PRESET_MULTIPLE_REGISTER,
+                        start=254,
+                        end=258,
+                        values=struct.pack(">BBBBHHH", 0, 0, 0, 0, 0, 0, 0),
+                    )
+                )
+                return
+
         if cmd_type == "number" and action == "set":
             # TODO: find a way to pack multi-register commands only by json declaration
             if cmd_name == "slot1_power":
@@ -233,19 +246,26 @@ class Client:
                 continue
             unique_id = f"grobro_{device_id}_cmd_{cmd_name}"
             cmd_type = cmd.homeassistant.type
-            payload["cmps"][unique_id] = {
-                "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
-                "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
-                "platform": cmd_type,
-                "unique_id": unique_id,
-                **cmd.homeassistant.dict(exclude_none=True),
-            }
-            if cmd.growatt:
+            if cmd.homeassistant.type == "number":
+                payload["cmps"][unique_id] = {
+                    "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
+                    "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
+                    "platform": cmd_type,
+                    "unique_id": unique_id,
+                    **cmd.homeassistant.dict(exclude_none=True),
+                }
                 payload["cmps"][f"{unique_id}_read"] = {
                     "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/read",
                     "platform": "button",
                     "unique_id": f"{unique_id}_read",
                     "name": f"{cmd.homeassistant.name} Read",
+                }
+            elif cmd.homeassistant.type == "button":
+                payload["cmps"][f"{unique_id}_read"] = {
+                    "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/press",
+                    "platform": "button",
+                    "unique_id": f"{unique_id}",
+                    "name": f"{cmd.homeassistant.name}",
                 }
 
         for state_name, state in known_registers.input_registers.items():
