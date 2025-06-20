@@ -153,6 +153,17 @@ class Client:
                     )
                 )
                 return
+            if cmd_name == "default_power":
+                value = int(msg.payload.decode())
+                self.on_command(
+                    GrowattModbusFunctionSingle(
+                        device_id=device_id,
+                        function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                        register=252,
+                        value=value,
+                    )
+                )
+                return
 
 
             pos = known_registers.holding_registers[cmd_name].growatt.position

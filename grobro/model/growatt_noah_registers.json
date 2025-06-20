@@ -10,6 +10,17 @@
         "max": 800,
         "step": 1
       }
+    },
+    "default_power": {
+      "homeassistant": {
+        "publish": true,
+        "name": "Default Out Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
     }
   },
   "input_registers": {
