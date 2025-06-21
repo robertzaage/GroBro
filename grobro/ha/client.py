@@ -134,6 +134,19 @@ class Client:
             LOG.info("unknown device type: %s", device_id)
             return
 
+        
+        if cmd_type == "button" and cmd_name == "read_all":
+            for name, register in known_registers.holding_registers.items():
+                pos = register.growatt.position
+                self.on_command(
+                    GrowattModbusFunctionSingle(
+                        device_id=device_id,
+                        function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                        register=pos.register_no,
+                        value=pos.register_no,  
+                    )
+                ) 
+            return
         if cmd_type == "button" and action == "read":
             pos = known_registers.holding_registers[cmd_name].growatt.position
             self.on_command(
@@ -143,7 +156,7 @@ class Client:
                     register=pos.register_no,
                     value=pos.register_no,
                 )
-            )
+            )        
         if cmd_type == "number" and action == "set":
             # TODO: find a way to pack multi-register commands only by json declaration
             if cmd_name == "slot1_power":
@@ -167,6 +180,15 @@ class Client:
                     function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
                     register=pos.register_no,
                     value=int(msg.payload.decode()),
+                )
+            )
+            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name,pos.register_no)
+            self.on_command(
+                GrowattModbusFunctionSingle(
+                    device_id=device_id,
+                    function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    register=pos.register_no,
+                    value=pos.register_no,  # Wie Sie bestätigt haben, muss hier die Registernummer stehen
                 )
             )
 
@@ -240,14 +262,13 @@ class Client:
                 "unique_id": unique_id,
                 **cmd.homeassistant.dict(exclude_none=True),
             }
-            if cmd.growatt:
-                payload["cmps"][f"{unique_id}_read"] = {
-                    "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/{cmd_name}/read",
+            
+        payload["cmps"][f"grobro_{device_id}_cmd_read_all"] = {
+                    "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/read_all/read",
                     "platform": "button",
-                    "unique_id": f"{unique_id}_read",
-                    "name": f"{cmd.homeassistant.name} Read",
+                    "unique_id": f"grobro_{device_id}_cmd_read_all",
+                    "name": "Read All Values",
                 }
-
         for state_name, state in known_registers.input_registers.items():
             if not state.homeassistant.publish:
                 continue
