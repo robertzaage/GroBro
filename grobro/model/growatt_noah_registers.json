@@ -1,5 +1,25 @@
 {
   "holding_registers": {
+    "slot1_clear": {
+      "growatt": {
+        "position": {
+          "register_no": 254,
+          "size": 10
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Clear",
+        "type": "button"
+      }
+    },
     "slot1_power": {
       "growatt": {
         "position": {
