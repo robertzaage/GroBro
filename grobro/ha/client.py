@@ -169,6 +169,15 @@ class Client:
                     value=int(msg.payload.decode()),
                 )
             )
+            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name,pos.register_no)
+            self.on_command(
+                GrowattModbusFunctionSingle(
+                    device_id=device_id,
+                    function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    register=pos.register_no,
+                    value=pos.register_no,  # Wie Sie bestätigt haben, muss hier die Registernummer stehen
+                )
+            )
 
     # Reset the timeout timer for a device.
     def __reset_device_timer(self, device_id):
