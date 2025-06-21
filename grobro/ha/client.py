@@ -145,7 +145,8 @@ class Client:
                         register=pos.register_no,
                         value=pos.register_no,  
                     )
-                )    
+                ) 
+            return
         if cmd_type == "button" and action == "read":
             pos = known_registers.holding_registers[cmd_name].growatt.position
             self.on_command(
