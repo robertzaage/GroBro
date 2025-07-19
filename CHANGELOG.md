@@ -1,3 +1,29 @@
+## v2.0.0
+
+⚠️ This is a major release with **breaking changes**. Please read carefully before upgrading.
++ Double-check and **update your configuration**
++ Remove any old Growatt devices from Home Assistant if you experience problems
+
+### Breaking Changes
+
++ **Home Assistant auto-discovery** is now **device-based** (was previously global).
++ The following environment variables have been **deprecated**:
+  + `REGISTER_FILTER` → replaced by automatic device detection and is removed
+  + `ACTIVATE_COMMUNICATION_GROWATT_SERVER` → replaced by `GROWATT_CLOUD` with optional **selective forwarding** per device serial
++ **Sensor names may have changed**, and **additional sensors were added**.  
+
+### New Environment Variables
+
++ `GROWATT_CLOUD`: Enables Growatt cloud communication with **selective forwarding**
++ `DEVICE_TIMEOUT`: Marks device as inactive after a specified timeout without data
++ `MAX_SLOTS`: Sets number of Home Assistant control timeslots for **NOAH batteries**
+
+### New Features
+
++ Full codebase refactor
++ **Control support** for Inverters and Batteries
++ Added support for **NEXA-series batteries**
+
 ## v1.7.4
 
 + Enabled automatic selection of the correct register map based on device ID, deprecating the user-unfriendly `REGISTER_FILTER` variable.
