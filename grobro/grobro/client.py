@@ -88,7 +88,7 @@ class Client:
             self._client.tls_insecure_set(True)
         self._client.connect(grobro_mqtt.host, grobro_mqtt.port, 60)
         self._client.on_message = self.__on_message
-        self._client.subscribe("c/#")
+        self._client.on_connect = self.__on_connect
         self._forward_mqtt_config = forward_mqtt
 
     def start(self):
@@ -118,6 +118,10 @@ class Client:
         status = result[0]
         if status != 0:
             LOG.warning("Sending failed: %s", result)
+
+    def __on_connect(self, client, userdata, flags, reason_code, properties):
+      LOG.debug(f"Connected with result code {reason_code}")
+      self._client.subscribe("c/#")      
 
     def __on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
