@@ -1,3 +1,13 @@
+## v2.0.1
+
+### Bug Fixes
+
++ Subscribe to MQTT topic again after broken connection
+
+### New Features
+
++ Added possibility to select the smart mode for slots of a NOAH
+
 ## v2.0.0
 
 ⚠️ This is a major release with **breaking changes**. Please read carefully before upgrading.
