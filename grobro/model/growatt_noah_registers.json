@@ -1628,8 +1628,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT",
-          }
+          "data_type": "INT"
         }
       },
       "homeassistant": {
@@ -1646,8 +1645,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT",
-          }
+          "data_type": "INT"
         }
       },
       "homeassistant": {
