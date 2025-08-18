@@ -1,6 +1,6 @@
 from typing import Optional, Union
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import importlib.resources as resources
 import json
 import struct
@@ -37,34 +37,36 @@ class GrowattRegisterDataType(BaseModel):
     def parse(self, data_raw: bytes):
         if not data_raw:
             return None
+
         unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
+
         if self.data_type == GrowattRegisterDataTypes.FLOAT:
             opts = self.float_options
             value = struct.unpack(unpack_type, data_raw)[0]
             value *= opts.multiplier
             value += opts.delta
             return round(value, 3)
+
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
             value = struct.unpack(unpack_type, data_raw)[0]
             h = value // 256
             m = value % 256
             return (h * 100) + m
+
         elif self.data_type == GrowattRegisterDataTypes.INT:
-            value = struct.unpack(unpack_type, data_raw)[0]
-            return value
+            return struct.unpack(unpack_type, data_raw)[0]
+
         elif self.data_type == GrowattRegisterDataTypes.ENUM:
             opts = self.enum_options
             value = struct.unpack(unpack_type, data_raw)[0]
             if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
-                return None  # TODO: implement
+                return none # TODO: implement actual BITFIELD parsing
             elif opts.enum_type == GrowattRegisterEnumTypes.INT_MAP:
                 enum_value = opts.values.get(int(value), None)
-                if not enum_value:
-                    return None
-                return value
+                return enum_value
+
         elif self.data_type == GrowattRegisterDataTypes.STRING:
-            value = data_raw.decode("ascii", errors="ignore").strip("\x00")
-            return value
+            return data_raw.decode("ascii", errors="ignore").strip("\x00")
 
 
 class GrowattRegisterPosition(BaseModel):
@@ -94,7 +96,7 @@ class HomeAssistantHoldingRegister(BaseModel):
         extra = "forbid"
 
 
-class HomeassistantInputRegister(BaseModel):
+class HomeAssistantInputRegister(BaseModel):
     name: str
     publish: bool
     state_class: Optional[str] = None
@@ -111,17 +113,17 @@ class HomeAssistantHoldingRegisterValue(BaseModel):
 
 class HomeAssistantHoldingRegisterInput(BaseModel):
     device_id: str
-    payload: list[HomeAssistantHoldingRegisterValue] = []
+    payload: list[HomeAssistantHoldingRegisterValue] = Field(default_factory=list)
 
 
-class HomeAssistantInputRegister(BaseModel):
+class HomeAssistantInputRegisterInput(BaseModel):
     device_id: str
-    payload: dict[str, Union[str, float, int]] = {}
+    payload: dict[str, Union[str, float, int]] = Field(default_factory=dict)
 
 
 class GroBroInputRegister(BaseModel):
     growatt: GrowattInputRegister
-    homeassistant: HomeassistantInputRegister
+    homeassistant: HomeAssistantInputRegister
 
 
 class GroBroHoldingRegister(BaseModel):
@@ -134,16 +136,12 @@ class GroBroRegisters(BaseModel):
     holding_registers: dict[str, GroBroHoldingRegister]
 
 
-with resources.files(__package__).joinpath("growatt_neo_registers.json").open(
-    "rb"
-) as f:
-    KNOWN_NEO_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
-with resources.files(__package__).joinpath("growatt_noah_registers.json").open(
-    "rb"
-) as f:
-    KNOWN_NOAH_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
+# Laden der JSON-Registerdateien
+def load_registers(filename: str) -> GroBroRegisters:
+    with resources.files(__package__).joinpath(filename).open("r", encoding="utf-8") as f:
+        return GroBroRegisters.parse_obj(json.load(f))
 
-with resources.files(__package__).joinpath("growatt_nexa_registers.json").open(
-    "rb"
-) as f:
-    KNOWN_NEXA_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
+
+KNOWN_NEO_REGISTERS = load_registers("growatt_neo_registers.json")
+KNOWN_NOAH_REGISTERS = load_registers("growatt_noah_registers.json")
+KNOWN_NEXA_REGISTERS = load_registers("growatt_nexa_registers.json")
