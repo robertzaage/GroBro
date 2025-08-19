@@ -84,7 +84,6 @@ class Client:
             self._discovery_cache.remove(device_id)
         self.__publish_device_discovery(device_id)
 
-
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
         # publish discovery
@@ -94,9 +93,54 @@ class Client:
         if DEVICE_TIMEOUT > 0:
             self.__reset_device_timer(state.device_id)
 
+        # --- NEU: ENUM INT_MAP → Klartext mappen ---------------------------------
+        payload = dict(state.payload)  # shallow copy
+        # passende Register-Definitionen ermitteln (anhand device_id-Präfix)
+        known_registers: Optional[GroBroRegisters] = None
+        try:
+            if state.device_id.startswith("QMN"):
+                known_registers = KNOWN_NEO_REGISTERS
+            elif state.device_id.startswith("0PVP"):
+                known_registers = KNOWN_NOAH_REGISTERS
+            elif state.device_id.startswith("0HVR"):
+                known_registers = KNOWN_NEXA_REGISTERS
+        except Exception:
+            known_registers = None
+
+        if known_registers:
+            for key, value in list(payload.items()):
+                try:
+                    reg = known_registers.input_registers.get(key)
+                    if not reg:
+                        continue
+
+                    # helper, um sowohl Dict- als auch Objektzugriffe zu unterstützen
+                    def _get(obj, name, default=None):
+                        try:
+                            return getattr(obj, name)
+                        except Exception:
+                            try:
+                                return obj.get(name, default)  # type: ignore[attr-defined]
+                            except Exception:
+                                return default
+
+                    data = _get(reg.growatt, "data")
+                    data_type = _get(data, "data_type")
+                    enum_options = _get(data, "enum_options")
+                    enum_type = _get(enum_options, "enum_type")
+                    values_map = _get(enum_options, "values", {})
+
+                    if data_type == "ENUM" and enum_type == "INT_MAP" and values_map:
+                        # keys sind in der Map Strings; fallback auf Originalwert
+                        mapped = values_map.get(str(value), values_map.get(value, str(value)))
+                        payload[key] = mapped
+                except Exception as e:
+                    LOG.warning("HA: enum mapping failed for %s=%s: %s", key, value, e)
+        # -------------------------------------------------------------------------
+
         # update state
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
-        self._client.publish(topic, json.dumps(state.payload), retain=False)
+        self._client.publish(topic, json.dumps(payload), retain=False)
 
     def publish_holding_register_input(
         self, ha_input: HomeAssistantHoldingRegisterInput
@@ -137,7 +181,7 @@ class Client:
         if not known_registers:
             LOG.info("Unknown device type: %s", device_id)
             return
- 
+
         if cmd_type == "button" and cmd_name == "read_all":
             for name, register in known_registers.holding_registers.items():
                 if name.startswith("slot"):
@@ -167,17 +211,17 @@ class Client:
                     value=pos.register_no,
                 )
             )
-        
-        if (cmd_type == "number" or cmd_type == "switch" ) and action == "set":
-            
+
+        if (cmd_type == "number" or cmd_type == "switch") and action == "set":
+
             if cmd_type == "switch":
                 parsed_value = 1 if msg.payload.decode().upper() == "ON" else 0
             elif "_start_time" in cmd_name or "_end_time" in cmd_name:
                 hour = int(msg.payload.decode()) // 100
                 minute = int(msg.payload.decode()) % 100
-                parsed_value=(hour * 256) + minute
+                parsed_value = (hour * 256) + minute
             else:
-                parsed_value=int(msg.payload.decode())
+                parsed_value = int(msg.payload.decode())
 
             pos = known_registers.holding_registers[cmd_name].growatt.position
             LOG.debug("Setting %s register %s to value %s", cmd_name, pos.register_no, parsed_value)
@@ -189,8 +233,8 @@ class Client:
                     value=parsed_value,
                 )
             )
-            # Todo , if we can parse msg_type 37 , read is no longer needed 
-            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name,pos.register_no)
+            # Todo , if we can parse msg_type 37 , read is no longer needed
+            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name, pos.register_no)
             self.on_command(
                 GrowattModbusFunctionSingle(
                     device_id=device_id,
@@ -251,11 +295,11 @@ class Client:
             },
             "cmps": {},
         }
-        
+
         for cmd_name, cmd in known_registers.holding_registers.items():
             if not cmd.homeassistant.publish:
                 continue
-            
+
             if cmd_name.startswith("slot"):
                 try:
                     slot_num = int(cmd_name[4])
@@ -309,7 +353,6 @@ class Client:
         self._client.publish(topic, payload_str, retain=True)
         self._discovery_payload_cache[device_id] = payload_str
         self._discovery_cache.append(device_id)
-
 
     def __migrate_entity_discovery(self, device_id, knwon_registers: GroBroRegisters):
         old_entities = [
