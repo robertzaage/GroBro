@@ -354,7 +354,7 @@ class Client:
         self._discovery_payload_cache[device_id] = payload_str
         self._discovery_cache.append(device_id)
 
-    def __migrate_entity_discovery(self, device_id, knwon_registers: GroBroRegisters):
+    def __migrate_entity_discovery(self, device_id, known_registers: GroBroRegisters):
         old_entities = [
             ("set_wirk", "number"),
         ]
@@ -364,7 +364,7 @@ class Client:
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
-        for cmd_name, cmd in knwon_registers.holding_registers.items():
+        for cmd_name, cmd in known_registers.holding_registers.items():
             cmd_type = cmd.homeassistant.type
             self._client.publish(
                 f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
@@ -376,7 +376,7 @@ class Client:
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
-        for state_name, state in knwon_registers.input_registers.items():
+        for state_name, state in known_registers.input_registers.items():
             self._client.publish(
                 f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state_name}/config",
                 json.dumps({"migrate_discovery": True}),
