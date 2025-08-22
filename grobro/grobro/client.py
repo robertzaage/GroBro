@@ -29,7 +29,7 @@ from grobro.model.growatt_registers import GrowattRegisterEnumTypes
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
-from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS, KNOWN_NEXA_REGISTERS
+from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS, KNOWN_NEXA_REGISTERS, KNOWN_SPF_REGISTERS
 
 
 LOG = logging.getLogger(__name__)
@@ -159,6 +159,8 @@ class Client:
                     known_registers = KNOWN_NOAH_REGISTERS
                 elif device_id.startswith("0HVR"):
                     known_registers = KNOWN_NEXA_REGISTERS
+                elif device_id.startswith("HAQ"):
+                    known_registers = KNOWN_SPF_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return
