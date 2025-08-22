@@ -36,7 +36,7 @@
         "icon": "mdi:alert-circle"
       }
     },
-    "Vpv1": {
+    "PV1_Voltage": {
       "growatt": {
         "position": {
           "register_no": 1,
@@ -60,7 +60,7 @@
         "icon": "mdi:sine-wave"
       }
     },
-    "Vpv2": {
+    "PV2_Voltage": {
       "growatt": {
         "position": {
           "register_no": 2,
@@ -84,7 +84,7 @@
         "icon": "mdi:sine-wave"
       }
     },
-    "Ppv1": {
+    "PV1_Power": {
       "growatt": {
         "position": {
           "register_no": 3,
@@ -108,7 +108,7 @@
         "icon": "mdi:flash"
       }
     },
-    "Ppv2": {
+    "PV2_Power": {
       "growatt": {
         "position": {
           "register_no": 5,
@@ -132,7 +132,7 @@
         "icon": "mdi:flash"
       }
     },
-    "Buck1Curr ": {
+    "BuckConverter1_Current ": {
       "growatt": {
         "position": {
           "register_no": 7,
@@ -156,7 +156,7 @@
         "icon": "mdi:current-ac"
       }
     },
-    "Buck2Curr ": {
+    "BuckConverter2_Current ": {
       "growatt": {
         "position": {
           "register_no": 8,
@@ -180,7 +180,7 @@
         "icon": "mdi:current-ac"
       }
     },
-    "OPWatt ": {
+    "Output_Watts ": {
       "growatt": {
         "position": {
           "register_no": 8,
@@ -204,7 +204,7 @@
         "icon": "mdi:flash"
       }
     },
-    "OPVA": {
+    "Output_VA": {
       "growatt": {
         "position": {
           "register_no": 11,
@@ -228,7 +228,7 @@
         "icon": "mdi:flash"
       }
     },
-    "ACChrWatt": {
+    "AC_Charger_Watts": {
       "growatt": {
         "position": {
           "register_no": 13,
@@ -251,7 +251,7 @@
         "unit_of_measurement": "W",
         "icon": "mdi:flash"
       },
-      "ACChr_VA": {
+      "AC_Charger_VA": {
         "growatt": {
           "position": {
             "register_no": 15,
@@ -267,12 +267,59 @@
           }
         },
         "homeassistant": {
-          "name": "AC charge watt",
+          "name": "AC charge apparent power",
           "publish": true,
           "state_class": "measurement",
           "device_class": "apparent_power",
           "unit_of_measurement": "VA",
           "icon": "mdi:flash"
+        }
+      },
+      "Battery_Voltage": {
+        "growatt": {
+          "position": {
+            "register_no": 17,
+            "offset": 0,
+            "size": 2
+          },
+          "data": {
+            "data_type": "FLOAT",
+            "float_options": {
+              "delta": 0.0,
+              "multiplier": 0.01
+            }
+          }
+        },
+        "homeassistant": {
+          "name": "Battery voltage",
+          "publish": true,
+          "state_class": "measurement",
+          "device_class": "voltage",
+          "unit_of_measurement": "V",
+          "icon": "mdi:sine-wave"
+        }
+      },
+      "Battery_SOC": {
+        "growatt": {
+          "position": {
+            "register_no": 18,
+            "offset": 0,
+            "size": 2
+          },
+          "data": {
+            "data_type": "FLOAT",
+            "float_options": {
+              "delta": 0.0,
+              "multiplier": 1.0
+            }
+          }
+        },
+        "homeassistant": {
+          "name": "Battery SOC",
+          "publish": false,
+          "state_class": "measurement",
+          "unit_of_measurement": "%",
+          "icon": "mdi:percent"
         }
       }
     }
