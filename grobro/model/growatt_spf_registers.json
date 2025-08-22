@@ -1,0 +1,88 @@
+{
+  "holding_registers": {},
+  "input_registers": {
+    "System_Status": {
+      "growatt": {
+        "position": {
+          "register_no": 0,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Standby",
+              "1": "(No Use)",
+              "2": "Discharge",
+              "3": "Fault",
+              "4": "Flash",
+              "5": "PV charge",
+              "6": "AC charge",
+              "7": "Combine charge",
+              "8": "Combine charge and Bypass",
+              "9": "PV charge and Bypass",
+              "10": "AC charge and Bypass",
+              "11": "Bypass",
+              "12": "PV charge and Discharge"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "System status",
+        "publish": false,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "Vpv1": {
+      "growatt": {
+        "position": {
+          "register_no": 1,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
+      }
+    },
+    "Vpv2": {
+      "growatt": {
+        "position": {
+          "register_no": 2,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
+      }
+    }
+  }
+}
