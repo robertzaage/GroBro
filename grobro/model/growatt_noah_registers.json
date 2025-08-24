@@ -58,7 +58,7 @@
             "name": "Slot 1 Mode",
             "type": "number",
             "min": 0,
-            "max": 2,
+            "max": 1,
             "step": 1
         }
     },
@@ -1040,7 +1040,17 @@
               "2": "2 On",
               "3": "1&2 On",
               "4": "3 On",
-              "5": "1&3 On"
+              "5": "1&3 On",
+              "6": "2&3 On",
+              "7": "1&2&3 On",
+              "8": "4 On",
+              "9": "1&4 On",
+              "10": "2&4 On",
+              "11": "1&2&4 On",
+              "12": "3&4 On",
+              "13": "1&3&4 On",
+              "14": "2&3&4 On",
+              "15": "All On"
             }
           }
         }
@@ -1216,10 +1226,10 @@
         "icon": "mdi:flash"
       }
     },
-    "bat2_temp2": {
+    "bat2_temp": {
       "growatt": {
         "position": {
-          "register_no": 97,
+          "register_no": 42,
           "offset": 0,
           "size": 2
         },
@@ -1636,6 +1646,23 @@
         "icon": "mdi:identifier"
       }
     },
+    "firmware": {
+      "growatt": {
+        "position": {
+          "register_no": 12,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware",
+        "publish": true,
+        "icon": "mdi:identifier"
+      }
+    },    
     "bat_1_soc_pct": {
       "growatt": {
         "position": {
@@ -1696,7 +1723,7 @@
     "bat1_temp": {
       "growatt": {
         "position": {
-          "register_no": 94,
+          "register_no": 30,
           "offset": 0,
           "size": 2
         },
