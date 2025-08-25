@@ -21,7 +21,7 @@ from grobro.model.growatt_registers import (
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_function import (
     GrowattModbusFunctionSingle,
-    GrowattModbusFunctionMultiple,  # ggf. später genutzt
+    GrowattModbusFunctionMultiple,
 )
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -30,7 +30,7 @@ MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
 LOG = logging.getLogger(__name__)
 
 
-# ------------------- Hilfsfunktionen -------------------
+# ------------------- Helpfunctions -------------------
 
 def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
     """Ermittle passende Register-Sammlung anhand device_id-Präfix."""
@@ -79,7 +79,7 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
     )
 
 
-# ------------------- Client-Klasse -------------------
+# ------------------- Client-Class -------------------
 
 class Client:
     on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]]
@@ -362,7 +362,6 @@ class Client:
         if device_id not in self._discovery_cache:
             self._discovery_cache.append(device_id)
 
-        # gleich befüllen
         self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
         self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
 
@@ -411,7 +410,7 @@ class Client:
             self._config_cache[device_id] = config
             LOG.info(f"Saved minimal config for new device: {config}")
 
-        # Device Info für HA
+        # Device Info for HA
         device_info: dict = {
             "identifiers": [device_id],
             "name": f"Growatt {device_id}",
@@ -422,15 +421,15 @@ class Client:
         type_name = get_device_type_name(device_id)
 
         known_model_id = {
-            "55": "NEO-series",
-            "72": "NEXA-series",
-            "61": "NOAH-series",
+            "55": "NEO-Series",
+            "72": "NEXA-Series",
+            "61": "NOAH-Series",
         }.get(getattr(config, "device_type", None))
 
         if known_model_id:
             device_info["model"] = known_model_id
         else:
-            device_info["model"] = f"{type_name}-series"
+            device_info["model"] = f"{type_name}-Series"
 
         if getattr(config, "model_id", None):
             device_info["model"] += f" ({config.model_id})"
