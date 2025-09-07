@@ -421,15 +421,15 @@ class Client:
         type_name = get_device_type_name(device_id)
 
         known_model_id = {
-            "55": "NEO-Series",
-            "72": "NEXA-Series",
-            "61": "NOAH-Series",
+            "55": "NEO-series",
+            "72": "NEXA-series",
+            "61": "NOAH-series",
         }.get(getattr(config, "device_type", None))
 
         if known_model_id:
             device_info["model"] = known_model_id
         else:
-            device_info["model"] = f"{type_name}-Series"
+            device_info["model"] = f"{type_name}-series"
 
         if getattr(config, "model_id", None):
             device_info["model"] += f" ({config.model_id})"
