@@ -58,7 +58,7 @@
             "name": "Slot 1 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -158,7 +158,7 @@
             "name": "Slot 2 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -258,7 +258,7 @@
             "name": "Slot 3 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -358,7 +358,7 @@
             "name": "Slot 4 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -458,7 +458,7 @@
             "name": "Slot 5 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -558,7 +558,7 @@
             "name": "Slot 6 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -658,7 +658,7 @@
             "name": "Slot 7 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -758,7 +758,7 @@
             "name": "Slot 8 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -858,7 +858,7 @@
             "name": "Slot 9 Mode",
             "type": "number",
             "min": 0,
-            "max": 1,
+            "max": 2,
             "step": 1
         }
     },
@@ -1075,7 +1075,7 @@
             "values": {
               "0": "Load First",
               "1": "Battery First",
-              "2": "Grid First"
+              "2": "Smart Mode"
             }
           }
         }
