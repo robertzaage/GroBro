@@ -1,8 +1,7 @@
 from grobro.model.modbus_message import GrowattModbusFunction
 import struct
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
-from pylint.checkers.base import register
 from typing import Optional
 
 MODBUS_COMMAND_STRUCT = ">HHHBB30sHH"
@@ -52,7 +51,7 @@ class GrowattModbusFunctionMultiple(BaseModel):
             function=function,
             start=start,
             end=end,
-            value=value,
+            values=values,
         )
 
     def build_grobro(self) -> bytes:
@@ -63,7 +62,7 @@ class GrowattModbusFunctionMultiple(BaseModel):
             36 + len(self.values),
             1,
             self.function,
-            self.device_id.encode("ascii").ljust(30, b"\x00"),  # device_id
+            self.device_id.encode("ascii").ljust(30, b"\x00"),
             self.start,
             self.end,
         )
@@ -88,11 +87,11 @@ class GrowattModbusFunctionSingle(BaseModel):
 
     device_id: str
     function: GrowattModbusFunction
-    register: int
+    register_no: int = Field(alias="register")  # <-- Warnung behoben
     value: int
 
     @staticmethod
-    def parse_grobro(buffer) -> Optional["GrowattModbusMessage"]:
+    def parse_grobro(buffer) -> Optional["GrowattModbusFunctionSingle"]:
         (
             constant_1,
             constant_7,
@@ -109,7 +108,7 @@ class GrowattModbusFunctionSingle(BaseModel):
         return GrowattModbusFunctionSingle(
             device_id=device_id,
             function=function,
-            register=register,
+            register_no=register,
             value=value,
         )
 
@@ -121,7 +120,10 @@ class GrowattModbusFunctionSingle(BaseModel):
             36,
             1,
             self.function,
-            self.device_id.encode("ascii").ljust(30, b"\x00"),  # device_id
-            self.register,
+            self.device_id.encode("ascii").ljust(30, b"\x00"),
+            self.register_no,
             self.value,
         )
+
+    class Config:
+        populate_by_name = True
