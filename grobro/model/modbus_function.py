@@ -87,7 +87,7 @@ class GrowattModbusFunctionSingle(BaseModel):
 
     device_id: str
     function: GrowattModbusFunction
-    register_no: int = Field(alias="register")  # <-- Warnung behoben
+    register_no: int = Field(alias="register")
     value: int
 
     @staticmethod
