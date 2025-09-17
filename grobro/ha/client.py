@@ -169,7 +169,7 @@ class Client:
         try:
             LOG.debug("HA: publish: %s", ha_input)
             for value in ha_input.payload:
-                topic = f"{HA_BASE_TOPIC}/{value.register.type}/grobro/{ha_input.device_id}/{value.name}/get"
+                topic = f"{HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
                 self._client.publish(topic, value.value, retain=False)
         except Exception as e:
             LOG.error(f"HA: publish msg: {e}")

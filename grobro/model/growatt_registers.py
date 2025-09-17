@@ -1,6 +1,6 @@
 from typing import Optional, Union
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import importlib.resources as resources
 import json
 import struct
@@ -106,7 +106,10 @@ class HomeassistantInputRegister(BaseModel):
 class HomeAssistantHoldingRegisterValue(BaseModel):
     name: str
     value: Union[str, float, int]
-    register: HomeAssistantHoldingRegister
+    register_def: HomeAssistantHoldingRegister = Field(alias="register")
+
+    class Config:
+        populate_by_name = True
 
 
 class HomeAssistantHoldingRegisterInput(BaseModel):
@@ -134,16 +137,9 @@ class GroBroRegisters(BaseModel):
     holding_registers: dict[str, GroBroHoldingRegister]
 
 
-with resources.files(__package__).joinpath("growatt_neo_registers.json").open(
-    "rb"
-) as f:
+with resources.files(__package__).joinpath("growatt_neo_registers.json").open("rb") as f:
     KNOWN_NEO_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
-with resources.files(__package__).joinpath("growatt_noah_registers.json").open(
-    "rb"
-) as f:
+with resources.files(__package__).joinpath("growatt_noah_registers.json").open("rb") as f:
     KNOWN_NOAH_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
-
-with resources.files(__package__).joinpath("growatt_nexa_registers.json").open(
-    "rb"
-) as f:
+with resources.files(__package__).joinpath("growatt_nexa_registers.json").open("rb") as f:
     KNOWN_NEXA_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
