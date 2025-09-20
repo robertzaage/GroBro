@@ -17,6 +17,7 @@ from grobro.model.growatt_registers import (
     KNOWN_NEO_REGISTERS,
     KNOWN_NOAH_REGISTERS,
     KNOWN_NEXA_REGISTERS,
+    KNOWN_SPF_REGISTERS
 )
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_function import (
@@ -40,6 +41,8 @@ def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
         return KNOWN_NOAH_REGISTERS
     if device_id.startswith("0HVR"):
         return KNOWN_NEXA_REGISTERS
+    if device_id.startswith("HAQ"):
+        return KNOWN_SPF_REGISTERS
     return None
 
 
