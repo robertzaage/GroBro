@@ -89,7 +89,7 @@
         "position": {
           "register_no": 3,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -113,7 +113,7 @@
         "position": {
           "register_no": 5,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -185,7 +185,7 @@
         "position": {
           "register_no": 9,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -209,7 +209,7 @@
         "position": {
           "register_no": 11,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -233,7 +233,7 @@
         "position": {
           "register_no": 13,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -257,7 +257,7 @@
         "position": {
           "register_no": 15,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -639,7 +639,7 @@
         "position": {
           "register_no": 36,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -663,7 +663,7 @@
         "position": {
           "register_no": 38,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -687,7 +687,7 @@
         "position": {
           "register_no": 48,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -711,7 +711,7 @@
         "position": {
           "register_no": 50,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -735,7 +735,7 @@
         "position": {
           "register_no": 56,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -759,7 +759,7 @@
         "position": {
           "register_no": 58,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -783,7 +783,7 @@
         "position": {
           "register_no": 60,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -807,7 +807,7 @@
         "position": {
           "register_no": 62,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -855,7 +855,7 @@
         "position": {
           "register_no": 69,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -879,7 +879,7 @@
         "position": {
           "register_no": 71,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -903,7 +903,7 @@
         "position": {
           "register_no": 73,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -927,7 +927,7 @@
         "position": {
           "register_no": 75,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
@@ -951,7 +951,7 @@
         "position": {
           "register_no": 77,
           "offset": 0,
-          "size": 4
+          "size": 2
         },
         "data": {
           "data_type": "FLOAT",
