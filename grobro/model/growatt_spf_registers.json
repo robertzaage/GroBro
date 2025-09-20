@@ -132,7 +132,7 @@
         "icon": "mdi:flash"
       }
     },
-    "BuckConverter1_Current ": {
+    "BuckConverter1_Current": {
       "growatt": {
         "position": {
           "register_no": 7,
@@ -156,7 +156,7 @@
         "icon": "mdi:current-ac"
       }
     },
-    "BuckConverter2_Current ": {
+    "BuckConverter2_Current": {
       "growatt": {
         "position": {
           "register_no": 8,
@@ -178,6 +178,102 @@
         "device_class": "current",
         "unit_of_measurement": "A",
         "icon": "mdi:current-ac"
+      }
+    },
+    "PV1_Charge_Power_Low": {
+      "growatt": {
+        "position": {
+          "register_no": 4,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 charge power (low)",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV1_Charge_Power_High": {
+      "growatt": {
+        "position": {
+          "register_no": 3,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 charge power (high)",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV2_Charge_Power_Low": {
+      "growatt": {
+        "position": {
+          "register_no": 6,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 charge power (low)",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV2_Charge_Power_High": {
+      "growatt": {
+        "position": {
+          "register_no": 5,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 charge power (high)",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
       }
     },
     "Output_Watts ": {
@@ -308,11 +404,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
-          }
+          "data_type": "INT"
         }
       },
       "homeassistant": {
