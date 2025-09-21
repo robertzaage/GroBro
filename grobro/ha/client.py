@@ -54,6 +54,8 @@ def get_device_type_name(device_id: str) -> str:
         return "NOAH"
     if device_id.startswith("0HVR"):
         return "NEXA"
+    if device_id.startswith("HAQ"):
+        return "SPF"
     return "UNKNOWN"
 
 
