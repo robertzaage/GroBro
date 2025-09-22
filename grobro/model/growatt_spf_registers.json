@@ -1,0 +1,1152 @@
+{
+  "holding_registers": {},
+  "input_registers": {
+    "System_Status": {
+      "growatt": {
+        "position": {
+          "register_no": 0,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Standby",
+              "1": "(No Use)",
+              "2": "Discharge",
+              "3": "Fault",
+              "4": "Flash",
+              "5": "PV charge",
+              "6": "AC charge",
+              "7": "Combine charge",
+              "8": "Combine charge and Bypass",
+              "9": "PV charge and Bypass",
+              "10": "AC charge and Bypass",
+              "11": "Bypass",
+              "12": "PV charge and Discharge"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "System status",
+        "publish": true,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "PV1_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 1,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "PV2_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 2,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "PV1_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 3,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV2_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 5,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV1_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 7,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 current ",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "PV2_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 8,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "Output_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 9,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output active power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "Output_VA": {
+      "growatt": {
+        "position": {
+          "register_no": 11,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output apparent power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:flash"
+      }
+    },
+    "AC_Charge_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 13,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC charge power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "AC_Charger_VA": {
+      "growatt": {
+        "position": {
+          "register_no": 15,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC charge apparent power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:flash"
+      }
+    },
+    "Battery_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 17,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "Battery_SOC": {
+      "growatt": {
+        "position": {
+          "register_no": 18,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery SOC",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "Bus_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 19,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Bus voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "AC_In_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 20,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC input voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "AC_In_Freq": {
+      "growatt": {
+        "position": {
+          "register_no": 21,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC input frequency",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "frequency",
+        "unit_of_measurement": "Hz",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "AC_Out_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 22,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC output voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "AC_Out_Freq": {
+      "growatt": {
+        "position": {
+          "register_no": 23,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC output frequency",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "frequency",
+        "unit_of_measurement": "Hz",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "DC_Out_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 24,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "DC output voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "Inverter_Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 25,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "DC_to_DC_Conv_Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 26,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "DC-DC temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "Load_Percentage": {
+      "growatt": {
+        "position": {
+          "register_no": 27,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Load percentage",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "BuckConverter1_Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 32,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Buck1 temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "BuckConverter2_Temp": {
+      "growatt": {
+        "position": {
+          "register_no": 33,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Buck2 temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "Output_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 34,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output current ",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "Inverter_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 35,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter current ",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "AC_Input_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 36,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC input power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "AC_In_VA": {
+      "growatt": {
+        "position": {
+          "register_no": 38,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC input apparent power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:flash"
+      }
+    },
+    "PV_Energy_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 48,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "PV_Energy_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 50,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "AC_Charge_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 56,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC charge energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "AC_Charge_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 58,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC charge total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "Battery_Discharge_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 60,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery discharge today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "Battery_Discharge_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 62,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery discharge total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "AC_Discharge_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 64,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC discharge today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "AC_Discharge_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 66,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC discharge total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "AC_Charger_Battery_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 68,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC charger battery current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-ac"
+      }
+    },
+    "AC_Discharge_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 69,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC discharge power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "AC_Discharge_VA": {
+      "growatt": {
+        "position": {
+          "register_no": 71,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC discharge apparent power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:flash"
+      }
+    },
+    "Battery_Discharge_Watts": {
+      "growatt": {
+        "position": {
+          "register_no": 73,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery discharge watt",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "Battery_Discharge_VA": {
+      "growatt": {
+        "position": {
+          "register_no": 75,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery discharge apparent power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:flash"
+      }
+    },
+    "Battery_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 77,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:flash"
+      }
+    },
+    "Inverter_Fan_Speed": {
+      "growatt": {
+        "position": {
+          "register_no": 82,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Fan speed of inverter",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "MPPT_Fan_Speed": {
+      "growatt": {
+        "position": {
+          "register_no": 81,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Fan speed of MPPT charger",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
+      }
+    },
+    "Fault_code": {
+      "growatt": {
+        "position": {
+          "register_no": 40,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter fault code",
+        "publish": false,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "Warning_code": {
+      "growatt": {
+        "position": {
+          "register_no": 41,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter warning code",
+        "publish": false,
+        "state_class": "measurement",
+        "icon": "mdi:information-outline"
+      }
+    },
+    "Fault_value": {
+      "growatt": {
+        "position": {
+          "register_no": 42,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter fault value",
+        "publish": false,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "Warning_value": {
+      "growatt": {
+        "position": {
+          "register_no": 43,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter fault value",
+        "publish": false,
+        "icon": "mdi:alert-circle"
+      }
+    },
+    "Time_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 30,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "name": "Work time total",
+        "publish": false,
+        "state_class": "measurement",
+        "unit_of_measurement": "s",
+        "icon": "mdi:information-outline"
+      }
+    }
+  }
+}
