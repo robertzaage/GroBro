@@ -10,8 +10,8 @@ class GrowattRegisterDataTypes(str, Enum):
     ENUM = "ENUM"
     STRING = "STRING"
     FLOAT = "FLOAT"
-    SIGNED_FLOAT = "SIGNED_FLOAT"
     INT = "INT"
+    SIGNED_FLOAT = "SIGNED_FLOAT"
     SIGNED_INT = "SIGNED_INT"
     TIME_HHMM = "TIME_HHMM"
 
