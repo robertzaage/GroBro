@@ -11,6 +11,8 @@ class GrowattRegisterDataTypes(str, Enum):
     STRING = "STRING"
     FLOAT = "FLOAT"
     INT = "INT"
+    SIGNED_FLOAT = "SIGNED_FLOAT"
+    SIGNED_INT = "SIGNED_INT"
     TIME_HHMM = "TIME_HHMM"
 
 
@@ -38,7 +40,10 @@ class GrowattRegisterDataType(BaseModel):
         if not data_raw:
             return None
         unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
-        if self.data_type == GrowattRegisterDataTypes.FLOAT:
+        is_signed = self.data_type in [GrowattRegisterDataTypes.SIGNED_INT, GrowattRegisterDataTypes.SIGNED_FLOAT]
+        if is_signed:
+            unpack_type = unpack_type.lower()
+        if self.data_type in [GrowattRegisterDataTypes.FLOAT, GrowattRegisterDataTypes.SIGNED_FLOAT]:
             opts = self.float_options
             value = struct.unpack(unpack_type, data_raw)[0]
             value *= opts.multiplier
@@ -49,7 +54,7 @@ class GrowattRegisterDataType(BaseModel):
             h = value // 256
             m = value % 256
             return (h * 100) + m
-        elif self.data_type == GrowattRegisterDataTypes.INT:
+        elif self.data_type in [GrowattRegisterDataTypes.INT, GrowattRegisterDataTypes.SIGNED_INT]:
             value = struct.unpack(unpack_type, data_raw)[0]
             return value
         elif self.data_type == GrowattRegisterDataTypes.ENUM:
