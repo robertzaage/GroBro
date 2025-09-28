@@ -27,6 +27,7 @@ from grobro.model.modbus_function import (
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
+PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
 LOG = logging.getLogger(__name__)
 
@@ -168,14 +169,14 @@ class Client:
 
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
-        self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=False)
+        self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
         try:
             LOG.debug("HA: publish: %s", ha_input)
             for value in ha_input.payload:
                 topic = f"{HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
-                self._client.publish(topic, value.value, retain=False)
+                self._client.publish(topic, value.value, retain=PUBLISH_SENSORS_RETAINED)
         except Exception as e:
             LOG.error(f"HA: publish msg: {e}")
 

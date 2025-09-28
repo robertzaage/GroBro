@@ -116,6 +116,7 @@ docker run --detach \
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
 | `DEVICE_TIMEOUT`     | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds. |
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
+| `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Publish sensor states with MQTT retain flag enabled(default false) |
 
 # Example Setup with DuckDNS and HA-MQTT
 
