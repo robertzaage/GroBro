@@ -260,7 +260,7 @@ class Client:
         self._client.publish(
             f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
             "online" if online else "offline",
-            retain=False,
+            retain=True,
         )
 
     def __publish_device_discovery(self, device_id: str):
