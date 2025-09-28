@@ -114,9 +114,10 @@ docker run --detach \
 | `GROWATT_CLOUD`      | ❌ No    | Set to `true` to redirect messages to and from the Growatt Cloud. This is turned off by default. Supports a comma-separated list of device serials (e.g. `123456789,987654321`) for selective forwarding. |
 | `LOG_LEVEL`          | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
-| `DEVICE_TIMEOUT`     | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds. |
+| `DEVICE_TIMEOUT`     | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.After this time the device and all its entities will be marked as unavailable in Home Assistant. |
+| `AVAILABILITY_SENSOR`     | ❌ No    | Set to `true` to expose device availability only as a dedicated `online` sensor instead of marking the device and all its entities unavailable after timeout. Default is `false`.  |
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
-| `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Publish sensor states with MQTT retain flag enabled(default false) |
+| `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
 
 # Example Setup with DuckDNS and HA-MQTT
 

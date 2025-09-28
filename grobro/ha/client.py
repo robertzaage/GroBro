@@ -27,6 +27,7 @@ from grobro.model.modbus_function import (
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
+AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
 LOG = logging.getLogger(__name__)
@@ -258,11 +259,18 @@ class Client:
 
     def __publish_availability(self, device_id: str, online: bool):
         LOG.debug("Set device %s availability: %s", device_id, online)
-        self._client.publish(
-            f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
-            "online" if online else "offline",
-            retain=True,
-        )
+        if (not online and not AVAILABILITY_SENSOR) or online:
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
+                "online" if online else "offline",
+                retain=True,
+            )
+        if (AVAILABILITY_SENSOR):
+            self._client.publish(
+                f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
+                "ON" if online else "OFF",
+                retain=PUBLISH_SENSORS_RETAINED,
+            )
 
     def __publish_device_discovery(self, device_id: str):
         known_registers = get_known_registers(device_id)
@@ -349,6 +357,16 @@ class Client:
             "object_id": f"{device_id}_type",
             "icon": "mdi:chip",
         }
+        # Online Entity
+        if DEVICE_TIMEOUT > 0 and AVAILABILITY_SENSOR:
+            payload["cmps"][f"grobro_{device_id}_online"] = {
+                "platform": "binary_sensor",
+                "name": "Online",
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
+                "device_class": "connectivity",
+                "unique_id": f"grobro_{device_id}_online",
+                "object_id": f"{device_id}_online",
+            }
 
         payload_str = json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
