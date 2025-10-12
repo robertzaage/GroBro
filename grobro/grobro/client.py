@@ -138,13 +138,16 @@ class Client:
             device_id = msg.topic.split("/")[-1]
             if GROWATT_CLOUD_ENABLED:
                 if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
-                    forward_client = self.__connect_to_growatt_server(device_id)
-                    forward_client.publish(
-                        msg.topic,
-                        payload=msg.payload,
-                        qos=msg.qos,
-                        retain=msg.retain,
-                    )
+                    try:
+                        forward_client = self.__connect_to_growatt_server(device_id)
+                        forward_client.publish(
+                            msg.topic,
+                            payload=msg.payload,
+                            qos=msg.qos,
+                            retain=msg.retain,
+                        )
+                    except Exception as e:
+                        LOG.error(f"Forwarding to GROWATT_CLOUD failed: {e}")
 
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
