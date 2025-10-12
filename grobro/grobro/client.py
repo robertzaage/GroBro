@@ -120,7 +120,7 @@ class Client:
             LOG.warning("Sending failed: %s", result)
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
-      LOG.debug(f"Connected with result code {reason_code}")
+      LOG.debug(f"Connected to GroBro MQTT server with result code {reason_code}")
       self._client.subscribe("c/#")      
 
     def __on_message(self, client, userdata, msg: MQTTMessage):

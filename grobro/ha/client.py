@@ -113,6 +113,7 @@ class Client:
                 topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
         self._client.on_message = self.__on_message
+        self._client.on_connect = self.__on_connect
 
         # Configs laden (Cache aus Dateien)
         for fname in os.listdir("."):
@@ -182,6 +183,9 @@ class Client:
             LOG.error(f"HA: publish msg: {e}")
 
     # ------------------- MQTT Callback -------------------
+
+    def __on_connect(self, client, userdata, flags, reason_code, properties):
+        LOG.debug(f"Connected to HA MQTT server with result code {reason_code}")
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
