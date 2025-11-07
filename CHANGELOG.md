@@ -1,3 +1,18 @@
+## v2.1.0
+
+### Bug Fixes
+
++ Fixed pydantic warnings on startup
++ Continue with local message processing if cloud forwarding fails
++ Fixed object_id deprecated messages in HA
+
+### New Features
+
++ Added support for SPF models (via Shine WiFi X dongle)
++ Added smart mode (NOAH) which works only in connection with Growatt cloud again
++ Extended NOAH device infos
++ Added option to expose device availability via dedicated online sensor and to send sensor states retain via MQTT
+
 ## v2.0.1
 
 ### Bug Fixes
