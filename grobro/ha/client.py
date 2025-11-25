@@ -163,6 +163,21 @@ class Client:
         # ENUM Mapping
         payload = dict(state.payload)
         known_registers = get_known_registers(state.device_id)
+
+        # Replace invalid battery temperatures (-273) with None
+        if known_registers:
+            for key, value in list(payload.items()):
+                reg = known_registers.input_registers.get(key)
+                if not reg:
+                    continue
+
+                # Identify batX_temp sensors
+                name = key  # key == "bat1_temp", "bat2_temp", etc.
+                if name.startswith("bat") and name.endswith("_temp"):
+                    if isinstance(value, (int, float)) and value == -273:
+                        payload[key] = None
+
+        # ENUM Mapping (must come AFTER our replacement!)
         if known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
@@ -172,6 +187,7 @@ class Client:
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
+
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
         try:
