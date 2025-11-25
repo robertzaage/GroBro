@@ -1236,8 +1236,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
+            "delta": -273,
+            "multiplier": 0.1
           }
         }
       },
@@ -1713,8 +1713,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
+            "delta": -273,
+            "multiplier": 0.1
           }
         }
       },
@@ -1737,8 +1737,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
+            "delta": -273,
+            "multiplier": 0.1
           }
         }
       },
@@ -1761,8 +1761,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.01
+            "delta": -273,
+            "multiplier": 0.1
           }
         }
       },
