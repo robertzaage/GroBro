@@ -174,7 +174,7 @@ class Client:
                 # Identify batX_temp sensors
                 name = key  # key == "bat1_temp", "bat2_temp", etc.
                 if name.startswith("bat") and name.endswith("_temp"):
-                    if isinstance(value, (int, float)) and value == -273:
+                    if isinstance(value, (int, float)) and value == -273.1:
                         payload[key] = None
 
         # ENUM Mapping (must come AFTER our replacement!)
