@@ -50,3 +50,6 @@ configuration:
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.
+  AVAILABILITY_SENSOR:
+    name: AVAILABILITY_SENSOR
+    description: Expose device availability only as a dedicated online sensor instead of marking the device and all its entities unavailable after timeout.

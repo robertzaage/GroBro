@@ -50,3 +50,6 @@ configuration:
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Legt den Timeout in Sekunden fest, wann das Gerät als Nicht Verfügbar angezeigt wird. Default ist 0 (deaktiviert). Empfehlung 300+ Sekunden.
+  AVAILABILITY_SENSOR:
+    name: AVAILABILITY_SENSOR
+    description: Lässt die Geräteverfügbarkeit ausschließlich als dedizierten Online-Sensor anzeigen, anstatt das Gerät und alle seine Entitäten nach Ablauf der Zeitüberschreitung als nicht verfügbar zu markieren.

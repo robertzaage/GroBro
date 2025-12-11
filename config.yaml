@@ -36,6 +36,7 @@ options:
   DUMP_MESSAGES: false
   DUMP_DIR: "/share/GroBro/dump"
   MAX_SLOTS: 1
+  AVAILABILITY_SENSOR: false
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -52,7 +53,8 @@ schema:
   REGISTER_FILTER: "str?"
   GROWATT_CLOUD: bool
   LOG_LEVEL: list(INFO|ERROR|DEBUG)?
-  DUMP_MESSAGES: "bool"
+  DUMP_MESSAGES: bool
   DUMP_DIR: "str?"
   DEVICE_TIMEOUT: "int?"
   MAX_SLOTS: "int?"
+  AVAILABILITY_SENSOR: bool
