@@ -82,10 +82,11 @@ if __name__ == "__main__":
     # setup com: grobro -> ha
     grobro_client.on_input_register = ha_client.publish_input_register
     grobro_client.on_holding_register_input = ha_client.publish_holding_register_input
-
     grobro_client.on_config = ha_client.set_config
+
     # setup com: ha -> grobro
     ha_client.on_command = grobro_client.send_command
+    ha_client.on_config_command = lambda dev, reg, val: grobro_client.send_config_message(dev, reg, val)
 
     RUNNING = True
     signal_handler = SignalHandler()
