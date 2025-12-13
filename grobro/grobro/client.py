@@ -119,6 +119,48 @@ class Client:
         if status != 0:
             LOG.warning("Sending failed: %s", result)
 
+    def send_config_message(self, device_id: str, register_no: int, value: str):
+        from grobro.grobro import builder
+        import struct
+
+        def build_config_message(device_id: str, register_no: int, value: str):
+            HEADER = b"\x00\x01\x00\x07"
+            MSG_TYPE = 0x0118
+            dev = device_id.encode("ascii").ljust(16, b"\x00")
+            value_bytes = value.encode("ascii")
+
+            tlv = (
+                struct.pack(">H", 1)
+                + struct.pack(">H", len(value_bytes) + 4)
+                + struct.pack(">H", register_no)
+                + struct.pack(">H", len(value_bytes))
+                + value_bytes
+            )
+            payload = b"\x00" * 14 + tlv
+            msg_len = len(payload) + 2 + 16
+
+            msg = (
+                HEADER
+                + struct.pack(">H", msg_len)
+                + struct.pack(">H", MSG_TYPE)
+                + dev
+                + payload
+            )
+            return msg
+
+        raw = build_config_message(device_id, register_no, value)
+        scrambled = scramble(raw)
+        final_payload = append_crc(scrambled)
+
+        topic = f"s/33/{device_id}"
+        LOG.info(f"Sending config message to {device_id} register={register_no} value={value}")
+
+        self._client.publish(
+            topic,
+            final_payload,
+            properties=MQTT_PROP_FORWARD_HA,
+        )
+
     def __on_connect(self, client, userdata, flags, reason_code, properties):
       LOG.debug(f"Connected to GroBro MQTT server with result code {reason_code}")
       self._client.subscribe("c/#")      
