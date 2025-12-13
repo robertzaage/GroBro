@@ -116,22 +116,38 @@ def decode_noah(mtype: int, payload: bytes):
             return res
     return {"raw_hex": body.hex()}
 
-# TODO: Merge tlv_parse and decode_register
-def tlv_parse(buf: bytes):
-    out, off = [], 0
-    while off + 6 <= len(buf):
-        reg, idk, ln = struct.unpack_from(">HHH", buf, off)
-        off += 6
-        if off + ln > len(buf):
-            break
-        val = buf[off : off + ln]
-        off += ln
-        try:
-            val = val.decode("ascii")
-        except UnicodeDecodeError:
-            val = val.hex()
-        out.append({"register": reg, "value": val})
-    return out
+def parse_config_message(data: bytes):
+    pos = 0
+
+    # Skip the 14 padding bytes
+    pos += 14
+
+    # TLV TYPE (2 bytes)
+    tlv_type = struct.unpack_from(">H", data, pos)[0]
+    pos += 2
+
+    # TLV LENGTH (2 bytes)
+    tlv_len = struct.unpack_from(">H", data, pos)[0]
+    pos += 2
+
+    # Register number (2 bytes)
+    register_no = struct.unpack_from(">H", data, pos)[0]
+    pos += 2
+
+    # Value length (2 bytes)
+    value_len = struct.unpack_from(">H", data, pos)[0]
+    pos += 2
+
+    # Value
+    value = data[pos : pos + value_len].decode("ascii")
+
+    return {
+        "tlv_type": tlv_type,
+        "tlv_len": tlv_len,
+        "register_no": register_no,
+        "value_len": value_len,
+        "value": value,
+    }
 
 def decode_register(payload: bytes) -> dict | None:
     # Handles both read request and answer
@@ -156,7 +172,7 @@ def decode_payload(device_id: str,mtype: int, payload: bytes):
     # NEO
     #if device_id.startswith("QMN000"):
     if mtype == 0x0118:
-        return {"tlvs": tlv_parse(payload[16:])}
+        return parse_config_message(payload)
     if mtype == 0x0119:
         return decode_register(payload[16:])
     # NOAH
