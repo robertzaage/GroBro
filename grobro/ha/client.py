@@ -206,7 +206,7 @@ class Client:
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
-        if len(parts) != 5 or parts[0] not in {"number", "button", "switch"}:
+        if len(parts) != 5 or parts[0] not in {"number", "button", "switch", "config"}:
             return
         cmd_type, _, device_id, cmd_name, action = parts
 
@@ -267,10 +267,18 @@ class Client:
         # Config
         if parts[0] == "config" and action == "set":
             register_no = int(cmd_name)
-            value = msg.payload.decode().strip()
+            raw_value = msg.payload.decode().strip()
+
+            # Special case: Sync Time -> dynamic timestamp
+            if register_no == 31:
+                from datetime import datetime
+                value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                LOG.info(f"Generating SYNC TIME config for {device_id}: {value}")
+            else:
+                value = raw_value
+
             LOG.info(f"HA config command: device={device_id} register={register_no} value={value}")
 
-            # forward upward – same callback used for modbus
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)
             return
@@ -345,13 +353,23 @@ class Client:
             }
 
         # Config command: Restart Datalogger (Register 4 / Value 1)
-        cfg_uid = f"grobro_{device_id}_restart_datalogger"
-        payload["cmps"][cfg_uid] = {
+        restart_uid = f"grobro_{device_id}_restart_datalogger"
+        payload["cmps"][restart_uid] = {
             "platform": "button",
             "name": "Restart Datalogger",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/4/set",
             "payload_press": "1",
-            "unique_id": cfg_uid
+            "unique_id": restart_uid
+        }
+
+        # Config command: Sync Time (register 31 / Value "%Y-%m-%d %H:%M:%S")
+        time_sync_uid = f"grobro_{device_id}_sync_time"
+        payload["cmps"][time_sync_uid] = {
+            "platform": "button",
+            "name": "Sync Time",
+            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
+            "payload_press": "",
+            "unique_id": time_sync_uid
         }
 
         # Read-All Button
