@@ -86,6 +86,7 @@ if __name__ == "__main__":
 
     # setup com: ha -> grobro
     ha_client.on_command = grobro_client.send_command
+    ha_client.on_config_read = grobro_client.send_config_read_message
     ha_client.on_config_command = lambda dev, reg, val: grobro_client.send_config_message(dev, reg, val)
 
     RUNNING = True

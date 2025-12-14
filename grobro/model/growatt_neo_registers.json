@@ -1,4 +1,108 @@
 {
+  "config_registers": {
+    "data_interval": {
+      "growatt": {
+        "register_no": 4,
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Update Interval",
+        "type": "number",
+        "unit_of_measurement": "min",
+        "min": 0,
+        "max": 60,
+        "step": 1
+      }
+    },
+    "datalogger_sn": {
+      "growatt": {
+        "register_no": 8,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Datalogger Serial Number",
+        "type": "sensor",
+        "icon": "mdi:identifier"
+      }
+    },
+    "mqtt_port": {
+      "growatt": {
+        "register_no": 18,
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "MQTT Port",
+        "type": "number",
+        "min": 1,
+        "max": 65535
+      }
+    },
+    "mqtt_broker": {
+      "growatt": {
+        "register_no": 19,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "MQTT Broker",
+        "type": "sensor",
+        "icon": "mdi:server-network"
+      }
+    },
+    "firmware_version": {
+      "growatt": {
+        "register_no": 21,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Firmware Version",
+        "type": "sensor",
+        "icon": "mdi:chip"
+      }
+    },
+    "system_time": {
+      "growatt": {
+        "register_no": 31,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "System Time",
+        "type": "sensor",
+        "icon": "mdi:clock-outline"
+      }
+    },
+    "wifi_ssid": {
+      "growatt": {
+        "register_no": 56,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "WiFi SSID",
+        "type": "sensor",
+        "icon": "mdi:wifi"
+      }
+    }
+  },
   "holding_registers": {
     "output_power_limit": {
       "growatt": {

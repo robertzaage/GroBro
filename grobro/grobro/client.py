@@ -119,9 +119,35 @@ class Client:
         if status != 0:
             LOG.warning("Sending failed: %s", result)
 
+    def send_config_read_message(self, device_id: str, register_no: int):
+
+        HEADER = b"\x00\x01\x00\x07"
+        MSG_TYPE = 0x0119
+
+        dev = device_id.encode("ascii").ljust(16, b"\x00")
+        body = (
+            struct.pack(">H", 1)
+            + struct.pack(">H", register_no)
+        )
+        payload = b"\x00" * 14 + body
+        msg_len = len(payload) + 2 + 16
+
+        msg = (
+            HEADER
+            + struct.pack(">H", msg_len)
+            + struct.pack(">H", MSG_TYPE)
+            + dev
+            + payload
+        )
+
+        final_payload = append_crc(scramble(msg))
+        topic = f"s/33/{device_id}"
+
+        LOG.info(f"Sending config read to {device_id} register={register_no}")
+        self._client.publish(topic, final_payload, properties=MQTT_PROP_FORWARD_HA)
+
+
     def send_config_message(self, device_id: str, register_no: int, value: str):
-        from grobro.grobro import builder
-        import struct
 
         def build_config_message(device_id: str, register_no: int, value: str):
             HEADER = b"\x00\x01\x00\x07"

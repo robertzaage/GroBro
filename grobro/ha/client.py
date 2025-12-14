@@ -85,12 +85,35 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
         value=value if value is not None else register_no,
     )
 
+def iter_command_registers(known_registers: GroBroRegisters):
+    # Modbus holding registers
+    for name, reg in known_registers.holding_registers.items():
+        yield {
+            "name": name,
+            "ha": reg.homeassistant,
+            "topic_root": reg.homeassistant.type,
+            "cmd_id": name,
+            "state_id": name,
+            "is_config": False,
+        }
+
+    # Config registers
+    for name, reg in known_registers.config_registers.items():
+        yield {
+            "name": name,
+            "ha": reg.homeassistant,
+            "topic_root": "config",
+            "cmd_id": str(reg.growatt.register_no),
+            "state_id": str(reg.growatt.register_no),
+            "is_config": True,
+        }
 
 # ------------------- Client-Class -------------------
 
 class Client:
     on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]]
     on_config_command: Optional[Callable[[str, int, str], None]] = None
+    on_config_read: Optional[Callable[[str, int], None]] = None
 
     _client: mqtt.Client
     _config_cache: dict[str, model.DeviceConfig] = {}
@@ -231,6 +254,10 @@ class Client:
                     self.on_command(make_modbus_command(
                         device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
                     ))
+                if self.on_config_read:
+                    for name, cfg in known_registers.config_registers.items():
+                        LOG.debug("Reading config %s (%s)", name, cfg.growatt.register_no)
+                        self.on_config_read(device_id, cfg.growatt.register_no)
                 return
 
             if action == "read":
@@ -332,26 +359,36 @@ class Client:
             "cmps": {},
         }
 
-        # Commands
-        for cmd_name, cmd in known_registers.holding_registers.items():
-            if not cmd.homeassistant.publish:
+        # Commands (Modbus + Config)
+        for entry in iter_command_registers(known_registers):
+            ha = entry["ha"]
+            if not ha.publish:
                 continue
 
-            if cmd_name.startswith("slot"):
+            # slot filtering applies only to modbus
+            if not entry["is_config"] and entry["name"].startswith("slot"):
                 try:
-                    if int(cmd_name[4]) > MAX_SLOTS:
+                    if int(entry["name"][4]) > MAX_SLOTS:
                         continue
                 except ValueError:
                     continue
 
-            unique_id = f"grobro_{device_id}_cmd_{cmd_name}"
-            cmd_type = cmd.homeassistant.type
+            unique_id = f"grobro_{device_id}_cmd_{entry['name']}"
+            platform = ha.type
+
             payload["cmps"][unique_id] = {
-                "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
-                "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
-                "platform": cmd_type,
+                "platform": platform,
+                "name": ha.name,
                 "unique_id": unique_id,
-                **cmd.homeassistant.dict(exclude_none=True),
+                "command_topic": (
+                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{device_id}/{entry['cmd_id']}/set"
+                ),
+                "state_topic": (
+                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{device_id}/{entry['state_id']}/get"
+                ),
+                **ha.dict(exclude_none=True),
             }
 
         # Config command: Restart Datalogger (Register 32 / Value 1)
@@ -362,28 +399,6 @@ class Client:
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
             "payload_press": "1",
             "unique_id": restart_uid
-        }
-
-        # Config command: Sync Time (register 31 / Value "%Y-%m-%d %H:%M:%S")
-        time_sync_uid = f"grobro_{device_id}_sync_time"
-        payload["cmps"][time_sync_uid] = {
-            "platform": "button",
-            "name": "Sync Time",
-            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
-            "unique_id": time_sync_uid
-        }
-
-        # Config command: Data Interval (Register 4 / Value <n> minutes)
-        interval_uid = f"grobro_{device_id}_data_interval"
-        payload["cmps"][interval_uid] = {
-            "platform": "number",
-            "name": "Data Interval",
-            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/4/set",
-            "min": 0,
-            "max": 60,
-            "step": 1,
-            "mode": "slider",
-            "unique_id": interval_uid
         }
 
         # Read-All Button

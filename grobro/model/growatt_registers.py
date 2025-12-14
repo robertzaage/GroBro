@@ -5,7 +5,6 @@ import importlib.resources as resources
 import json
 import struct
 
-
 class GrowattRegisterDataTypes(str, Enum):
     ENUM = "ENUM"
     STRING = "STRING"
@@ -136,11 +135,28 @@ class GroBroHoldingRegister(BaseModel):
     growatt: Optional[GrowattInputRegister] = None
     homeassistant: HomeAssistantHoldingRegister
 
+class GroBroConfigRegister(BaseModel):
+    register_no: int
+    data: GrowattRegisterDataType
+
+class HomeAssistantConfigRegister(BaseModel):
+    publish: bool
+    name: str
+    type: str  # sensor | number | button
+    min: Optional[int] = None
+    max: Optional[int] = None
+    step: Optional[int] = None
+    unit_of_measurement: Optional[str] = None
+    icon: Optional[str] = None
+
+class GroBroConfigRegisterDef(BaseModel):
+    growatt: GroBroConfigRegister
+    homeassistant: HomeAssistantConfigRegister
 
 class GroBroRegisters(BaseModel):
     input_registers: dict[str, GroBroInputRegister]
     holding_registers: dict[str, GroBroHoldingRegister]
-
+    config_registers: dict[str, GroBroConfigRegisterDef] = {}
 
 with resources.files(__package__).joinpath("growatt_neo_registers.json").open("rb") as f:
     KNOWN_NEO_REGISTERS = GroBroRegisters.parse_obj(json.load(f))
