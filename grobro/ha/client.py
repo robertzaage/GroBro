@@ -361,6 +361,7 @@ class Client:
             "name": "Restart Datalogger",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
             "payload_press": "1",
+            "icon": "mdi:restart",
             "unique_id": restart_uid
         }
 
@@ -369,6 +370,7 @@ class Client:
         payload["cmps"][time_sync_uid] = {
             "platform": "button",
             "name": "Sync Time",
+            "icon": "mdi:clock-outline",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
             "unique_id": time_sync_uid
         }
