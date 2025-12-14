@@ -76,11 +76,15 @@ class Client:
         LOG.info(
             f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
         )
+        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id = f"grobro-grobro{('-' + client_id_suffix) if client_id_suffix else ''}"
+
         self._client = mqtt.Client(
-            client_id="grobro-grobro",
+            client_id=client_id,
             callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
             protocol=mqtt.MQTTv5,
         )
+
         if grobro_mqtt.username and grobro_mqtt.password:
             self._client.username_pw_set(grobro_mqtt.username, grobro_mqtt.password)
         if grobro_mqtt.use_tls:

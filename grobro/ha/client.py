@@ -123,7 +123,15 @@ class Client:
     def __init__(self, mqtt_config: model.MQTTConfig):
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
-        self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-ha")
+
+        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id = f"grobro-ha{('-' + client_id_suffix) if client_id_suffix else ''}"
+
+        self._client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2,
+            client_id=client_id
+        )
+
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
         if mqtt_config.use_tls:
@@ -398,6 +406,7 @@ class Client:
             "name": "Restart Datalogger",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
             "payload_press": "1",
+            "icon": "mdi:restart",
             "unique_id": restart_uid
         }
 
