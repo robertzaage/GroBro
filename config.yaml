@@ -32,6 +32,7 @@ options:
   TARGET_MQTT_PASS: ""
   HA_BASE_TOPIC: "homeassistant"
   GROWATT_CLOUD: false
+  GROWATT_CLOUD_CONFIG_FILTER: false
   LOG_LEVEL: ERROR
   DUMP_MESSAGES: false
   DUMP_DIR: "/share/GroBro/dump"
@@ -52,6 +53,7 @@ schema:
   HA_BASE_TOPIC: "str?"
   REGISTER_FILTER: "str?"
   GROWATT_CLOUD: bool
+  GROWATT_CLOUD_CONFIG_FILTER: bool
   LOG_LEVEL: list(INFO|ERROR|DEBUG)?
   DUMP_MESSAGES: bool
   DUMP_DIR: "str?"

@@ -37,6 +37,8 @@ HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 # Updated growatt cloud forwarding config
 GROWATT_CLOUD = os.getenv("GROWATT_CLOUD", "false")
+GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false")
+
 if GROWATT_CLOUD.lower() == "true":
     GROWATT_CLOUD_ENABLED = True
     GROWATT_CLOUD_FILTER = set()
@@ -211,6 +213,23 @@ class Client:
             if GROWATT_CLOUD_ENABLED:
                 if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
                     try:
+                        if GROWATT_CLOUD_CONFIG_FILTER:
+                            try:
+                                unscrambled = parser.unscramble(msg.payload)
+                                msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
+                                if msg_type in (0x0118, 0x0110):
+                                    LOG.warning(
+                                        "Blocked config write from Growatt Cloud for %s",
+                                        device_id,
+                                    )
+                                    return
+                            except Exception as e:
+                                LOG.error(
+                                    "Failed to inspect message before forwarding: %s",
+                                    e,
+                                )
+                                return
+
                         forward_client = self.__connect_to_growatt_server(device_id)
                         forward_client.publish(
                             msg.topic,
@@ -219,7 +238,7 @@ class Client:
                             retain=msg.retain,
                         )
                     except Exception as e:
-                        LOG.error(f"Forwarding to GROWATT_CLOUD failed: {e}")
+                        LOG.error(f"Forwarding to Growatt Cloud failed: {e}")
 
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
@@ -288,7 +307,7 @@ class Client:
                 )
                 return
 
-            # Config WRITE response (281)
+            # Config WRITE response (280)
             if msg_type == 280:
                 cfg = parser.parse_config_ack(unscrambled)
                 LOG.info(
