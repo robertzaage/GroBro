@@ -331,13 +331,10 @@ class Client:
             if register_no == 31:
                 from datetime import datetime
                 value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                LOG.info(f"Generating SYNC TIME config for {device_id}: {value}")
 
             # Normal config registers: use numeric or string value as-is
             else:
                 value = raw_value
-
-            LOG.info(f"HA Config command: device={device_id} reg={register_no} value={value}")
 
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)

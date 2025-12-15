@@ -224,6 +224,16 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
 
+            # Config Message
+            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
+            # NOAH=387 NEO=340,341
+            if msg_type in (387, 340, 341):
+                config_offset = parser.find_config_offset(unscrambled)
+                config = parser.parse_config_type(unscrambled, config_offset)
+                self.on_config(config)
+                LOG.info(f"Received config message for {device_id}")
+                return
+
             # Config READ response (281)
             msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
             if msg_type == 281:
@@ -278,6 +288,7 @@ class Client:
                 )
                 return
 
+            # Config WRITE response (281)
             if msg_type == 280:
                 cfg = parser.parse_config_ack(unscrambled)
                 LOG.info(
@@ -285,17 +296,6 @@ class Client:
                     cfg["device_id"],
                     cfg["register_no"],
                 )
-                return
-
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-
-            # NOAH=387 NEO=340,341
-            if msg_type in (387, 340, 341):
-                # Config message
-                config_offset = parser.find_config_offset(unscrambled)
-                config = parser.parse_config_type(unscrambled, config_offset)
-                self.on_config(config)
-                LOG.info(f"Received config message for {device_id}")
                 return
 
             else:
