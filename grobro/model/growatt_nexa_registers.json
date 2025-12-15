@@ -1,4 +1,66 @@
 {
+  "config_registers": {
+    "data_interval": {
+      "growatt": {
+        "register_no": 4,
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Update Interval",
+        "type": "number",
+        "unit_of_measurement": "min",
+        "min": 0,
+        "max": 60,
+        "step": 1
+      }
+    },
+    "mqtt_port": {
+      "growatt": {
+        "register_no": 18,
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "MQTT Port",
+        "type": "number",
+        "min": 1,
+        "max": 65535
+      }
+    },
+    "mqtt_broker": {
+      "growatt": {
+        "register_no": 19,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "MQTT Broker",
+        "type": "text",
+        "icon": "mdi:server-network"
+      }
+    },
+    "system_time": {
+      "growatt": {
+        "register_no": 31,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "System Time",
+        "type": "text",
+        "icon": "mdi:clock-outline"
+      }
+    }
+  },
   "holding_registers": {
     "slot1_power": {
       "homeassistant": {
