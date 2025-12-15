@@ -6,6 +6,8 @@ import json
 import logging
 from threading import Timer
 from typing import Callable, Optional
+from collections import deque
+from threading import Lock
 
 import paho.mqtt.client as mqtt
 
@@ -85,22 +87,60 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
         value=value if value is not None else register_no,
     )
 
+def iter_command_registers(known_registers: GroBroRegisters):
+    # Modbus holding registers
+    for name, reg in known_registers.holding_registers.items():
+        yield {
+            "name": name,
+            "ha": reg.homeassistant,
+            "topic_root": reg.homeassistant.type,
+            "cmd_id": name,
+            "state_id": name,
+            "is_config": False,
+        }
+
+    # Config registers
+    for name, reg in known_registers.config_registers.items():
+        yield {
+            "name": name,
+            "ha": reg.homeassistant,
+            "topic_root": "config",
+            "cmd_id": str(reg.growatt.register_no),
+            "state_id": str(reg.growatt.register_no),
+            "is_config": True,
+        }
 
 # ------------------- Client-Class -------------------
 
 class Client:
     on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]]
     on_config_command: Optional[Callable[[str, int, str], None]] = None
+    on_config_read: Optional[Callable[[str, int], None]] = None
+    on_config_read_response: Callable[[str, int], None] | None = None
 
     _client: mqtt.Client
     _config_cache: dict[str, model.DeviceConfig] = {}
     _discovery_cache: list[str] = []
     _device_timers: dict[str, Timer] = {}
 
+    # --- Config read sequencing ---
+    _config_read_queues: dict[str, deque[int]] = {}
+    _config_read_inflight: dict[str, int] = {}
+    _config_read_timers: dict[str, Timer] = {}
+    _config_read_lock = Lock()
+
     def __init__(self, mqtt_config: model.MQTTConfig):
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
-        self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="grobro-ha")
+
+        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id = f"grobro-ha{('-' + client_id_suffix) if client_id_suffix else ''}"
+
+        self._client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2,
+            client_id=client_id
+        )
+
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
         if mqtt_config.use_tls:
@@ -220,6 +260,7 @@ class Client:
         # Buttons
         if cmd_type == "button":
             if cmd_name == "read_all":
+		# Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
                     if name.startswith("slot"):
                         try:
@@ -229,10 +270,27 @@ class Client:
                             continue
                     pos = register.growatt.position
                     self.on_command(make_modbus_command(
-                        device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
+                        device_id,
+                        GrowattModbusFunction.READ_SINGLE_REGISTER,
+                        pos.register_no,
                     ))
-                return
 
+                # Queue config reads
+                if self.on_config_read:
+                    with self._config_read_lock:
+                        q = self._config_read_queues.setdefault(device_id, deque())
+                        for cfg in known_registers.config_registers.values():
+                            q.append(cfg.growatt.register_no)
+
+                    # give the datalogger time to answer modbus reads
+                    Timer(
+                        3.0,  # small delay is enough
+                        self.__kickoff_next_config_read,
+                        args=(device_id,),
+                    ).start()
+
+                return
+                
             if action == "read":
                 pos = known_registers.holding_registers[cmd_name].growatt.position
                 self.on_command(make_modbus_command(
@@ -273,13 +331,10 @@ class Client:
             if register_no == 31:
                 from datetime import datetime
                 value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                LOG.info(f"Generating SYNC TIME config for {device_id}: {value}")
 
             # Normal config registers: use numeric or string value as-is
             else:
                 value = raw_value
-
-            LOG.info(f"HA Config command: device={device_id} reg={register_no} value={value}")
 
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)
@@ -332,26 +387,36 @@ class Client:
             "cmps": {},
         }
 
-        # Commands
-        for cmd_name, cmd in known_registers.holding_registers.items():
-            if not cmd.homeassistant.publish:
+        # Commands (Modbus + Config)
+        for entry in iter_command_registers(known_registers):
+            ha = entry["ha"]
+            if not ha.publish:
                 continue
 
-            if cmd_name.startswith("slot"):
+            # slot filtering applies only to modbus
+            if not entry["is_config"] and entry["name"].startswith("slot"):
                 try:
-                    if int(cmd_name[4]) > MAX_SLOTS:
+                    if int(entry["name"][4]) > MAX_SLOTS:
                         continue
                 except ValueError:
                     continue
 
-            unique_id = f"grobro_{device_id}_cmd_{cmd_name}"
-            cmd_type = cmd.homeassistant.type
+            unique_id = f"grobro_{device_id}_cmd_{entry['name']}"
+            platform = ha.type
+
             payload["cmps"][unique_id] = {
-                "command_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/set",
-                "state_topic": f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}/{cmd_name}/get",
-                "platform": cmd_type,
+                "platform": platform,
+                "name": ha.name,
                 "unique_id": unique_id,
-                **cmd.homeassistant.dict(exclude_none=True),
+                "command_topic": (
+                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{device_id}/{entry['cmd_id']}/set"
+                ),
+                "state_topic": (
+                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{device_id}/{entry['state_id']}/get"
+                ),
+                **ha.dict(exclude_none=True),
             }
 
         # Config command: Restart Datalogger (Register 32 / Value 1)
@@ -361,6 +426,7 @@ class Client:
             "name": "Restart Datalogger",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
             "payload_press": "1",
+            "icon": "mdi:restart",
             "unique_id": restart_uid
         }
 
@@ -369,21 +435,9 @@ class Client:
         payload["cmps"][time_sync_uid] = {
             "platform": "button",
             "name": "Sync Time",
+            "icon": "mdi:clock-outline",
             "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
             "unique_id": time_sync_uid
-        }
-
-        # Config command: Data Interval (Register 4 / Value <n> minutes)
-        interval_uid = f"grobro_{device_id}_data_interval"
-        payload["cmps"][interval_uid] = {
-            "platform": "number",
-            "name": "Data Interval",
-            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/4/set",
-            "min": 0,
-            "max": 60,
-            "step": 1,
-            "mode": "slider",
-            "unique_id": interval_uid
         }
 
         # Read-All Button
@@ -539,3 +593,68 @@ class Client:
             device_info["connections"] = [["mac", config.mac_address]]
 
         return device_info
+
+    def __kickoff_next_config_read(self, device_id: str):
+        with self._config_read_lock:
+            # already waiting for a response
+            if device_id in self._config_read_inflight:
+                return
+
+            q = self._config_read_queues.get(device_id)
+            if not q:
+                return
+
+            register_no = q.popleft()
+            self._config_read_inflight[device_id] = register_no
+
+        if self.on_config_read:
+            self.on_config_read(device_id, register_no)
+
+        # start 1 minute timeout
+        timer = Timer(
+            60,
+            self.__config_read_timeout,
+            args=(device_id, register_no),
+        )
+        self._config_read_timers[device_id] = timer
+        timer.start()
+
+    def __config_read_timeout(self, device_id: str, register_no: int):
+        with self._config_read_lock:
+            inflight = self._config_read_inflight.get(device_id)
+            if inflight != register_no:
+                return
+
+            LOG.warning(
+                "Config read timeout for %s register=%s",
+                device_id,
+                register_no,
+            )
+
+            self._config_read_inflight.pop(device_id, None)
+            self._config_read_timers.pop(device_id, None)
+
+        # continue with next queued register
+        self.__kickoff_next_config_read(device_id)
+
+    def handle_config_read_response(self, device_id: str, register_no: int):
+        with self._config_read_lock:
+            inflight = self._config_read_inflight.get(device_id)
+            if inflight != register_no:
+                return
+
+            LOG.debug(
+                "Config read completed for %s register=%s",
+                device_id,
+                register_no,
+            )
+
+            timer = self._config_read_timers.pop(device_id, None)
+            if timer:
+                timer.cancel()
+
+            self._config_read_inflight.pop(device_id, None)
+
+        # continue with next queued read
+        self.__kickoff_next_config_read(device_id)
+

@@ -110,6 +110,7 @@ docker run --detach \
 | `TARGET_MQTT_TLS`    | ❌ No    | Set to `true` to enable TLS without certificate validation                 |
 | `TARGET_MQTT_USER`   | ❌ No    | Username for the target MQTT broker (if authentication is required)        |
 | `TARGET_MQTT_PASS`   | ❌ No    | Password for the target MQTT broker                                        |
+| `MQTT_CLIENT_SUFFIX` | ❌ No    | Optional suffix appended to all MQTT client IDs (grobro-ha and grobro-grobro). Allows running multiple GroBro instances in parallel against the same MQTT broker (e.g. prod, test). |
 | `HA_BASE_TOPIC`      | ❌ No    | Base MQTT topic used for Home Assistant auto-discovery and sensor states   |
 | `GROWATT_CLOUD`      | ❌ No    | Set to `true` to redirect messages to and from the Growatt Cloud. This is turned off by default. Supports a comma-separated list of device serials (e.g. `123456789,987654321`) for selective forwarding. |
 | `LOG_LEVEL`          | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |

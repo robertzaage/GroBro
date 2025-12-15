@@ -76,11 +76,15 @@ class Client:
         LOG.info(
             f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
         )
+        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id = f"grobro-grobro{('-' + client_id_suffix) if client_id_suffix else ''}"
+
         self._client = mqtt.Client(
-            client_id="grobro-grobro",
+            client_id=client_id,
             callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
             protocol=mqtt.MQTTv5,
         )
+
         if grobro_mqtt.username and grobro_mqtt.password:
             self._client.username_pw_set(grobro_mqtt.username, grobro_mqtt.password)
         if grobro_mqtt.use_tls:
@@ -119,9 +123,35 @@ class Client:
         if status != 0:
             LOG.warning("Sending failed: %s", result)
 
+    def send_config_read_message(self, device_id: str, register_no: int):
+
+        HEADER = b"\x00\x01\x00\x07"
+        MSG_TYPE = 0x0119
+
+        dev = device_id.encode("ascii").ljust(16, b"\x00")
+        body = (
+            struct.pack(">H", 1)
+            + struct.pack(">H", register_no)
+        )
+        payload = b"\x00" * 14 + body
+        msg_len = len(payload) + 2 + 16
+
+        msg = (
+            HEADER
+            + struct.pack(">H", msg_len)
+            + struct.pack(">H", MSG_TYPE)
+            + dev
+            + payload
+        )
+
+        final_payload = append_crc(scramble(msg))
+        topic = f"s/33/{device_id}"
+
+        LOG.info(f"Sending config read to {device_id} register={register_no}")
+        self._client.publish(topic, final_payload, properties=MQTT_PROP_FORWARD_HA)
+
+
     def send_config_message(self, device_id: str, register_no: int, value: str):
-        from grobro.grobro import builder
-        import struct
 
         def build_config_message(device_id: str, register_no: int, value: str):
             HEADER = b"\x00\x01\x00\x07"
@@ -194,8 +224,84 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
 
-            modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
-            LOG.debug("Received modbus message: %s", modbus_message)
+            # Config Message
+            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
+            # NOAH=387 NEO=340,341
+            if msg_type in (387, 340, 341):
+                config_offset = parser.find_config_offset(unscrambled)
+                config = parser.parse_config_type(unscrambled, config_offset)
+                self.on_config(config)
+                LOG.info(f"Received config message for {device_id}")
+                return
+
+            # Config READ response (281)
+            msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
+            if msg_type == 281:
+                cfg = parser.parse_config_message(unscrambled)
+                LOG.info(
+                    "Received config read response for %s reg=%s value=%s",
+                    cfg["device_id"],
+                    cfg["register_no"],
+                    cfg["value"],
+                )
+
+                # Publish value back to HA (config/.../get)
+                topic = (
+                    f"{HA_BASE_TOPIC}/config/grobro/"
+                    f"{cfg['device_id']}/{cfg['register_no']}/get"
+                )
+
+                value = cfg["value"]
+
+                # Cast value for HA number entities (INT config registers)
+                try:
+                    known_registers = None
+                    if cfg["device_id"].startswith("QMN"):
+                        known_registers = KNOWN_NEO_REGISTERS
+                    elif cfg["device_id"].startswith("0PVP"):
+                        known_registers = KNOWN_NOAH_REGISTERS
+                    elif cfg["device_id"].startswith("0HVR"):
+                        known_registers = KNOWN_NEXA_REGISTERS
+                    elif cfg["device_id"].startswith("HAQ"):
+                        known_registers = KNOWN_SPF_REGISTERS
+
+                    if known_registers:
+                        for reg in known_registers.config_registers.values():
+                            if reg.growatt.register_no == cfg["register_no"]:
+                                if reg.growatt.data.data_type == "INT":
+                                    value = int(value)
+                                break
+                except Exception as e:
+                    LOG.debug(
+                        "Failed to cast config value for %s reg=%s: %s",
+                        cfg["device_id"],
+                        cfg["register_no"],
+                        e,
+                    )
+
+                self._client.publish(topic, value, retain=True)
+
+                if self.on_config_read_response:
+                    self.on_config_read_response(
+                        cfg["device_id"],
+                        cfg["register_no"],
+                )
+                return
+
+            # Config WRITE response (281)
+            if msg_type == 280:
+                cfg = parser.parse_config_ack(unscrambled)
+                LOG.info(
+                    "Received config write response for %s reg=%s OK!",
+                    cfg["device_id"],
+                    cfg["register_no"],
+                )
+                return
+
+            else:
+                modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
+                LOG.debug("Received modbus message: %s", modbus_message)
+
             if modbus_message:
                 known_registers = None
                 if device_id.startswith("QMN"):
@@ -251,23 +357,11 @@ class Client:
 
                 return
 
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-
             # NOAH: MSG-TYPE 37 is response when setting a register was succeful
             # TODO impmlement a proper response handling
             #example hex: 00 01 00 07 00 25 01 06 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc 00 00 14 8c af
 
             # NOAH: MSG-TYPE 831 looks like published Holding Register??
-            ## Example Hex: 00 01 00 07 03 3f 01 03 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49 06 14 0f 20 01 03 00 00 00 7c 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 75 58 00 00 00 19 00 06 00 14 00 0f 00 20 00 01 00 00 00 00 00 00 00 00 00 00 00 31 50 42 46 55 00 00 00 00 00 00 32 31 32 30 31 33 32 31 31 30 31 30 32 31 33 30 30 36 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d 00 f9 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fa 01 76 00 64 00 03 00 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 03 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5c 83
-
-            # NOAH=387 NEO=340,341
-            if msg_type in (387, 340, 341):
-                # Config message
-                config_offset = parser.find_config_offset(unscrambled)
-                config = parser.parse_config_type(unscrambled, config_offset)
-                self.on_config(config)
-                LOG.info(f"Received config message for {device_id}")
-                return
 
             LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
