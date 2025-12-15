@@ -38,6 +38,9 @@ configuration:
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
     description: Set to True to redirect messages to and from the Growatt Server. Default is False
+  GROWATT_CLOUD_CONFIG_FILTER:
+    name: GROWATT_CLOUD_CONFIG_FILTER
+    description: Enable to prevent forwarding config messages. This protects the datalogger from remote setting changes initiated by the Growatt Cloud. Default is False
   LOG_LEVEL:
     name: LOG_LEVEL
     description: Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR.

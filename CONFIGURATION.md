@@ -113,6 +113,7 @@ docker run --detach \
 | `MQTT_CLIENT_SUFFIX` | ❌ No    | Optional suffix appended to all MQTT client IDs (grobro-ha and grobro-grobro). Allows running multiple GroBro instances in parallel against the same MQTT broker (e.g. prod, test). |
 | `HA_BASE_TOPIC`      | ❌ No    | Base MQTT topic used for Home Assistant auto-discovery and sensor states   |
 | `GROWATT_CLOUD`      | ❌ No    | Set to `true` to redirect messages to and from the Growatt Cloud. This is turned off by default. Supports a comma-separated list of device serials (e.g. `123456789,987654321`) for selective forwarding. |
+| `GROWATT_CLOUD_CONFIG_FILTER`  | ❌ No | Set to `true` to prevent forwarding config messages. This protects the datalogger from remote setting changes initiated by the Growatt Cloud. |
 | `LOG_LEVEL`          | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
 | `DEVICE_TIMEOUT`     | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.After this time the device and all its entities will be marked as unavailable in Home Assistant. |

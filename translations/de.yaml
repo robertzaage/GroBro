@@ -38,6 +38,9 @@ configuration:
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
     description: Auf True setzen, um Nachrichten zum und vom Growatt-Server umzuleiten. Standard ist False
+  GROWATT_CLOUD_CONFIG_FILTER:
+    name: GROWATT_CLOUD_CONFIG_FILTER
+    description: Verhindert die Weiterleitung von Konfigurationsnachrichten. Dies schützt den Datenlogger vor ferninitiierten Einstellungänderungen durch die Growatt Cloud
   LOG_LEVEL:
     name: LOG_LEVEL
     description: Legt den Logging-Level fest. Das Programm verwendet derzeit nur die Level ERROR, DEBUG und INFO. Standard ist ERROR.
