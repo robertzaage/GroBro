@@ -143,3 +143,24 @@ def parse_config_message(data: bytes):
         "register_no": register_no,
         "value": value,
     }
+
+
+def parse_config_ack(data: bytes):
+    config_ack_struct = struct.Struct(">4sHH16s14sH")
+
+    (
+     	header,
+        msg_len,
+        msg_type,
+        device_id,
+        _padding,
+        register_no,
+    ) = config_ack_struct.unpack_from(data)
+
+    return {
+	"header": header,
+        "message_length": msg_len,
+        "message_type": msg_type,
+        "device_id": device_id.rstrip(b"\x00").decode("ascii"),
+        "register_no": register_no,
+    }

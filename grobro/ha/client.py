@@ -610,12 +610,6 @@ class Client:
             register_no = q.popleft()
             self._config_read_inflight[device_id] = register_no
 
-        LOG.info(
-            "Sending config read to %s register=%s",
-            device_id,
-            register_no,
-        )
-
         if self.on_config_read:
             self.on_config_read(device_id, register_no)
 

@@ -240,7 +240,6 @@ class Client:
                     f"{HA_BASE_TOPIC}/config/grobro/"
                     f"{cfg['device_id']}/{cfg['register_no']}/get"
                 )
-                #self._client.publish(topic, cfg["value"], retain=True)
 
                 value = cfg["value"]
 
@@ -279,9 +278,30 @@ class Client:
                 )
                 return
 
+            if msg_type == 280:
+                cfg = parser.parse_config_ack(unscrambled)
+                LOG.info(
+                    "Received config write response for %s reg=%s OK!",
+                    cfg["device_id"],
+                    cfg["register_no"],
+                )
+                return
 
-            modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
-            LOG.debug("Received modbus message: %s", modbus_message)
+            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
+
+            # NOAH=387 NEO=340,341
+            if msg_type in (387, 340, 341):
+                # Config message
+                config_offset = parser.find_config_offset(unscrambled)
+                config = parser.parse_config_type(unscrambled, config_offset)
+                self.on_config(config)
+                LOG.info(f"Received config message for {device_id}")
+                return
+
+            else:
+                modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
+                LOG.debug("Received modbus message: %s", modbus_message)
+
             if modbus_message:
                 known_registers = None
                 if device_id.startswith("QMN"):
@@ -337,22 +357,11 @@ class Client:
 
                 return
 
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-
             # NOAH: MSG-TYPE 37 is response when setting a register was succeful
             # TODO impmlement a proper response handling
             #example hex: 00 01 00 07 00 25 01 06 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc 00 00 14 8c af
 
             # NOAH: MSG-TYPE 831 looks like published Holding Register??
-
-            # NOAH=387 NEO=340,341
-            if msg_type in (387, 340, 341):
-                # Config message
-                config_offset = parser.find_config_offset(unscrambled)
-                config = parser.parse_config_type(unscrambled, config_offset)
-                self.on_config(config)
-                LOG.info(f"Received config message for {device_id}")
-                return
 
             LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
