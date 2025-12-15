@@ -6,6 +6,8 @@ import json
 import logging
 from threading import Timer
 from typing import Callable, Optional
+from collections import deque
+from threading import Lock
 
 import paho.mqtt.client as mqtt
 
@@ -114,11 +116,18 @@ class Client:
     on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]]
     on_config_command: Optional[Callable[[str, int, str], None]] = None
     on_config_read: Optional[Callable[[str, int], None]] = None
+    on_config_read_response: Callable[[str, int], None] | None = None
 
     _client: mqtt.Client
     _config_cache: dict[str, model.DeviceConfig] = {}
     _discovery_cache: list[str] = []
     _device_timers: dict[str, Timer] = {}
+
+    # --- Config read sequencing ---
+    _config_read_queues: dict[str, deque[int]] = {}
+    _config_read_inflight: dict[str, int] = {}
+    _config_read_timers: dict[str, Timer] = {}
+    _config_read_lock = Lock()
 
     def __init__(self, mqtt_config: model.MQTTConfig):
         # Setup target MQTT client for publishing
@@ -251,6 +260,7 @@ class Client:
         # Buttons
         if cmd_type == "button":
             if cmd_name == "read_all":
+		# Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
                     if name.startswith("slot"):
                         try:
@@ -260,14 +270,27 @@ class Client:
                             continue
                     pos = register.growatt.position
                     self.on_command(make_modbus_command(
-                        device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
+                        device_id,
+                        GrowattModbusFunction.READ_SINGLE_REGISTER,
+                        pos.register_no,
                     ))
-                if self.on_config_read:
-                    for name, cfg in known_registers.config_registers.items():
-                        LOG.debug("Reading config %s (%s)", name, cfg.growatt.register_no)
-                        self.on_config_read(device_id, cfg.growatt.register_no)
-                return
 
+                # Queue config reads
+                if self.on_config_read:
+                    with self._config_read_lock:
+                        q = self._config_read_queues.setdefault(device_id, deque())
+                        for cfg in known_registers.config_registers.values():
+                            q.append(cfg.growatt.register_no)
+
+                    # give the datalogger time to answer modbus reads
+                    Timer(
+                        3.0,  # small delay is enough
+                        self.__kickoff_next_config_read,
+                        args=(device_id,),
+                    ).start()
+
+                return
+                
             if action == "read":
                 pos = known_registers.holding_registers[cmd_name].growatt.position
                 self.on_command(make_modbus_command(
@@ -408,6 +431,16 @@ class Client:
             "payload_press": "1",
             "icon": "mdi:restart",
             "unique_id": restart_uid
+        }
+
+        # Config command: Sync Time (register 31 / Value "%Y-%m-%d %H:%M:%S")
+        time_sync_uid = f"grobro_{device_id}_sync_time"
+        payload["cmps"][time_sync_uid] = {
+            "platform": "button",
+            "name": "Sync Time",
+            "icon": "mdi:clock-outline",
+            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
+            "unique_id": time_sync_uid
         }
 
         # Read-All Button
@@ -563,3 +596,74 @@ class Client:
             device_info["connections"] = [["mac", config.mac_address]]
 
         return device_info
+
+    def __kickoff_next_config_read(self, device_id: str):
+        with self._config_read_lock:
+            # already waiting for a response
+            if device_id in self._config_read_inflight:
+                return
+
+            q = self._config_read_queues.get(device_id)
+            if not q:
+                return
+
+            register_no = q.popleft()
+            self._config_read_inflight[device_id] = register_no
+
+        LOG.info(
+            "Sending config read to %s register=%s",
+            device_id,
+            register_no,
+        )
+
+        if self.on_config_read:
+            self.on_config_read(device_id, register_no)
+
+        # start 1 minute timeout
+        timer = Timer(
+            60,
+            self.__config_read_timeout,
+            args=(device_id, register_no),
+        )
+        self._config_read_timers[device_id] = timer
+        timer.start()
+
+    def __config_read_timeout(self, device_id: str, register_no: int):
+        with self._config_read_lock:
+            inflight = self._config_read_inflight.get(device_id)
+            if inflight != register_no:
+                return
+
+            LOG.warning(
+                "Config read timeout for %s register=%s",
+                device_id,
+                register_no,
+            )
+
+            self._config_read_inflight.pop(device_id, None)
+            self._config_read_timers.pop(device_id, None)
+
+        # continue with next queued register
+        self.__kickoff_next_config_read(device_id)
+
+    def handle_config_read_response(self, device_id: str, register_no: int):
+        with self._config_read_lock:
+            inflight = self._config_read_inflight.get(device_id)
+            if inflight != register_no:
+                return
+
+            LOG.debug(
+                "Config read completed for %s register=%s",
+                device_id,
+                register_no,
+            )
+
+            timer = self._config_read_timers.pop(device_id, None)
+            if timer:
+                timer.cancel()
+
+            self._config_read_inflight.pop(device_id, None)
+
+        # continue with next queued read
+        self.__kickoff_next_config_read(device_id)
+

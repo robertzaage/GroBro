@@ -224,6 +224,62 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
 
+            # Config READ response (281)
+            msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
+            if msg_type == 281:
+                cfg = parser.parse_config_message(unscrambled)
+                LOG.info(
+                    "Received config read response for %s reg=%s value=%s",
+                    cfg["device_id"],
+                    cfg["register_no"],
+                    cfg["value"],
+                )
+
+                # Publish value back to HA (config/.../get)
+                topic = (
+                    f"{HA_BASE_TOPIC}/config/grobro/"
+                    f"{cfg['device_id']}/{cfg['register_no']}/get"
+                )
+                #self._client.publish(topic, cfg["value"], retain=True)
+
+                value = cfg["value"]
+
+                # Cast value for HA number entities (INT config registers)
+                try:
+                    known_registers = None
+                    if cfg["device_id"].startswith("QMN"):
+                        known_registers = KNOWN_NEO_REGISTERS
+                    elif cfg["device_id"].startswith("0PVP"):
+                        known_registers = KNOWN_NOAH_REGISTERS
+                    elif cfg["device_id"].startswith("0HVR"):
+                        known_registers = KNOWN_NEXA_REGISTERS
+                    elif cfg["device_id"].startswith("HAQ"):
+                        known_registers = KNOWN_SPF_REGISTERS
+
+                    if known_registers:
+                        for reg in known_registers.config_registers.values():
+                            if reg.growatt.register_no == cfg["register_no"]:
+                                if reg.growatt.data.data_type == "INT":
+                                    value = int(value)
+                                break
+                except Exception as e:
+                    LOG.debug(
+                        "Failed to cast config value for %s reg=%s: %s",
+                        cfg["device_id"],
+                        cfg["register_no"],
+                        e,
+                    )
+
+                self._client.publish(topic, value, retain=True)
+
+                if self.on_config_read_response:
+                    self.on_config_read_response(
+                        cfg["device_id"],
+                        cfg["register_no"],
+                )
+                return
+
+
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             LOG.debug("Received modbus message: %s", modbus_message)
             if modbus_message:
@@ -288,7 +344,6 @@ class Client:
             #example hex: 00 01 00 07 00 25 01 06 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc 00 00 14 8c af
 
             # NOAH: MSG-TYPE 831 looks like published Holding Register??
-            ## Example Hex: 00 01 00 07 03 3f 01 03 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49 06 14 0f 20 01 03 00 00 00 7c 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 75 58 00 00 00 19 00 06 00 14 00 0f 00 20 00 01 00 00 00 00 00 00 00 00 00 00 00 31 50 42 46 55 00 00 00 00 00 00 32 31 32 30 31 33 32 31 31 30 31 30 32 31 33 30 30 36 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7d 00 f9 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fa 01 76 00 64 00 03 00 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 00 00 00 00 00 00 00 c8 00 00 03 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5c 83
 
             # NOAH=387 NEO=340,341
             if msg_type in (387, 340, 341):

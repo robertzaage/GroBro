@@ -17,20 +17,6 @@
         "step": 1
       }
     },
-    "datalogger_sn": {
-      "growatt": {
-        "register_no": 8,
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "publish": true,
-        "name": "Datalogger Serial Number",
-        "type": "sensor",
-        "icon": "mdi:identifier"
-      }
-    },
     "mqtt_port": {
       "growatt": {
         "register_no": 18,
@@ -56,22 +42,8 @@
       "homeassistant": {
         "publish": true,
         "name": "MQTT Broker",
-        "type": "sensor",
+        "type": "text",
         "icon": "mdi:server-network"
-      }
-    },
-    "firmware_version": {
-      "growatt": {
-        "register_no": 21,
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "publish": true,
-        "name": "Firmware Version",
-        "type": "sensor",
-        "icon": "mdi:chip"
       }
     },
     "system_time": {
@@ -84,22 +56,8 @@
       "homeassistant": {
         "publish": true,
         "name": "System Time",
-        "type": "sensor",
+        "type": "text",
         "icon": "mdi:clock-outline"
-      }
-    },
-    "wifi_ssid": {
-      "growatt": {
-        "register_no": 56,
-        "data": {
-          "data_type": "STRING"
-        }
-      },
-      "homeassistant": {
-        "publish": true,
-        "name": "WiFi SSID",
-        "type": "sensor",
-        "icon": "mdi:wifi"
       }
     }
   },

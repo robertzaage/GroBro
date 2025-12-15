@@ -116,3 +116,30 @@ def find_config_offset(data):
         if 0 < key < 1000 and 0 < length < 256:
             return i
     return 0x1C
+
+
+def parse_config_message(data: bytes):
+    config_read_struct = struct.Struct(">4sHH16s14sH1xH2x")
+
+    (
+        header,
+        msg_len,
+        msg_type,
+        device_id,
+        _padding,
+        config_type,
+        register_no,
+    ) = config_read_struct.unpack_from(data)
+
+    # remove trailing checksum
+    value = data[config_read_struct.size:-2].decode("ascii")
+
+    return {
+        "header": header,
+        "message_length": msg_len,
+        "message_type": msg_type,
+        "device_id": device_id.rstrip(b"\x00").decode("ascii"),
+        "config_type": config_type,
+        "register_no": register_no,
+        "value": value,
+    }

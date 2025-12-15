@@ -83,6 +83,7 @@ if __name__ == "__main__":
     grobro_client.on_input_register = ha_client.publish_input_register
     grobro_client.on_holding_register_input = ha_client.publish_holding_register_input
     grobro_client.on_config = ha_client.set_config
+    grobro_client.on_config_read_response = ha_client.handle_config_read_response
 
     # setup com: ha -> grobro
     ha_client.on_command = grobro_client.send_command
