@@ -311,7 +311,7 @@ class Client:
             if msg_type == 280:
                 cfg = parser.parse_config_ack(unscrambled)
                 LOG.info(
-                    "Received config write response for %s reg=%s OK!",
+                    "Received config write response for %s reg=%s accepted",
                     cfg["device_id"],
                     cfg["register_no"],
                 )
