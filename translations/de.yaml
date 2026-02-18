@@ -56,3 +56,6 @@ configuration:
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: Lässt die Geräteverfügbarkeit ausschließlich als dedizierten Online-Sensor anzeigen, anstatt das Gerät und alle seine Entitäten nach Ablauf der Zeitüberschreitung als nicht verfügbar zu markieren.
+  TZ:
+    name: Zeitzone
+    sescription: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.

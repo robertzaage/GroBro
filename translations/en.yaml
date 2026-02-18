@@ -56,3 +56,6 @@ configuration:
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: Expose device availability only as a dedicated online sensor instead of marking the device and all its entities unavailable after timeout.
+  TZ:
+    name: Timezone
+    description: Configure your local timezone to ensure all application logs and system events are recorded with accurate localized timestamps.

@@ -1,3 +1,21 @@
+## v2.2.0
+
+### Bug Fixes
++ Fixed NOAH battery temperature accuracy by correcting offsets and mapping
++ Fixed NOAH battery temperature display to show "unknown" instead of stale data when offline
++ Fixed missing `AVAILABILITY_SENSOR` configuration in the Home Assistant add-on (#132)
++ Fixed message parsing order to prevent read from wrong parser
++ Improved logging for configuration read responses and general system events
+
+### New Features
++ Added `GROWATT_CLOUD_CONFIG_FILTER` option to prevent the Growatt Cloud from remotely changing datalogger settings (#38)
++ Added interactive control features: Datalogger restart button and Time Synchronization button (#122) and (#81)
++ Added ability to configure the data reporting interval
++ Added configurable MQTT Client IDs to allow running multiple GroBro instances in parallel (#142)
++ Added support for reading configuration messages and updated all register maps with config controls
++ Enhanced UI with updated control icons for configuration settings
++ Added `TZ` option to HA-Addon to set the desired time zone for logging (#149)
+
 ## v2.1.0
 
 ### Bug Fixes

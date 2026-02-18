@@ -38,6 +38,7 @@ options:
   DUMP_DIR: "/share/GroBro/dump"
   MAX_SLOTS: 1
   AVAILABILITY_SENSOR: false
+  TZ: ""
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -60,3 +61,4 @@ schema:
   DEVICE_TIMEOUT: "int?"
   MAX_SLOTS: "int?"
   AVAILABILITY_SENSOR: bool
+  TZ: str
