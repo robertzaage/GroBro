@@ -17,6 +17,19 @@
         "step": 1
       }
     },
+    "dns_server": {
+      "growatt": {
+        "register_no": 12,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": false,
+        "name": "DNS Server",
+        "type": "text"
+      }
+    },
     "mqtt_port": {
       "growatt": {
         "register_no": 18,
@@ -46,6 +59,20 @@
         "icon": "mdi:server-network"
       }
     },
+    "time_zone": {
+      "growatt": {
+        "register_no": 30,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Time Zone",
+        "type": "text",
+        "icon": "mdi:clock-outline"
+      }
+    },
     "system_time": {
       "growatt": {
         "register_no": 31,
@@ -62,7 +89,121 @@
     }
   },
   "holding_registers": {
+    "charge_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 250,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Limit",
+        "unit_of_measurement": "%",
+        "type": "number",
+        "min": 70,
+        "max": 100,
+        "step": 1
+      }
+    },
+    "discharge_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 251,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Discharge Limit",
+        "unit_of_measurement": "%",
+        "type": "number",
+        "min": 0,
+        "max": 30,
+        "step": 1
+      }
+    },
+    "slot1_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 254,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot1_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 255,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot1_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 256,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
     "slot1_power": {
+      "growatt": {
+        "position": {
+          "register_no": 257,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Power",
@@ -71,6 +212,895 @@
         "min": 0,
         "max": 800,
         "step": 1
+      }
+    },
+    "slot1_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 258,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot2_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 259,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot2_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 260,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot2_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 261,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot2_power": {
+      "growatt": {
+        "position": {
+          "register_no": 262,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot2_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 263,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot3_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 264,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot3_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 265,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot3_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 266,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot3_power": {
+      "growatt": {
+        "position": {
+          "register_no": 267,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot3_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 268,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot4_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 269,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot4_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 270,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot4_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 271,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot4_power": {
+      "growatt": {
+        "position": {
+          "register_no": 272,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot4_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 273,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot5_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 274,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot5_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 275,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot5_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 276,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot5_power": {
+      "growatt": {
+        "position": {
+          "register_no": 277,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot5_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 278,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot6_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 279,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot6_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 280,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot6_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 281,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot6_power": {
+      "growatt": {
+        "position": {
+          "register_no": 282,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot6_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 283,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot7_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 284,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot7_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 285,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot7_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 286,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot7_power": {
+      "growatt": {
+        "position": {
+          "register_no": 287,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot7_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 288,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot8_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 289,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot8_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 290,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot8_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 291,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot8_power": {
+      "growatt": {
+        "position": {
+          "register_no": 292,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot8_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 293,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot9_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 294,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Start Time",
+        "type": "number",
+        "min": 0,
+        "max": 2358,
+        "step": 1,
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot9_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 295,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 End Time",
+        "type": "number",
+        "min": 0,
+        "max": 2359,
+        "step": 1,
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot9_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 296,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Mode",
+        "type": "number",
+        "min": 0,
+        "max": 2,
+        "step": 1
+      }
+    },
+    "slot9_power": {
+      "growatt": {
+        "position": {
+          "register_no": 297,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "slot9_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 298,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Enabled",
+        "type": "switch"
+      }
+    },
+    "ac_always_on": {
+      "growatt": {
+        "position": {
+          "register_no": 305,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "AC always on Enabled",
+        "type": "switch"
+      }
+    },
+    "smart_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 321,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Smart Mode Enabled (?)",
+        "type": "switch"
+      }
+    },
+    "default_power": {
+      "growatt": {
+        "position": {
+          "register_no": 322,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Default Out Power",
+        "unit_of_measurement": "W",
+        "type": "number",
+        "min": 0,
+        "max": 800,
+        "step": 1
+      }
+    },
+    "island_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 327,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Island Mode Enabled",
+        "type": "switch"
       }
     }
   },
