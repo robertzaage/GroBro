@@ -4,6 +4,9 @@
 + Added most of the NEXA 2000 config and holding registers that were still missing (#157)
 + Improved logging for MQTT config (#55)
 
+### Bug Fixes
++ NEXA: "Battery Count" and "Battery Cycle Count" should be INT, not FLOAT (#161)
+
 ## v2.2.0
 
 ### Bug Fixes
