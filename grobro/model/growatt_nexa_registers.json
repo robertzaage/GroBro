@@ -131,6 +131,24 @@
         "step": 1
       }
     },
+    "grid_power_allowed": {
+      "growatt": {
+        "position": {
+          "register_no": 326,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Grid Power Allowed",
+        "type": "switch",
+        "icon": "mdi:transmission-tower"
+      }
+    },
     "slot1_start_time": {
       "growatt": {
         "position": {
