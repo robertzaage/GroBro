@@ -1,3 +1,8 @@
+## v2.4.0
+
+### New Features
++ Added NEXA register to allow grid charging
+
 ## v2.3.0
 
 ### New Features
