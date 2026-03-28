@@ -3,6 +3,9 @@
 ### New Features
 + Added NEXA register to allow grid charging
 
+### Bug Fixes
++ Fixed wrong NEXA battery 1 temperature reading (#162)
+
 ## v2.3.0
 
 ### New Features
