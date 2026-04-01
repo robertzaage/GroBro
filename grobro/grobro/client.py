@@ -37,7 +37,7 @@ HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 # Updated growatt cloud forwarding config
 GROWATT_CLOUD = os.getenv("GROWATT_CLOUD", "false")
-GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false")
+GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false").lower()
 
 if GROWATT_CLOUD.lower() == "true":
     GROWATT_CLOUD_ENABLED = True
@@ -213,7 +213,7 @@ class Client:
             if GROWATT_CLOUD_ENABLED:
                 if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
                     try:
-                        if GROWATT_CLOUD_CONFIG_FILTER:
+                        if GROWATT_CLOUD_CONFIG_FILTER == "true":
                             try:
                                 unscrambled = parser.unscramble(msg.payload)
                                 msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
