@@ -1,8 +1,3 @@
-## v2.4.1
-
-### Bug Fixes
-+ Fixed bug which always blocks config messages from Growatt cloud
-
 ## v2.4.0
 
 ### New Features
@@ -10,6 +5,7 @@
 
 ### Bug Fixes
 + Fixed wrong NEXA battery 1 temperature reading (#162)
++ Fixed bug which always blocks config messages from Growatt cloud
 
 ## v2.3.0
 
