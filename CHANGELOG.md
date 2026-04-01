@@ -1,3 +1,8 @@
+## v2.4.1
+
+### Bug Fixes
++ Fixed bug which always blocks config messages from Growatt cloud
+
 ## v2.4.0
 
 ### New Features
