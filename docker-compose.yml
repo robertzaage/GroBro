@@ -1,0 +1,35 @@
+services:
+  grobro:
+    image: ghcr.io/robertzaage/grobro:latest
+    container_name: grobro
+    restart: unless-stopped
+    environment:
+      # Source: Growatt device via TLS
+      SOURCE_MQTT_HOST: <YOUR MQTT SERVERS HOSTNAME OR IP>
+      SOURCE_MQTT_PORT: 8883
+      SOURCE_MQTT_TLS: "true"
+      SOURCE_MQTT_USER: <YOUR GROWATT DATALOGGER SERIALNUMBER>
+      SOURCE_MQTT_PASS: Growatt
+
+      # Target: MQTT broker for Home Assistant
+      TARGET_MQTT_HOST: <YOUR MQTT SERVERS HOSTNAME OR IP>
+      TARGET_MQTT_PORT: 1883
+      TARGET_MQTT_TLS: "false"
+      TARGET_MQTT_USER: <YOUR MQTT SERVERS USER>
+      TARGET_MQTT_PASS: <YOUR MQTT SERVERS PASSWORD>
+
+      #HA_BASE_TOPIC: homeassistant
+      #DEVICE_TIMEOUT: 300
+      LOG_LEVEL: INFO
+
+      # Optional: Forward to Growatt Cloud (optional)
+      FORWARD_MQTT_HOST: mqtt.growatt.com
+      FORWARD_MQTT_PORT: 7006
+      FORWARD_MQTT_TLS: "false"
+      FORWARD_MQTT_USER: <YOUR GROWATT DATALOGGER SERIALNUMBER>
+      FORWARD_MQTT_PASS: Growatt
+
+networks:
+  default:
+    name: <YOUR MQTT SERVERS DOCKER NETWORK NAME>
+    external: true
