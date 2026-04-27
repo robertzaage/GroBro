@@ -23,6 +23,7 @@ services:
       LOG_LEVEL: INFO
 
       # Optional: Forward to Growatt Cloud (optional)
+      GROWATT_CLOUD: "true"
       FORWARD_MQTT_HOST: mqtt.growatt.com
       FORWARD_MQTT_PORT: 7006
       FORWARD_MQTT_TLS: "false"
