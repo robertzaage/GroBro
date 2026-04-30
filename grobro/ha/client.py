@@ -262,7 +262,7 @@ class Client:
             if cmd_name == "read_all":
 		# Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
-                    if name.startswith("slot"):
+                    
                         try:
                             if int(name[4]) > MAX_SLOTS:
                                 continue
