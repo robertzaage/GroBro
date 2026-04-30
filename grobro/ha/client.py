@@ -262,12 +262,6 @@ class Client:
             if cmd_name == "read_all":
 		# Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
-                    
-                        try:
-                            if int(name[4]) > MAX_SLOTS:
-                                continue
-                        except ValueError:
-                            continue
                     pos = register.growatt.position
                     self.on_command(make_modbus_command(
                         device_id,
