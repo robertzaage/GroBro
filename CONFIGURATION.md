@@ -116,8 +116,8 @@ docker run --detach \
 | `GROWATT_CLOUD_CONFIG_FILTER`  | ❌ No | Set to `true` to prevent forwarding config messages. This protects the datalogger from remote setting changes initiated by the Growatt Cloud. |
 | `LOG_LEVEL`          | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
 | `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
-| `DEVICE_TIMEOUT`     | ❌ No    | Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.After this time the device and all its entities will be marked as unavailable in Home Assistant. |
-| `AVAILABILITY_SENSOR`     | ❌ No    | Set to `true` to expose device availability only as a dedicated `online` sensor instead of marking the device and all its entities unavailable after timeout. Default is `false`.  |
+| `DEVICE_TIMEOUT` | ❌ No | Set the timeout in seconds for device communication. Default is `0` (disabled). Note: This must be greater than 0 for any availability/online tracking to work. Recommended: `300`+ seconds. After this time without data, the device is considered "offline." |
+| `AVAILABILITY_SENSOR` | ❌ No | Requires `DEVICE_TIMEOUT > 0`. Set to `true` to expose availability as a dedicated `online` binary sensor. If `false` (default), the device and all its entities will be marked as "unavailable" (grayed out) in Home Assistant when the timeout is reached. |
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
 
