@@ -152,3 +152,38 @@ If you can log in, everything is working correctly!
 
 ### 5. Optional: DNS Rewrite
 To stay fully local, you can set up a DNS server (like AdGuard) to rewrite your `*.duckdns.org` address to the IP of your Home Assistant instance. The certificates will remain valid.
+
+
+# Hardware Safety & Best Practices (Nexa 2000 & NOAH 2000)
+
+### 1. High-Frequency Modbus Writing (Shadow RAM)
+A common concern for users creating dynamic "Zero Export" automations in Home Assistant is that updating power limits every few seconds might destroy the device's Flash/EEPROM memory. 
+
+According to internal Growatt R&D information, **high-frequency Modbus writes for dynamic power control are 100% hardware-safe**, provided you use the Time Slot registers. 
+
+Both the Nexa 2000 and NOAH 2000 utilize a highly optimized **"Shadow RAM / Lazy Write"** mechanism. When GroBro sends a Modbus write command to the power settings, the MCU immediately applies this value to the volatile RAM, adjusting the output instantly *without* triggering physical EEPROM erase/write cycles. The system only commits these RAM values into the non-volatile EEPROM during a graceful system shutdown. Therefore, updating parameters like `slot1_power` every 30 seconds generates literally zero wear on the flash memory over the lifetime of the device.
+
+### 2. Recommended "Zero Export" Setup via Home Assistant
+To ensure a reliable and clean local control loop without relying on cloud APIs, the following setup is highly recommended by Growatt engineers for HA users:
+
+**The Fail-Safe Baseline (Do this once):**
+*   Set `default_power` (Reg 322) to a conservative, fixed value (e.g., 100W or 150W). 
+*   *Why?* Because dynamic values are only stored in RAM, a sudden power loss will wipe them. If the device reboots and Home Assistant is offline, the inverter will safely fall back to this basic household load baseline stored in the EEPROM.
+
+**Configure Static Slot Parameters (Do this once):**
+To keep Modbus traffic clean and reduce unnecessary bus load, configure the static parameters on Slot 1 just once:
+*   `slot1_start_time` (Reg 254) = 00:00
+*   `slot1_end_time` (Reg 255) = 23:59
+*   `slot1_mode` (Reg 256) = 0 (Load First)
+*   `slot1_enabled` (Reg 258) = 1 (ON)
+
+**The Dynamic Control (Automation Loop):**
+*   Let your Home Assistant automation continuously update **only** `slot1_power` (Reg 257) based on your local smart meter readings.
+
+### 3. Important Safety Warning Regarding AC Charging (Nexa 2000)
+Currently, dynamic adjustment of AC charging power (up to 700W) is handled entirely internally by the MCU via a closed-loop algorithm based on grid conditions. **There is no exposed Modbus register for third-party control over the AC charging limit.** 
+
+*   Do **not** attempt to reverse-engineer or force write custom values to the charging controller limits. 
+*   Accidentally bypassing the native BMS and charging electronics limits can result in catastrophic hardware failure, severe thermal runaway, or an explosion/fire hazard. Let the native electronics make the final call on charging. 
+
+*(Note: The technical insights in this section were provided by a Growatt employee acting out of personal enthusiasm for the Home Assistant community. Growatt does not officially support this project at this time, and these insights do not represent official company directives).*
