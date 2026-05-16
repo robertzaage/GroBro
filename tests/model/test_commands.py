@@ -9,12 +9,68 @@ from grobro.model.modbus_message import (
     GrowattModbusBlock,
     GrowattMetadata,
 )
-from grobro.grobro.builder import append_crc
-from grobro.grobro.builder import scramble
+from grobro.grobro.builder import append_crc, scramble
 from datetime import datetime
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 
 TEST_DEVICE_ID = "QMN000ABC1D2E3FG"
+DATA_DIR = Path(__file__).parent / "data"
+
+ALL_BIN_FILES = [
+    "NeoInputRegister.bin",
+    "NeoOutputPowerLimit.bin",
+    "NeoReadOutputPowerLimit.bin",
+    "NeoSetDateTime.bin",
+    "NeoSetInterval.bin",
+    "NeoSetMQTTHost.bin",
+    "NeoSetMQTTPort.bin",
+    "NeoSetOTAUpdate.bin",
+    "NeoSetOutputPowerLimit.bin",
+]
+
+
+def test_all_binary_files_exist():
+    for fname in ALL_BIN_FILES:
+        path = DATA_DIR / fname
+        assert path.exists(), f"Missing binary file: {path}"
+        data = path.read_bytes()
+        assert len(data) > 0, f"Empty binary file: {path}"
+
+
+@pytest.mark.parametrize("file_name", ALL_BIN_FILES)
+def test_unscramble(file_name):
+    data = (DATA_DIR / file_name).read_bytes()
+    unscrambled = parser.unscramble(data)
+    assert len(unscrambled) == len(data)
+
+
+CONFIG_BIN_FILES = [
+    "NeoSetDateTime.bin",
+    "NeoSetInterval.bin",
+    "NeoSetMQTTHost.bin",
+    "NeoSetMQTTPort.bin",
+    "NeoSetOTAUpdate.bin",
+]
+
+
+@pytest.mark.parametrize(
+    ("file_name", "exp_register", "exp_value_contains"),
+    [
+        ("NeoSetDateTime.bin", 5888, "2025-04-25"),
+        ("NeoSetInterval.bin", 1280, "1"),
+        ("NeoSetMQTTHost.bin", 4352, "mqtt.zaage.it"),
+        ("NeoSetMQTTPort.bin", 2048, "8883"),
+        ("NeoSetOTAUpdate.bin", 15872, "cdn.growatt.com"),
+    ],
+)
+def test_config_messages(file_name, exp_register, exp_value_contains):
+    data = (DATA_DIR / file_name).read_bytes()
+    unscrambled = parser.unscramble(data)
+    result = parser.parse_config_message(unscrambled)
+    assert result["device_id"] == "QMN000BZP2N1T1KY"
+    assert result["config_type"] == 1
+    assert result["register_no"] == exp_register
+    assert exp_value_contains in result["value"]
 
 
 @pytest.mark.parametrize(
@@ -80,41 +136,49 @@ TEST_DEVICE_ID = "QMN000ABC1D2E3FG"
     ],
 )
 def test_double(want_msg, file_name):
-    print(want_msg, file_name)
-    fixture_path = Path(__file__).parent / "data" / file_name
-    # test parsing
+    fixture_path = DATA_DIR / file_name
     with open(fixture_path, "rb") as f:
         want_raw = parser.unscramble(f.read())
         got_msg = type(want_msg).parse_grobro(want_raw)
-        print("got", got_msg)
-        print("wnt", want_msg)
         assert got_msg == want_msg
-    # test building
     got_raw = got_msg.build_grobro()
-    print("got raw:", got_raw.hex(" "))
-    print("wnt raw:", want_raw[:-2].hex(" "))
-    print("parsed again:", type(want_msg).parse_grobro(got_raw + bytes(2)))
     assert got_raw == want_raw[0:-2]
 
 
 if __name__ == "__main__":
-    """
-    util to generate syntetic test data.
-    should only be used once after verifiying
-    that parse + build of new type works with real data
-    """
     msgs = [
         (
             "NeoReadOutputPowerLimit.bin",
-            NeoReadOutputPowerLimit(device_id=TEST_DEVICE_ID),
+            GrowattModbusFunctionSingle(
+                device_id=TEST_DEVICE_ID,
+                function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                register=3,
+                value=3,
+            ),
         ),
         (
             "NeoSetOutputPowerLimit.bin",
-            NeoSetOutputPowerLimit(device_id=TEST_DEVICE_ID, value=42),
+            GrowattModbusFunctionSingle(
+                device_id=TEST_DEVICE_ID,
+                function=GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                register=3,
+                value=42,
+            ),
         ),
         (
             "NeoOutputPowerLimit.bin",
-            NeoOutputPowerLimit(device_id=TEST_DEVICE_ID, value=42),
+            GrowattModbusMessage(
+                unknown=1,
+                device_id=TEST_DEVICE_ID,
+                function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                register_blocks=[
+                    GrowattModbusBlock(
+                        start=3,
+                        end=3,
+                        values=struct.pack(">H", 42),
+                    ),
+                ],
+            ),
         ),
         (
             "NeoInputRegister.bin",
@@ -141,7 +205,7 @@ if __name__ == "__main__":
             ),
         ),
     ]
-    for msg in msgs:
-        with open(f"tests/model/data/{msg[0]}", "wb") as f:
-            msg_raw = msg[1].build_grobro()
+    for fname, msg in msgs:
+        with open(DATA_DIR / fname, "wb") as f:
+            msg_raw = msg.build_grobro()
             f.write(append_crc(scramble(msg_raw)))

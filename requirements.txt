@@ -3,3 +3,5 @@ crc
 pydantic
 rope
 pylint
+pytest
+pytest-cov

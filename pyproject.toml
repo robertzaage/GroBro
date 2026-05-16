@@ -1,0 +1,7 @@
+[build-system]
+requires = []
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
