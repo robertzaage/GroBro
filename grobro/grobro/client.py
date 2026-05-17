@@ -46,6 +46,7 @@ else:
     GROWATT_CLOUD_FILTER = set()
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
+PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 DUMP_DIR = os.getenv("DUMP_DIR", "/dump")
 
 # Property to flag messages forwarded from growatt cloud
