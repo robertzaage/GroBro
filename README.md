@@ -1,5 +1,10 @@
 # GroBro - Growatt MQTT Message Broker
 
+[![CI](https://github.com/robertzaage/GroBro/actions/workflows/tests.yml/badge.svg)](https://github.com/robertzaage/GroBro/actions/workflows/tests.yml)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?logo=python)](https://github.com/robertzaage/GroBro)
+[![License](https://img.shields.io/github/license/robertzaage/GroBro)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/robertzaage/GroBro?logo=github)](https://github.com/robertzaage/GroBro/releases)
+
 GroBro is a bridge service that decodes encrypted MQTT packets from Growatt NEO, NOAH, NEXA, SPF (Shine WiFi-X) devices and republishes them in a format compatible with Home Assistant. 
 It supports auto-discovery via MQTT and allows full integration of Growatt data into your smart home.
 
