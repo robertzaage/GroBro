@@ -2,17 +2,17 @@
 
 ### New Features
 + Added `MAX_BAT` environment variable to control how many battery packs appear in Home Assistant. For example, `MAX_BAT=1` hides all but the first battery module. Set it to match how many batteries your system actually has.
++ Added `FILTER_DATA_GLITCHES` option (default: off) to prevent glitches on total_increasing sensors after a device reconnects (#154)
 + Added 37 missing NOAH input registers: PV1/PV2 temperature, battery SOH, PV3/PV4 voltage/current/temperature, battery 1 serial number, all battery warning and protection statuses, work mode, charging status/power, fault status, AC couple statuses, CT/grid/household load registers, system temperature, and cell voltage limits
 + Parser now supports the `mult` field (in addition to `float_options`) for simpler register definitions
-+ Added parser for NOAH msg_type 0x6F64 (EcoTracker JSON data). EcoTracker sensor data is now forwarded to HA instead of being silently dropped (#176)
 + Added support for ShineWeLink-X2 data loggers (RAQ serial prefix). These dongles bridge LoRa-connected inverters like the NEO 1000M-X into MQTT. Their messages are now properly routed, including config telemetry (firmware version, serial number).
++ Added parser for new message type `0x6F64` (EcoTracker JSON data). EcoTracker sensor data is now forwarded to HA instead of being silently dropped (#176)
 
 ### Bug Fixes
 + Fixed missing `device_class: voltage` for Output Voltage sensor
 + Removed duplicate `out_voltage` register definition
-+ Added `FILTER_DATA_GLITCHES` option (default: off) to prevent glitches on total_increasing sensors after a device reconnects (#154)
 + Added `VENDOR_100` to modbus function enum and downgraded unknown function log from INFO to DEBUG to reduce log noise (#176)
-+ Fixed NOAH config messages (FE19) not being processed — firmware version, serial number and other device info are now properly saved in Home Assistant
++ Fixed NOAH config messages (FE19) not being processed - firmware version, serial number and other device info are now properly saved in Home Assistant
 
 ## v2.4.0
 
