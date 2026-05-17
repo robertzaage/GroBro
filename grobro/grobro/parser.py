@@ -164,3 +164,150 @@ def parse_config_ack(data: bytes):
         "device_id": device_id.rstrip(b"\x00").decode("ascii"),
         "register_no": register_no,
     }
+
+
+# All NOAH-specific message types share a common payload structure:
+#   14 zero bytes + type-specific data
+# The 2-byte type/subtype field starts at payload offset 14.
+
+
+def parse_noah_0103(data: bytes) -> dict:
+    """
+    NOAH type 0x0103 — Holding register dump.
+    Payload: 14 zero bytes + 16B device serial (offset 14) + register data.
+    """
+    payload = data[24:]
+    device_id = payload[14:30].rstrip(b"\x00").decode("ascii", errors="replace")
+    reg_data = payload[30:]
+    registers = []
+    for i in range(0, len(reg_data) - 1, 2):
+        registers.append(struct.unpack_from(">H", reg_data, i)[0])
+    return {
+        "message_type": 0x0103,
+        "device_id": device_id,
+        "registers": registers,
+        "register_count": len(registers),
+    }
+
+
+def parse_noah_0110(data: bytes) -> dict:
+    """
+    NOAH type 0x0110 — Preset-multiple register response/ack.
+    Payload: 14 zero bytes + subtype(2B, 0x0001) + padding(2B) + echoed register/value pairs(4B each).
+    """
+    payload = data[24:]
+    regs = {}
+    # register data at payload[14:] in the format: reg_lo(1B) + val_hi(1B) or reg(2B) + val(2B)
+    body = payload[14:]
+    pos = 0
+    while pos + 4 <= len(body):
+        reg = struct.unpack_from(">H", body, pos)[0]
+        val = struct.unpack_from(">H", body, pos + 2)[0]
+        regs[reg] = val
+        pos += 4
+    return {
+        "message_type": 0x0110,
+        "device_id": data[8:24].rstrip(b"\x00").decode("ascii", errors="replace"),
+        "registers": regs,
+    }
+
+
+def parse_noah_0125(data: bytes) -> dict:
+    """
+    NOAH type 0x0125 — Serial number query response.
+    Payload: 14 zero bytes + 16B device serial (offset 14).
+    """
+    payload = data[24:]
+    device_id = payload[14:30].rstrip(b"\x00").decode("ascii", errors="replace")
+    return {
+        "message_type": 0x0125,
+        "device_id": device_id,
+    }
+
+
+def parse_noah_fe18(data: bytes) -> dict:
+    """
+    NOAH type 0xFE18 — Datetime set command (server to device).
+    Payload: 14 zero bytes + TLV {type(2B, 0x0001) + length(2B, 23)
+             + field_1(2B) + field_2(2B) + ASCII_datetime(19B)}.
+    """
+    payload = data[24:]
+    sub_type = struct.unpack_from(">H", payload, 14)[0]
+    tlv_len = struct.unpack_from(">H", payload, 16)[0]
+    f1 = struct.unpack_from(">H", payload, 18)[0] if len(payload) >= 20 else 0
+    f2 = struct.unpack_from(">H", payload, 20)[0] if len(payload) >= 22 else 0
+    datetime_str = payload[22:41].decode("ascii", errors="replace") if len(payload) >= 41 else ""
+    return {
+        "message_type": 0xFE18,
+        "device_id": data[8:24].rstrip(b"\x00").decode("ascii", errors="replace"),
+        "subtype": sub_type,
+        "tlv_length": tlv_len,
+        "field_1": f1,
+        "field_2": f2,
+        "datetime": datetime_str,
+    }
+
+
+FE19_SUBTYPE_FULL_CONFIG = 0x0020
+FE19_SUBTYPE_DEV_STATUS = 0x0001
+
+
+def parse_noah_fe19(data: bytes) -> dict:
+    """
+    NOAH type 0xFE19 — Config/status TLV message.
+    Payload: 14 zero bytes + subtype(2B) + padding(2B, 0x0000) + TLV entries.
+    Subtype 0x0020 = full device config, 0x0001 = dev status TLV.
+    """
+    payload = data[24:]
+    if len(payload) < 18:
+        return {"message_type": 0xFE19, "error": "payload too short"}
+    subtype = struct.unpack_from(">H", payload, 14)[0]
+    tlv_offset = find_config_offset(payload)
+    config = parse_config_type(payload, tlv_offset)
+    return {
+        "message_type": 0xFE19,
+        "device_id": data[8:24].rstrip(b"\x00").decode("ascii", errors="replace"),
+        "subtype": subtype,
+        "config": config,
+        "tlv_offset": tlv_offset,
+    }
+
+
+def parse_noah_fe25(data: bytes) -> dict:
+    """
+    NOAH type 0xFE25 — Heartbeat / empty keepalive.
+    Payload: zeros except for CRC at end.
+    """
+    payload = data[24:]
+    # Check first 40 bytes for emptiness (last bytes may be non-payload data)
+    check_len = min(40, len(payload) - 4)  # exclude unknown trailing + CRC
+    payload_body = payload[:check_len]
+    return {
+        "message_type": 0xFE25,
+        "device_id": data[8:24].rstrip(b"\x00").decode("ascii", errors="replace"),
+        "payload_length": len(payload),
+        "is_empty": all(b == 0 for b in payload_body),
+    }
+
+
+NOAH_DECODERS = {
+    0x0103: parse_noah_0103,
+    0x0110: parse_noah_0110,
+    0x0125: parse_noah_0125,
+    0xFE18: parse_noah_fe18,
+    0xFE19: parse_noah_fe19,
+    0xFE25: parse_noah_fe25,
+}
+
+
+def parse_noah_message(data: bytes) -> dict | None:
+    """
+    Dispatch a NOAH message (msg_type at offset 6) to the appropriate parser.
+    """
+    if len(data) < 8:
+        return None
+    msg_type = struct.unpack_from(">H", data, 6)[0]
+    decoder = NOAH_DECODERS.get(msg_type)
+    if decoder:
+        return decoder(data)
+    return None
