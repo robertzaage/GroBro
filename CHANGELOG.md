@@ -1,3 +1,8 @@
+## v2.5.1
+
+### Bug Fixes
++ Fixed regression where NOAH message dispatcher consumed ALL device types' function 3 (holding register) and function 16 (preset multiple) messages, causing them to never reach the modbus parser. This broke NEO, NEXA, and SPF devices that send these function codes.
+
 ## v2.5.0
 
 ### New Features

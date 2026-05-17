@@ -336,7 +336,7 @@ class Client:
                     if config and config.serial_number:
                         LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
                         self.on_config(config)
-                return
+                    return
 
             # Generic modbus message
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
