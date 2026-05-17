@@ -11,6 +11,7 @@
 + Removed duplicate `out_voltage` register definition
 + Added `FILTER_DATA_GLITCHES` option (default: off) to prevent glitches on total_increasing sensors after a device reconnects (#154)
 + Added `VENDOR_100` to modbus function enum and downgraded unknown function log from INFO to DEBUG to reduce log noise (#176)
++ Fixed NOAH config messages (FE19) not being processed — firmware version, serial number and other device info are now properly saved in Home Assistant
 
 ## v2.4.0
 

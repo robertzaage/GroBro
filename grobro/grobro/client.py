@@ -327,6 +327,17 @@ class Client:
                 self._client.publish(topic, eco["data"], retain=PUBLISH_SENSORS_RETAINED)
                 return
 
+            # NOAH-specific message types (FE19 config, 0103 holding regs, etc.)
+            noah_msg = parser.parse_noah_message(unscrambled)
+            if noah_msg:
+                LOG.debug("Parsed NOAH message: type=0x%04X device=%s", noah_msg.get("message_type"), noah_msg.get("device_id", ""))
+                if noah_msg.get("message_type") == 0xFE19:
+                    config = noah_msg.get("config")
+                    if config and config.serial_number:
+                        LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+                        self.on_config(config)
+                return
+
             # Generic modbus message
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             LOG.debug("Received modbus message: %s", modbus_message)

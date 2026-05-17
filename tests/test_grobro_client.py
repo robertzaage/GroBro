@@ -244,6 +244,18 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
+    def test_noah_type_fe19_config2(self, client):
+        data = (Path(DATA_DIR) / "NoahTypeFE19_Config2.bin").read_bytes()
+        msg = _msg("c/33/0PVP0000TEST0001", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+
+    def test_noah_type_fe19_config3(self, client):
+        data = (Path(DATA_DIR) / "NoahTypeFE19_Config3.bin").read_bytes()
+        msg = _msg("c/33/0PVP0000TEST0001", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+
     def test_noah_type_fe19_devstatus(self, client):
         data = (Path(DATA_DIR) / "NoahTypeFE19_DevStatus.bin").read_bytes()
         msg = _msg("c/33/0PVP0000TEST0001", data)
