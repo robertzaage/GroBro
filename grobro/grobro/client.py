@@ -352,6 +352,8 @@ class Client:
                     known_registers = KNOWN_NEXA_REGISTERS
                 elif device_id.startswith("HAQ"):
                     known_registers = KNOWN_SPF_REGISTERS
+                elif device_id.startswith("RAQ"):
+                    known_registers = KNOWN_NEO_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return

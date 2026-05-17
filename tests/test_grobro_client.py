@@ -268,6 +268,30 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         # keepalive, no callbacks
 
+    def test_shinewelink_fe19_fullconfig(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkFE19_FullConfig.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+
+    def test_shinewelink_fe19_devstatus(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkFE19_DevStatus1.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_not_called()
+
+    def test_shinewelink_input_register(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkReadInputRegisters.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        client._client.on_message(None, None, msg)
+        client.on_input_register.assert_called_once()
+
+    def test_shinewelink_holding_register(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkReadHoldingRegisters.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        # Function 3 is parsed by parse_grobro but not routed to a callback
+        client._client.on_message(None, None, msg)
+
     def test_dump_messages_in_on_message(self, client):
         with patch("grobro.grobro.client.DUMP_MESSAGES", True):
             with patch("grobro.grobro.client.dump_message_binary") as mock_dump:

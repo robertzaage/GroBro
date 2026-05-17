@@ -82,6 +82,13 @@ class TestHelpers:
     def test_get_device_type_name_spf(self):
         assert get_device_type_name("HAQ1234567890") == "SPF"
 
+    def test_get_known_registers_raq(self):
+        r = get_known_registers("RAQ0E8H042")
+        assert r is not None
+
+    def test_get_device_type_name_raq(self):
+        assert get_device_type_name("RAQ0E8H042") == "RAQ"
+
     def test_get_device_type_name_unknown(self):
         assert get_device_type_name("UNKNOWN") == "UNKNOWN"
 

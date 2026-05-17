@@ -48,6 +48,8 @@ def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
         return KNOWN_NEXA_REGISTERS
     if device_id.startswith("HAQ"):
         return KNOWN_SPF_REGISTERS
+    if device_id.startswith("RAQ"):
+        return KNOWN_NEO_REGISTERS
     return None
 
 
@@ -61,6 +63,8 @@ def get_device_type_name(device_id: str) -> str:
         return "NEXA"
     if device_id.startswith("HAQ"):
         return "SPF"
+    if device_id.startswith("RAQ"):
+        return "RAQ"
     return "UNKNOWN"
 
 

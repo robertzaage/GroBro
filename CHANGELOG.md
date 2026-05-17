@@ -5,6 +5,7 @@
 + Added 37 missing NOAH input registers: PV1/PV2 temperature, battery SOH, PV3/PV4 voltage/current/temperature, battery 1 serial number, all battery warning and protection statuses, work mode, charging status/power, fault status, AC couple statuses, CT/grid/household load registers, system temperature, and cell voltage limits
 + Parser now supports the `mult` field (in addition to `float_options`) for simpler register definitions
 + Added parser for NOAH msg_type 0x6F64 (EcoTracker JSON data). EcoTracker sensor data is now forwarded to HA instead of being silently dropped (#176)
++ Added support for ShineWeLink-X2 data loggers (RAQ serial prefix). These dongles bridge LoRa-connected inverters like the NEO 1000M-X into MQTT. Their messages are now properly routed, including config telemetry (firmware version, serial number).
 
 ### Bug Fixes
 + Fixed missing `device_class: voltage` for Output Voltage sensor
