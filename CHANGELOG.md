@@ -2,6 +2,12 @@
 
 ### New Features
 + Added `MAX_BAT` environment variable to control how many battery packs appear in Home Assistant. For example, `MAX_BAT=1` hides all but the first battery module. Set it to match how many batteries your system actually has.
++ Added 37 missing NOAH input registers: PV1/PV2 temperature, battery SOH, PV3/PV4 voltage/current/temperature, battery 1 serial number, all battery warning and protection statuses, work mode, charging status/power, fault status, AC couple statuses, CT/grid/household load registers, system temperature, and cell voltage limits
++ Parser now supports the `mult` field (in addition to `float_options`) for simpler register definitions
+
+### Bug Fixes
++ Fixed missing `device_class: voltage` for Output Voltage sensor
++ Removed duplicate `out_voltage` register definition
 
 ## v2.4.0
 

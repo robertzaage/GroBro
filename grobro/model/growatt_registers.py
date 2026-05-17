@@ -34,6 +34,7 @@ class GrowattRegisterDataType(BaseModel):
     data_type: GrowattRegisterDataTypes
     float_options: Optional[GrowattRegisterFloatOptions] = None
     enum_options: Optional[GrowattRegisterEnumOptions] = None
+    mult: Optional[float] = None
 
     def parse(self, data_raw: bytes):
         if not data_raw:
@@ -45,10 +46,12 @@ class GrowattRegisterDataType(BaseModel):
         if is_signed:
             unpack_type = unpack_type.lower()
         if self.data_type in [GrowattRegisterDataTypes.FLOAT, GrowattRegisterDataTypes.SIGNED_FLOAT]:
-            opts = self.float_options
             value = struct.unpack(unpack_type, data_raw)[0]
-            value *= opts.multiplier
-            value += opts.delta
+            if self.mult is not None:
+                value *= self.mult
+            elif self.float_options:
+                value *= self.float_options.multiplier
+                value += self.float_options.delta
             return round(value, 3)
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
             value = struct.unpack(unpack_type, data_raw)[0]
