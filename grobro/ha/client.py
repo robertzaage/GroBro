@@ -149,6 +149,7 @@ class Client:
     _config_cache: dict[str, model.DeviceConfig] = {}
     _discovery_cache: list[str] = []
     _device_timers: dict[str, Timer] = {}
+    _last_energy_values: dict[tuple[str, str], float] = {}
 
     # --- Config read sequencing ---
     _config_read_queues: dict[str, deque[int]] = {}
@@ -257,6 +258,22 @@ class Client:
                 reg = known_registers.input_registers.get(key)
                 if reg:
                     payload[key] = map_enum_value(reg, value)
+
+        # Prevent glitches on total_increasing sensors (energy counters)
+        if known_registers:
+            for key, value in list(payload.items()):
+                reg = known_registers.input_registers.get(key)
+                if not reg:
+                    continue
+                if getattr(reg.homeassistant, "state_class", None) == "total_increasing":
+                    device_key = (state.device_id, key)
+                    last_value = self._last_energy_values.get(device_key)
+                    if isinstance(value, (int, float)):
+                        if last_value is not None and value < last_value:
+                            payload[key] = last_value
+                            LOG.debug("Suppressed decrease for %s/%s: %.1f -> %.1f", state.device_id, key, last_value, value)
+                        else:
+                            self._last_energy_values[device_key] = value
 
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
