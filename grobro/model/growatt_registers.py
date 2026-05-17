@@ -38,6 +38,8 @@ class GrowattRegisterDataType(BaseModel):
     def parse(self, data_raw: bytes):
         if not data_raw:
             return None
+        if self.data_type == GrowattRegisterDataTypes.STRING:
+            return data_raw.decode("ascii", errors="ignore").strip("\x00")
         unpack_type = {1: "!B", 2: "!H", 4: "!I"}[len(data_raw)]
         is_signed = self.data_type in [GrowattRegisterDataTypes.SIGNED_INT, GrowattRegisterDataTypes.SIGNED_FLOAT]
         if is_signed:
@@ -66,9 +68,6 @@ class GrowattRegisterDataType(BaseModel):
                 if not enum_value:
                     return None
                 return value
-        elif self.data_type == GrowattRegisterDataTypes.STRING:
-            value = data_raw.decode("ascii", errors="ignore").strip("\x00")
-            return value
 
 
 class GrowattRegisterPosition(BaseModel):

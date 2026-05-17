@@ -2,3 +2,4 @@ __pycache__
 .env
 .ropeproject
 grobro.egg-info
+.coverage

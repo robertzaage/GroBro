@@ -40,7 +40,7 @@ class GrowattModbusBlock(BaseModel):
             assert len(result.values) == num_blocks * 2
             return result
         except Exception as e:
-            LOG.warn("Parsing GrowattModbusBlock: %s", e)
+            LOG.warning("Parsing GrowattModbusBlock: %s", e)
 
     def build_grobro(self) -> bytes:
         result = struct.pack(">HH", self.start, self.end) + self.values
@@ -181,7 +181,7 @@ class GrowattModbusMessage(BaseModel):
                 register_blocks=register_blocks,
             )
         except Exception as e:
-            LOG.warn("parsing GrowattModbusMessage: %s", e)
+            LOG.warning("parsing GrowattModbusMessage: %s", e)
 
     def build_grobro(self) -> bytes:
         result = struct.pack(

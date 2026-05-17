@@ -416,7 +416,7 @@ class Client:
                     f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
                     f"{device_id}/{entry['state_id']}/get"
                 ),
-                **ha.dict(exclude_none=True),
+                **ha.model_dump(exclude_none=True),
             }
 
         # Config command: Restart Datalogger (Register 32 / Value 1)
