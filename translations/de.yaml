@@ -62,6 +62,8 @@ configuration:
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: Lässt die Geräteverfügbarkeit ausschließlich als dedizierten Online-Sensor anzeigen, anstatt das Gerät und alle seine Entitäten nach Ablauf der Zeitüberschreitung als nicht verfügbar zu markieren.
-  TZ:
+  FILTER_ENERGY_GLITCHES:
+    name: FILTER_ENERGY_GLITCHES
+    description: Wenn aktiviert, werden Sprünge in den Energiezählern (pv_eng_month, pv_eng_year, etc.) unterdrückt, nachdem der NOAH wieder online geht. Standard ist deaktiviert.
     name: Zeitzone
     sescription: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.
