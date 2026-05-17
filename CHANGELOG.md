@@ -1,3 +1,8 @@
+## v2.5.0
+
+### New Features
++ Added `MAX_BAT` environment variable to control how many battery packs appear in Home Assistant. For example, `MAX_BAT=1` hides all but the first battery module. Set it to match how many batteries your system actually has.
+
 ## v2.4.0
 
 ### New Features

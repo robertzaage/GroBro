@@ -1,8 +1,7 @@
 import os
-import struct
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch, PropertyMock, call
+from unittest.mock import MagicMock, patch
 
 import pytest
 from paho.mqtt.client import MQTTMessage
@@ -66,10 +65,14 @@ class TestModule:
                 assert (Path(tmp) / "s/33/test" / files[0]).read_bytes() == b"hello"
 
     def test_dump_message_binary_error(self):
-        with patch("grobro.grobro.client.DUMP_DIR", "/nonexistent/deep/path"):
-            with patch("grobro.grobro.client.DUMP_MESSAGES", True):
-                dump_message_binary("s/33/test", b"data")
-                # should not raise
+        with patch("grobro.grobro.client.os.makedirs", side_effect=OSError("denied")):
+            dump_message_binary("s/33/test", b"data")
+            # should not raise
+
+    def test_dump_message_binary_write_error(self):
+        with patch("builtins.open", side_effect=OSError("denied")):
+            dump_message_binary("s/33/test", b"data")
+            # should not raise
 
     def test_growatt_cloud_disabled(self):
         assert hasattr(grobro_client, "GROWATT_CLOUD_ENABLED")
@@ -90,7 +93,7 @@ class TestClientLifecycle:
         with patch("grobro.grobro.client.mqtt.Client") as mc:
             instance = MagicMock()
             mc.return_value = instance
-            c = Client(cfg, cfg)
+            Client(cfg, cfg)
             instance.username_pw_set.assert_called_once_with("u", "p")
             instance.tls_set.assert_called_once()
             instance.tls_insecure_set.assert_called_once_with(True)
@@ -102,6 +105,13 @@ class TestClientLifecycle:
         client._client.loop_stop.assert_called_once()
         client._client.disconnect.assert_called_once()
 
+    def test_stop_with_forward_clients(self, client):
+        fc = MagicMock()
+        client._forward_clients["fw1"] = fc
+        client.stop()
+        fc.loop_stop.assert_called_once()
+        fc.disconnect.assert_called_once()
+
     def test_on_connect(self, client):
         client._client.on_connect(None, None, None, 0, None)
         client._client.subscribe.assert_called_once_with("c/#")
@@ -110,7 +120,6 @@ class TestClientLifecycle:
 class TestClientSend:
     def test_send_command(self, client):
         from grobro.model.modbus_function import GrowattModbusFunctionSingle
-        from grobro.grobro.builder import scramble, append_crc
         cmd = GrowattModbusFunctionSingle(
             device_id="QMN000ABC1D2E3FG",
             function=3,
@@ -135,6 +144,14 @@ class TestClientSend:
         topic = client._client.publish.call_args[0][0]
         assert topic == "s/33/QMN000ABC1D2E3FG"
 
+    def test_send_command_failure(self, client):
+        client._client.publish.return_value = (1, None)
+        from grobro.model.modbus_function import GrowattModbusFunctionSingle
+        cmd = GrowattModbusFunctionSingle(
+            device_id="QMN000ABC1D2E3FG", function=3, register=100, value=100
+        )
+        client.send_command(cmd)
+
 
 class TestClientOnMessage:
     def test_forwarded_message_skipped(self, client):
@@ -144,49 +161,49 @@ class TestClientOnMessage:
 
     def test_config_message_neo_340(self, client):
         data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
     def test_config_message_neo_341(self, client):
         data = (Path(DATA_DIR) / "NeoConfigTLV_341.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
     def test_config_read_response_281(self, client):
         data = (Path(DATA_DIR) / "NeoConfigReadResponse_337.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         client._client.publish.assert_called()  # publishes back to HA topic
 
     def test_config_write_ack_280(self, client):
         data = (Path(DATA_DIR) / "NeoConfigWriteAck_DataInterval.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         # no error, returns cleanly
 
     def test_modbus_input_register_neo(self, client):
         data = (Path(DATA_DIR) / "NeoReadInputRegisters.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         client.on_input_register.assert_called_once()
 
     def test_modbus_single_register_neo(self, client):
         data = (Path(DATA_DIR) / "NeoReadSingleRegister_3.bin").read_bytes()
-        msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
         client.on_holding_register_input.assert_called_once()
 
     def test_modbus_prese_single_noah(self, client):
         data = (Path(DATA_DIR) / "NoahPresetSingle_OutputLimit.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # PRESET_SINGLE_REGISTER response is not routed to handlers
 
     def test_modbus_input_noah(self, client):
         data = (Path(DATA_DIR) / "NoahReadInputRegisters_0-124.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         client.on_input_register.assert_called_once()
 
@@ -198,46 +215,111 @@ class TestClientOnMessage:
             fc = MagicMock()
             mock_connect.return_value = fc
             data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
-            msg = _msg(f"c/33/QMN000ABC1D2E3FG", data)
+            msg = _msg("c/33/QMN000ABC1D2E3FG", data)
             client._client.on_message(None, None, msg)
             mock_connect.assert_called_once_with("QMN000ABC1D2E3FG")
             fc.publish.assert_called_once()
 
     def test_noah_type0103(self, client):
         data = (Path(DATA_DIR) / "NoahType0103_HoldingRegs.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # NOAH type 259 is not handled by client, no callback called
 
     def test_noah_type0110(self, client):
         data = (Path(DATA_DIR) / "NoahType0110_PresetMResp.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # This is a preset response, handled gracefully
 
     def test_noah_type0125(self, client):
         data = (Path(DATA_DIR) / "NoahType0125_SerialResp.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # Serial response, handled gracefully
 
     def test_noah_type_fe19_config(self, client):
         data = (Path(DATA_DIR) / "NoahTypeFE19_Config.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
     def test_noah_type_fe19_devstatus(self, client):
         data = (Path(DATA_DIR) / "NoahTypeFE19_DevStatus.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # DevStatus (msg_type=53) not handled as config, just no crash
 
     def test_noah_type_fe25(self, client):
         data = (Path(DATA_DIR) / "NoahTypeFE25_Empty.bin").read_bytes()
-        msg = _msg(f"c/33/0PVP0000TEST0001", data)
+        msg = _msg("c/33/0PVP0000TEST0001", data)
         client._client.on_message(None, None, msg)
         # keepalive, no callbacks
+
+    def test_dump_messages_in_on_message(self, client):
+        with patch("grobro.grobro.client.DUMP_MESSAGES", True):
+            with patch("grobro.grobro.client.dump_message_binary") as mock_dump:
+                data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
+                msg = _msg("c/33/QMN000ABC1D2E3FG", data)
+                client._client.on_message(None, None, msg)
+                mock_dump.assert_called_once()
+
+    def test_unknown_device_type_modbus(self, client):
+        data = (Path(DATA_DIR) / "NeoReadInputRegisters.bin").read_bytes()
+        msg = _msg("c/33/UNKN00000000001", data)
+        client._client.on_message(None, None, msg)
+        client.on_input_register.assert_not_called()
+
+    def test_modbus_input_nexa(self, client):
+        data = (Path(DATA_DIR) / "NeoReadInputRegisters.bin").read_bytes()
+        msg = _msg("c/33/0HVR000TEST0001", data)
+        client._client.on_message(None, None, msg)
+        client.on_input_register.assert_called_once()
+
+    def test_modbus_input_spf(self, client):
+        data = (Path(DATA_DIR) / "NeoReadInputRegisters.bin").read_bytes()
+        msg = _msg("c/33/HAQ000TEST0001", data)
+        client._client.on_message(None, None, msg)
+        client.on_input_register.assert_called_once()
+
+    def test_invalid_payload_processing(self, client):
+        msg = _msg("c/33/QMN000ABC1D2E3FG", b"garbage")
+        client._client.on_message(None, None, msg)
+
+
+class TestClientCloudConfig:
+    @patch("grobro.grobro.client.GROWATT_CLOUD", "true")
+    @patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", True)
+    @patch("grobro.grobro.client.GROWATT_CLOUD_FILTER", set())
+    @patch("grobro.grobro.client.GROWATT_CLOUD_CONFIG_FILTER", "true")
+    def test_config_filter_blocks_0118(self, client):
+        with patch.object(client, "_Client__connect_to_growatt_server") as mock_connect:
+            data = (Path(DATA_DIR) / "NeoConfigWriteAck_DataInterval.bin").read_bytes()
+            msg = _msg("c/33/QMN000ABC1D2E3FG", data)
+            client._client.on_message(None, None, msg)
+            mock_connect.assert_not_called()
+
+    @patch("grobro.grobro.client.GROWATT_CLOUD", "true")
+    @patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", True)
+    @patch("grobro.grobro.client.GROWATT_CLOUD_FILTER", set())
+    @patch("grobro.grobro.client.GROWATT_CLOUD_CONFIG_FILTER", "true")
+    def test_config_filter_invalid_payload(self, client):
+        with patch.object(client, "_Client__connect_to_growatt_server") as mock_connect:
+            msg = _msg("c/33/QMN000ABC1D2E3FG", b"garbage")
+            client._client.on_message(None, None, msg)
+            mock_connect.assert_not_called()
+
+    @patch("grobro.grobro.client.GROWATT_CLOUD", "true")
+    @patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", True)
+    @patch("grobro.grobro.client.GROWATT_CLOUD_FILTER", set())
+    def test_cloud_forwarding_exception(self, client):
+        with patch.object(
+            client, "_Client__connect_to_growatt_server", side_effect=Exception("boom")
+        ):
+            data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
+            msg = _msg("c/33/QMN000ABC1D2E3FG", data)
+            client._client.on_message(None, None, msg)
+            client.on_config.assert_called_once()
 
 
 class TestClientForward:
@@ -261,3 +343,32 @@ class TestClientForward:
             result2 = client._Client__connect_to_growatt_server("test-dev")
             assert result2 is fc
             assert mc.call_count == 1
+
+    def test_forward_client_dump_messages(self, client):
+        with patch("grobro.grobro.client.DUMP_MESSAGES", True):
+            with patch("grobro.grobro.client.dump_message_binary") as mock_dump:
+                with patch("grobro.grobro.client.GROWATT_CLOUD", "true"):
+                    client._Client__on_message_forward_client(None, None, _msg(
+                        "s/device1", b"data",
+                    ))
+                    mock_dump.assert_called_once()
+
+    def test_forward_client_cloud_disabled(self, client):
+        with patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", False):
+            client._Client__on_message_forward_client(None, None, _msg(
+                "s/device1", b"data",
+            ))
+            client._client.publish.assert_not_called()
+
+    def test_forward_client_device_not_in_filter(self, client):
+        client._Client__on_message_forward_client(None, None, _msg(
+            "s/device1", b"data",
+        ))
+        client._client.publish.assert_not_called()
+
+    def test_forward_client_publish_exception(self, client):
+        with patch("grobro.grobro.client.GROWATT_CLOUD", "true"):
+            with patch.object(client._client, "publish", side_effect=Exception("boom")):
+                client._Client__on_message_forward_client(None, None, _msg(
+                    "s/device1", b"data",
+                ))

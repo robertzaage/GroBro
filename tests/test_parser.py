@@ -1,4 +1,3 @@
-import struct
 from grobro.grobro import parser
 
 

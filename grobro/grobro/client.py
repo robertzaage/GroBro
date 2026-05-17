@@ -16,16 +16,12 @@ from paho.mqtt.client import MQTTMessage
 
 from grobro import model
 from grobro.grobro import parser
-from dis import Positions
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_message import GrowattModbusMessage
 from grobro.model.mqtt_config import MQTTConfig
-from grobro.model.growatt_registers import GrowattRegisterDataType
-from grobro.model.growatt_registers import GrowattRegisterDataTypes
-from grobro.model.growatt_registers import GrowattRegisterEnumTypes
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
@@ -205,7 +201,7 @@ class Client:
             return
 
         file = get_property(msg, "file")
-        LOG.debug(f"Received message (%s): %s: %s", file, msg.topic, msg.payload)
+        LOG.debug("Received message (%s): %s: %s", file, msg.topic, msg.payload)
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
@@ -241,7 +237,7 @@ class Client:
                         LOG.error(f"Forwarding to Growatt Cloud failed: {e}")
 
             unscrambled = parser.unscramble(msg.payload)
-            LOG.debug(f"Received: %s %s", msg.topic, unscrambled.hex(" "))
+            LOG.debug("Received: %s %s", msg.topic, unscrambled.hex(" "))
 
             # Config Message
             msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
@@ -367,7 +363,6 @@ class Client:
                     
                     for name, register in known_registers.input_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
-                        data_type = register.growatt.data
                         value = register.growatt.data.parse(data_raw)
                         # TODO: this is a workaround for broken messages sent by neo inverters at night.
                         # They emmit state updates with incredible high wattage, which spoils HA statistics.

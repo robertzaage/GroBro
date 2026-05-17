@@ -2,13 +2,9 @@
 # Automatically descrambles the binary data and decodes it into a structured format.
 
 import struct
-import json
-import sys
-import os
 import logging
 import grobro.model as model
 from itertools import cycle
-import importlib.resources as resources
 
 LOG = logging.getLogger(__name__)
 

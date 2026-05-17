@@ -1,7 +1,6 @@
 from grobro.model.modbus_message import GrowattModbusFunction
 import struct
 from pydantic import BaseModel, ConfigDict, Field
-from enum import Enum
 from typing import Optional
 
 MODBUS_COMMAND_STRUCT = ">HHHBB30sHH"

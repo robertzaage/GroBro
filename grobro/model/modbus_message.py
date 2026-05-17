@@ -1,11 +1,9 @@
-from rope.base import serializer
 from typing import Optional
 from datetime import datetime
 import struct
 import logging
 from pydantic.main import BaseModel
 from enum import Enum
-from pylint.checkers.base import register
 from grobro.model.growatt_registers import GrowattRegisterPosition
 
 LOG = logging.getLogger(__name__)

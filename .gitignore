@@ -3,3 +3,5 @@ __pycache__
 .ropeproject
 grobro.egg-info
 .coverage
+coverage.xml
+htmlcov/

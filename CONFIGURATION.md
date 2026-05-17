@@ -119,6 +119,7 @@ docker run --detach \
 | `DEVICE_TIMEOUT` | ❌ No | Set the timeout in seconds for device communication. Default is `0` (disabled). Note: This must be greater than 0 for any availability/online tracking to work. Recommended: `300`+ seconds. After this time without data, the device is considered "offline." |
 | `AVAILABILITY_SENSOR` | ❌ No | Requires `DEVICE_TIMEOUT > 0`. Set to `true` to expose availability as a dedicated `online` binary sensor. If `false` (default), the device and all its entities will be marked as "unavailable" (grayed out) in Home Assistant when the timeout is reached. |
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
+| `MAX_BAT`       | ❌ No    | Limits how many battery packs appear in Home Assistant (default `4`). Example: `MAX_BAT=1` shows only the first battery (Bat1). Set this to match the actual number of batteries you have. |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
 
 # Example Setup with DuckDNS and HA-MQTT

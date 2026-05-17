@@ -139,7 +139,7 @@ def publish_message(broker, port, username, password, tls, device_id, payload):
     if status == 0:
         print(f"Sent message to topic {topic}")
     else:
-        print(f"Failed to send message")
+        print("Failed to send message")
     time.sleep(1)
     client.loop_stop()
 

@@ -47,6 +47,12 @@ configuration:
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
     description: Speichert jede empfangene Nachricht in $DUMP_DIR für eine spätere detaillierte Analyse.
+  MAX_SLOTS:
+    name: MAX_SLOTS
+    description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (nur NOAH, max 9). Standard ist 1.
+  MAX_BAT:
+    name: MAX_BAT
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Stelle dies auf die tatsächliche Anzahl deiner Batterien ein. Standard ist 4.
   DUMP_DIR:
     name: DUMP_DIR
     description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.

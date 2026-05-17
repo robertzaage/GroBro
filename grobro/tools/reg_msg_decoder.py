@@ -7,16 +7,14 @@ import struct
 import argparse
 import pathlib
 import json
-import binascii
 import sys
-import string
 import crc
 
 crc16 = crc.Calculator(crc.Crc16.MODBUS)
 
 def descramble(pkt: bytes) -> bytes:
     MASK = b"Growatt"
-    body, crc_stored = pkt[:-2], pkt[-2:]
+    _, _ = pkt[:-2], pkt[-2:]
     if not crc16.verify(pkt[:-2], struct.unpack("!H", pkt[-2:])[0]):
         print("Warning! CRC mismatch – continuing anyway...", file=sys.stderr)
     out = bytearray(pkt[:8])

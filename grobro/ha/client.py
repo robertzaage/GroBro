@@ -24,7 +24,6 @@ from grobro.model.growatt_registers import (
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_function import (
     GrowattModbusFunctionSingle,
-    GrowattModbusFunctionMultiple,
 )
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -32,6 +31,7 @@ DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
 AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
+MAX_BAT = int(os.getenv("MAX_BAT", "4"))
 LOG = logging.getLogger(__name__)
 
 
@@ -86,6 +86,33 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
         register=register_no,
         value=value if value is not None else register_no,
     )
+
+
+def _get_bat_number(name: str) -> Optional[int]:
+    if name.startswith("battery"):
+        rest = name[7:]
+        digits = ""
+        for c in rest:
+            if c.isdigit():
+                digits += c
+            else:
+                break
+        if digits:
+            return int(digits)
+    elif name.startswith("bat"):
+        rest = name[3:]
+        if rest.startswith("_"):
+            rest = rest[1:]
+        digits = ""
+        for c in rest:
+            if c.isdigit():
+                digits += c
+            else:
+                break
+        if digits:
+            return int(digits)
+    return None
+
 
 def iter_command_registers(known_registers: GroBroRegisters):
     # Modbus holding registers
@@ -217,6 +244,12 @@ class Client:
                 if name.startswith("bat") and name.endswith("_temp"):
                     if isinstance(value, (int, float)) and value == -273.1:
                         payload[key] = None
+
+        # Filter out battery values exceeding MAX_BAT
+        for key in list(payload.keys()):
+            bat_num = _get_bat_number(key)
+            if bat_num is not None and bat_num > MAX_BAT:
+                del payload[key]
 
         # ENUM Mapping (must come AFTER our replacement!)
         if known_registers:
@@ -451,6 +484,9 @@ class Client:
         # States
         for state_name, state in known_registers.input_registers.items():
             if not state.homeassistant.publish:
+                continue
+            bat_num = _get_bat_number(state_name)
+            if bat_num is not None and bat_num > MAX_BAT:
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {

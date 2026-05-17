@@ -1,8 +1,6 @@
 import os
 import json
-import tempfile
-from unittest.mock import MagicMock, patch, PropertyMock
-from threading import Timer
+from unittest.mock import MagicMock, patch
 
 import pytest
 from paho.mqtt.client import MQTTMessage
@@ -14,11 +12,13 @@ from grobro.ha.client import (
     map_enum_value,
     make_modbus_command,
     iter_command_registers,
+    _get_bat_number,
 )
-from grobro.model.modbus_message import GrowattModbusFunction
+from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 from grobro.model.mqtt_config import MQTTConfig
 from grobro.model.device_config import DeviceConfig
+from grobro.grobro.parser import unscramble
 
 
 DATA_DIR = __file__[: __file__.rfind("/")] + "/model/data"
@@ -32,6 +32,21 @@ def _msg(topic: str, payload: bytes = b""):
     m.retain = False
     m.properties = MagicMock()
     return m
+
+
+def _load_payload(file_name: str) -> dict:
+    with open(os.path.join(DATA_DIR, file_name), "rb") as f:
+        data = f.read()
+    unscrambled = unscramble(data)
+    msg = GrowattModbusMessage.parse_grobro(unscrambled)
+    known = get_known_registers(msg.device_id)
+    payload = {}
+    for name, reg in known.input_registers.items():
+        data_raw = msg.get_data(reg.growatt.position)
+        value = reg.growatt.data.parse(data_raw)
+        if value is not None:
+            payload[name] = value
+    return payload
 
 
 class TestHelpers:
@@ -122,6 +137,41 @@ class TestHelpers:
         assert result == 5
 
 
+class TestBatNumber:
+    def test_bat1_temp(self):
+        assert _get_bat_number("bat1_temp") == 1
+
+    def test_bat4_temp(self):
+        assert _get_bat_number("bat4_temp") == 4
+
+    def test_bat_2_ser_part_1(self):
+        assert _get_bat_number("bat2_ser_part_1") == 2
+
+    def test_bat_1_soc_pct(self):
+        assert _get_bat_number("bat_1_soc_pct") == 1
+
+    def test_bat_sysstate(self):
+        assert _get_bat_number("bat_sysstate") is None
+
+    def test_bat_cnt(self):
+        assert _get_bat_number("bat_cnt") is None
+
+    def test_battery1Soc(self):
+        assert _get_bat_number("battery1Soc") == 1
+
+    def test_battery4Soc(self):
+        assert _get_bat_number("battery4Soc") == 4
+
+    def test_batteryPackageQuantity(self):
+        assert _get_bat_number("batteryPackageQuantity") is None
+
+    def test_batteryCycles(self):
+        assert _get_bat_number("batteryCycles") is None
+
+    def test_non_bat_name(self):
+        assert _get_bat_number("Ppv") is None
+
+
 @pytest.fixture(autouse=True)
 def _cleanup_config_files():
     yield
@@ -161,7 +211,7 @@ class TestClientLifecycle:
             mc.return_value = instance
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 cfg = MQTTConfig(host="h", port=8883, username="u", password="p", use_tls=True)
-                c = Client(cfg)
+                Client(cfg)
                 instance.username_pw_set.assert_called_once_with("u", "p")
                 instance.tls_set.assert_called_once()
 
@@ -204,14 +254,22 @@ class TestClientConfig:
 class TestClientPublishInput:
     def test_publish_input_register(self, ha_client):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = _load_payload("NeoReadInputRegisters.bin")
         state = HomeAssistantInputRegister(
             device_id="QMN000ABC1D2E3FG",
-            payload={"Ppv": 1234, "Fac": 5000},
+            payload=payload,
         )
         ha_client.publish_input_register(state)
         ha_client._client.publish.assert_called()
-        topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
-        assert any("state" in t for t in topics)
+        expected_topic = "homeassistant/grobro/QMN000ABC1D2E3FG/state"
+        published = None
+        for call_args in ha_client._client.publish.call_args_list:
+            if call_args[0][0] == expected_topic:
+                published = json.loads(call_args[0][1])
+                break
+        assert published is not None
+        assert published.get("Ppv") == 525.1
+        assert published.get("Inverter_Status") == "NormalStatus"
 
     def test_publish_input_register_bat_temp_filter(self, ha_client):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
@@ -396,7 +454,10 @@ class TestClientDiscovery:
     def test_migrate_entity_discovery(self, ha_client):
         known = get_known_registers("QMN000ABC1D2E3FG")
         ha_client._Client__migrate_entity_discovery("QMN000ABC1D2E3FG", known)
-        assert ha_client._client.publish.called
+        topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
+        assert any("Ppv/config" in t for t in topics)
+        assert any("Fac/config" in t for t in topics)
+        assert any("Inverter_Status/config" in t for t in topics)
 
 
 class TestClientAvailability:
@@ -451,7 +512,7 @@ class TestClientConfigReadSequencing:
         Client._config_read_timers.clear()
 
     def test_kickoff_inflight(self):
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c.on_config_read = MagicMock()
@@ -460,7 +521,7 @@ class TestClientConfigReadSequencing:
 
     def test_kickoff_with_queue(self):
         from collections import deque
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c.on_config_read = MagicMock()
@@ -471,7 +532,7 @@ class TestClientConfigReadSequencing:
 
     def test_kickoff_skips_if_inflight(self):
         from collections import deque
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c.on_config_read = MagicMock()
@@ -481,7 +542,7 @@ class TestClientConfigReadSequencing:
                 c.on_config_read.assert_not_called()
 
     def test_handle_config_read_response(self):
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
@@ -490,7 +551,7 @@ class TestClientConfigReadSequencing:
                 assert "QMN000ABC1D2E3FG" not in c._config_read_inflight
 
     def test_handle_config_read_response_wrong_register(self):
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
@@ -499,7 +560,7 @@ class TestClientConfigReadSequencing:
                 assert c._config_read_inflight["QMN000ABC1D2E3FG"] == 1280
 
     def test_config_read_timeout(self):
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
@@ -507,7 +568,7 @@ class TestClientConfigReadSequencing:
                 assert "QMN000ABC1D2E3FG" not in c._config_read_inflight
 
     def test_config_read_timeout_wrong_register(self):
-        with patch("grobro.ha.client.mqtt.Client") as mc:
+        with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
@@ -523,3 +584,156 @@ class TestClientNoahOnMessage:
             mock_timer.return_value = timer_instance
             ha_client._client.on_message(None, None, msg)
         ha_client.on_command.assert_called()
+
+
+    def test_publish_input_register_noah(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = _load_payload("NoahReadInputRegisters_0-124.bin")
+        state = HomeAssistantInputRegister(
+            device_id="0PVP0000TEST0001",
+            payload=payload,
+        )
+        ha_client.publish_input_register(state)
+        expected_topic = "homeassistant/grobro/0PVP0000TEST0001/state"
+        published = None
+        for call_args in ha_client._client.publish.call_args_list:
+            if call_args[0][0] == expected_topic:
+                published = json.loads(call_args[0][1])
+                break
+        assert published is not None
+        assert published.get("out_power") == 356.0
+        assert published.get("bat1_temp") == 24.0
+        assert published.get("bat_1_soc_pct") == 100
+        assert "bat2_temp" in published
+        assert published["bat2_temp"] is None
+        assert published.get("tot_bat_soc_pct") == 100
+        assert published.get("bat_cnt") == 1
+        assert published.get("bat_cyclecnt") == 14
+        assert published.get("bat_sysstate") == "Idle"
+
+
+class TestMaxBat:
+    def test_publish_input_register_filters_bat_above_max(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        real_payload = _load_payload("NoahReadInputRegisters_0-124.bin")
+        with patch("grobro.ha.client.MAX_BAT", 1):
+            state = HomeAssistantInputRegister(
+                device_id="0PVP0000TEST0001",
+                payload=real_payload,
+            )
+            ha_client.publish_input_register(state)
+        published = None
+        expected_topic = "homeassistant/grobro/0PVP0000TEST0001/state"
+        for entry in ha_client._client.publish.call_args_list:
+            if entry.args[0] == expected_topic:
+                published = json.loads(entry.args[1])
+                break
+        assert published is not None
+        assert published.get("out_power") is not None
+        assert published.get("bat1_temp") == 24.0
+        assert published.get("bat_1_soc_pct") == 100
+        assert "bat2_temp" not in published
+        assert "bat_2_soc_pct" not in published
+
+    def test_discovery_filters_bat_above_max(self):
+        with patch("grobro.ha.client.mqtt.Client") as mc:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                with patch("grobro.ha.client.MAX_BAT", 1):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    c._Client__publish_device_discovery("0PVP0000TEST0001")
+        discovery_calls = [c for c in mc.return_value.publish.call_args_list
+                           if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
+        assert discovery_calls, "No discovery calls found"
+        payload = json.loads(discovery_calls[-1][0][1])
+        cmps = payload.get("cmps", {})
+        cmp_names = [v["name"] for v in cmps.values()]
+        assert any("Bat1" in n for n in cmp_names)
+        assert any("Battery 1" in n for n in cmp_names)
+        assert not any("Bat2" in n for n in cmp_names)
+        assert not any("Bat3" in n for n in cmp_names)
+        assert not any("Bat4" in n for n in cmp_names)
+        assert not any("Battery 2" in n for n in cmp_names)
+        assert any("Battery Count" in n for n in cmp_names)
+
+    def test_max_bat_default(self):
+        from grobro.ha.client import MAX_BAT
+        assert MAX_BAT == 4
+
+
+class TestEdgeCases:
+    def test_map_enum_bitfield(self):
+        from grobro.ha.client import map_enum_value
+        reg = MagicMock()
+        reg.growatt.data.data_type = "ENUM"
+        reg.growatt.data.enum_options.enum_type = "BITFIELD"
+        result = map_enum_value(reg, 5)
+        assert result == 5
+
+    def test_publish_unknown_payload_key(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        state = HomeAssistantInputRegister(
+            device_id="QMN000ABC1D2E3FG",
+            payload={"nonexistent_key": 42},
+        )
+        ha_client.publish_input_register(state)
+        ha_client._client.publish.assert_called()
+
+    def test_device_timer_enabled(self):
+        with patch("grobro.ha.client.mqtt.Client"):
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                with patch("grobro.ha.client.DEVICE_TIMEOUT", 5):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    c._Client__publish_device_discovery = MagicMock()
+                    c._Client__publish_availability = MagicMock()
+                    from grobro.model.growatt_registers import HomeAssistantInputRegister
+                    state = HomeAssistantInputRegister(
+                        device_id="QMN000ABC1D2E3FG",
+                        payload={"Ppv": 100},
+                    )
+                    c.publish_input_register(state)
+                    assert "QMN000ABC1D2E3FG" in c._device_timers
+
+    def test_on_connect_logs(self, caplog):
+        with patch("grobro.ha.client.mqtt.Client"):
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                caplog.set_level("DEBUG")
+                c._Client__on_connect(None, None, None, 0, None)
+                assert "Connected to HA MQTT server" in caplog.text
+
+    def test_slot_name_parse_error(self, ha_client):
+        msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")
+        with patch("grobro.ha.client.MAX_SLOTS", 1):
+            ha_client._client.on_message(None, None, msg)
+        ha_client.on_command.assert_called()
+
+    def test_device_info_fallback_new_device(self):
+        with patch("grobro.ha.client.mqtt.Client"):
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                with patch("grobro.model.device_config.DeviceConfig.from_file", return_value=None):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    info = c._Client__device_info_from_config("NEW_DEVICE_ID")
+                    assert info["identifiers"] == ["NEW_DEVICE_ID"]
+                    assert info["model"] == "UNKNOWN-series"
+
+    def test_config_read_timeout_clears_state(self, ha_client):
+        ha_client._config_read_queues.clear()
+        ha_client._config_read_inflight.clear()
+        ha_client._config_read_inflight["QMN000ABC1D2E3FG"] = 999
+        ha_client._Client__config_read_timeout("QMN000ABC1D2E3FG", 999)
+        assert "QMN000ABC1D2E3FG" not in ha_client._config_read_inflight
+
+    def test_discovery_online_entity_with_device_timeout(self):
+        with patch("grobro.ha.client.mqtt.Client") as mc:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                with patch("grobro.ha.client.DEVICE_TIMEOUT", 10):
+                    with patch("grobro.ha.client.AVAILABILITY_SENSOR", True):
+                        c = Client(MQTTConfig(host="localhost", port=1883))
+                        c._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+        discovery_calls = [c for c in mc.return_value.publish.call_args_list
+                           if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
+        assert discovery_calls
+        payload = json.loads(discovery_calls[-1][0][1])
+        cmps = payload.get("cmps", {})
+        cmp_names = [v["name"] for v in cmps.values()]
+        assert any("Online" in n for n in cmp_names)
