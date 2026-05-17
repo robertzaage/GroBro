@@ -8,7 +8,7 @@
 ### Bug Fixes
 + Fixed missing `device_class: voltage` for Output Voltage sensor
 + Removed duplicate `out_voltage` register definition
-+ Added `FILTER_ENERGY_GLITCHES` option (default: off) to prevent energy counter glitches after NOAH reconnects from being offline (#154)
++ Added `FILTER_DATA_GLITCHES` option (default: off) to prevent glitches on total_increasing sensors after a device reconnects (#154)
 
 ## v2.4.0
 

@@ -62,9 +62,9 @@ configuration:
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: Expose device availability only as a dedicated online sensor instead of marking the device and all its entities unavailable after timeout.
-  FILTER_ENERGY_GLITCHES:
-    name: FILTER_ENERGY_GLITCHES
-    description: When enabled, prevents glitches on energy counters (pv_eng_month, pv_eng_year, etc.) after the NOAH reconnects from being offline. Default is false.
+  FILTER_DATA_GLITCHES:
+    name: FILTER_DATA_GLITCHES
+    description: When enabled, prevents glitches on total_increasing sensors (energy counters, etc.) after a device reconnects from being offline. Default is false.
   TZ:
     name: Timezone
     description: Configure your local timezone to ensure all application logs and system events are recorded with accurate localized timestamps.

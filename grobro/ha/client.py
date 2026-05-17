@@ -32,7 +32,7 @@ AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
 MAX_BAT = int(os.getenv("MAX_BAT", "4"))
-FILTER_ENERGY_GLITCHES = os.getenv("FILTER_ENERGY_GLITCHES", "False").lower() == "true"
+FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
 
@@ -261,7 +261,7 @@ class Client:
                     payload[key] = map_enum_value(reg, value)
 
         # Prevent glitches on total_increasing sensors (energy counters)
-        if FILTER_ENERGY_GLITCHES and known_registers:
+        if FILTER_DATA_GLITCHES and known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
                 if not reg:

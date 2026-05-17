@@ -39,7 +39,7 @@ options:
   MAX_SLOTS: 1
   MAX_BAT: 4
   AVAILABILITY_SENSOR: false
-  FILTER_ENERGY_GLITCHES: false
+  FILTER_DATA_GLITCHES: false
   TZ: ""
 
 schema:
@@ -64,5 +64,5 @@ schema:
   MAX_SLOTS: "int?"
   MAX_BAT: "int?"
   AVAILABILITY_SENSOR: bool
-  FILTER_ENERGY_GLITCHES: bool
+  FILTER_DATA_GLITCHES: bool
   TZ: str
