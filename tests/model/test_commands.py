@@ -111,7 +111,7 @@ CONFIG_BIN_FILES = [
     [
         ("NeoSetDateTime.bin", 5888, "2025-04-25"),
         ("NeoSetInterval.bin", 1280, "1"),
-        ("NeoSetMQTTHost.bin", 4352, "mqtt.zaage.it"),
+        ("NeoSetMQTTHost.bin", 4352, "mqtt.example.com"),
         ("NeoSetMQTTPort.bin", 2048, "8883"),
         ("NeoSetOTAUpdate.bin", 15872, "cdn.growatt.com"),
     ],
@@ -223,102 +223,93 @@ def test_config_tlv(file_name):
     assert config.serial_number == expected
 
 
-def noah_decode_charge_limit(body):
-    pos = body.find(b"\x00\xFA\x00\xFB")
-    if pos == -1 or pos + 8 > len(body):
-        return None
-    upper = struct.unpack_from(">H", body, pos + 4)[0]
-    lower = struct.unpack_from(">H", body, pos + 6)[0]
-    return {"action": "charge_limit", "upper": upper, "lower": lower}
-
-
-def noah_decode_slot(body):
-    pos = body.find(b"\xFE")
-    if pos == -1 or pos + 13 > len(body):
-        return None
-    slot = body[pos + 1]
-    sh, sm, eh, em = body[pos + 3 : pos + 7]
-    power = struct.unpack_from(">H", body, pos + 9)[0]
-    if (sh, sm, eh, em, power) == (0, 0, 0, 0, 0):
-        return {"action": "slot_delete", "slot": slot}
-    return {
-        "action": "slot_create", "slot": slot,
-        "start": f"{sh:02d}:{sm:02d}",
-        "end": f"{eh:02d}:{em:02d}", "power": power,
-    }
-
-
-def noah_decode_output_limit(body):
-    pos = body.find(b"\xFC")
-    if pos == -1 or pos + 3 > len(body):
-        return None
-    power = struct.unpack(">H", body[pos + 1 : pos + 3])[0]
-    return {"action": "output_limit", "power": power}
-
-
-def noah_decode_datetime(body):
-    text = body[-19:].decode("ascii", "ignore")
-    if text.count("-") == 2 and text.count(":") == 2:
-        return {"action": "datetime"}
-
-
 def test_noah_preset_multiple_charge_limit():
     data = (DATA_DIR / "NoahPresetMultiple_ChargeLimit.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    payload = unscrambled[24:] if struct.unpack_from(">H", unscrambled, 6)[0] == 0x0110 else b""
-    if not payload:
-        parsed = GrowattModbusMessage.parse_grobro(unscrambled)
-        assert parsed is not None
-        payload = parsed.register_blocks[0].values if parsed.register_blocks else b""
-    assert len(payload) > 0
+    result = parser.parse_noah_message(unscrambled)
+    assert result is not None
+    assert result["message_type"] in (0x0110, 0x0111)
 
 
 def test_noah_type0103_holding_registers():
     data = (DATA_DIR / "NoahType0103_HoldingRegs.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
-    assert msg_type == 0x0103
+    result = parser.parse_noah_0103(unscrambled)
+    assert result["message_type"] == 0x0103
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert result["register_count"] > 0
 
 
 def test_noah_type0110_response():
     data = (DATA_DIR / "NoahType0110_PresetMResp.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
-    assert msg_type in (0x0110, 0x0111)
-    assert len(unscrambled) >= 40
+    result = parser.parse_noah_0110(unscrambled)
+    assert result["message_type"] == 0x0110
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert len(result["registers"]) > 0
 
 
 def test_noah_type0125_serial_response():
     data = (DATA_DIR / "NoahType0125_SerialResp.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    payload = unscrambled[24:]
-    assert len(payload) >= 10
+    result = parser.parse_noah_0125(unscrambled)
+    assert result["message_type"] == 0x0125
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
 
 
 def test_noah_typeFE18_datetime():
     data = (DATA_DIR / "NoahTypeFE18_DateTime.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
-    assert msg_type == 0xFE18
-    payload = unscrambled[24:]
-    assert b"2025" in payload or noah_decode_datetime(payload)
+    result = parser.parse_noah_fe18(unscrambled)
+    assert result["message_type"] == 0xFE18
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert "2025" in result["datetime"]
 
 
 def test_noah_typeFE19_devstatus():
     data = (DATA_DIR / "NoahTypeFE19_DevStatus.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    payload = unscrambled[24:]
-    assert b"DEV:" in payload
+    result = parser.parse_noah_fe19(unscrambled)
+    assert result["message_type"] == 0xFE19
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert result["subtype"] == parser.FE19_SUBTYPE_DEV_STATUS
+
+
+NOAH_FE19_CONFIG_FILES = [
+    "NoahTypeFE19_Config.bin",
+    "NoahTypeFE19_Config2.bin",
+    "NoahTypeFE19_Config3.bin",
+]
+
+
+@pytest.mark.parametrize("file_name", NOAH_FE19_CONFIG_FILES)
+def test_noah_typeFE19_full_config(file_name):
+    data = (DATA_DIR / file_name).read_bytes()
+    unscrambled = parser.unscramble(data)
+    result = parser.parse_noah_fe19(unscrambled)
+    assert result["message_type"] == 0xFE19
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert result["subtype"] == parser.FE19_SUBTYPE_FULL_CONFIG
+    cfg = result["config"]
+    assert cfg.serial_number == NOAH_TEST_DEVICE_ID, f"serial={cfg.serial_number}, tlv_offset={result.get('tlv_offset')}"
+
+
+def test_noah_typeFE19_msg():
+    data = (DATA_DIR / "NoahTypeFE19_Msg.bin").read_bytes()
+    unscrambled = parser.unscramble(data)
+    result = parser.parse_noah_fe19(unscrambled)
+    assert result["message_type"] == 0xFE19
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert result["subtype"] == parser.FE19_SUBTYPE_DEV_STATUS
 
 
 def test_noah_typeFE25_empty():
     data = (DATA_DIR / "NoahTypeFE25_Empty.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
-    assert msg_type == 0xFE25
-    payload = unscrambled[24:]
-    assert len(payload) >= 40
-    assert all(b == 0 for b in payload[:40])
+    result = parser.parse_noah_fe25(unscrambled)
+    assert result["message_type"] == 0xFE25
+    assert result["device_id"] == NOAH_TEST_DEVICE_ID
+    assert result["is_empty"]
 
 
 def test_all_bin_files_device_id_sanitized():
