@@ -1,6 +1,6 @@
 from grobro.model.modbus_message import GrowattModbusFunction
 import struct
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from enum import Enum
 from typing import Optional
 
@@ -125,5 +125,4 @@ class GrowattModbusFunctionSingle(BaseModel):
             self.value,
         )
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
