@@ -318,9 +318,17 @@ class Client:
                 )
                 return
 
-            else:
-                modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
-                LOG.debug("Received modbus message: %s", modbus_message)
+            # NOAH EcoTracker JSON data (0x6F64)
+            if msg_type == 0x6F64:
+                eco = parser.parse_noah_6f64(unscrambled)
+                LOG.debug("EcoTracker data for %s: %s", eco["device_id"], eco["data"][:80])
+                topic = f"{HA_BASE_TOPIC}/sensor/grobro/{eco['device_id']}/eco_tracker/state"
+                self._client.publish(topic, eco["data"], retain=PUBLISH_SENSORS_RETAINED)
+                return
+
+            # Generic modbus message
+            modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
+            LOG.debug("Received modbus message: %s", modbus_message)
 
             if modbus_message:
                 known_registers = None

@@ -286,6 +286,34 @@ def parse_noah_fe25(data: bytes) -> dict:
     }
 
 
+def parse_noah_6f64(data: bytes) -> dict:
+    """
+    NOAH type 0x6F64 (28516) — EcoTracker JSON data.
+    Structure:
+        [0:8]   - header (2B unknown, 2B const7, 2B len, 2B msg_type)
+        [8:38]  - device ID (30B ASCII, zero-padded)
+        [38:68] - EcoTracker serial (30B ASCII, zero-padded)
+        [68:75] - timestamp (7B: year-2000, month, day, hour, minute, second, millis)
+        [75:79] - JSON length (4B big-endian)
+        [79:-2] - JSON data
+        [-2:]   - checksum (ignored)
+    """
+    device_id = data[8:38].rstrip(b"\x00").decode("ascii", errors="replace")
+    eco_sn = data[38:68].rstrip(b"\x00").decode("ascii", errors="replace")
+    year_b, month, day, hour, minute, second, millis = struct.unpack_from(">BBBBBBB", data, 68)
+    json_len = struct.unpack_from(">I", data, 75)[0]
+    json_bytes = data[79:79 + json_len]
+    json_str = json_bytes.decode("ascii", errors="replace")
+    return {
+        "message_type": 0x6F64,
+        "device_id": device_id,
+        "eco_tracker_sn": eco_sn,
+        "timestamp": f"{2000 + year_b:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}.{millis:03d}",
+        "json_length": json_len,
+        "data": json_str,
+    }
+
+
 NOAH_DECODERS = {
     0x0103: parse_noah_0103,
     0x0110: parse_noah_0110,
@@ -293,6 +321,7 @@ NOAH_DECODERS = {
     0xFE18: parse_noah_fe18,
     0xFE19: parse_noah_fe19,
     0xFE25: parse_noah_fe25,
+    0x6F64: parse_noah_6f64,
 }
 
 
