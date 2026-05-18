@@ -3,6 +3,7 @@
 ### New Features
 + `MAX_BAT=auto` is now the default. The number of battery packs is detected automatically. You can still override with `MAX_BAT=1`, `MAX_BAT=2`, etc.
 + Battery serial numbers are now combined into a single sensor per battery (`Bat2/3/4 Serial`) instead of 4 separate part-sensors. Battery 1 uses the device serial ("Device SN").
++ PTQ inverters (NEO 1000M-X via LoRa) behind ShineWeLink dongles are now extracted from config messages and registered as separate NEO devices in Home Assistant, with modbus data routed to them automatically.
 
 ### Bug Fixes
 + Fixed MQTT topic serial containing control characters being used as HA device identifier

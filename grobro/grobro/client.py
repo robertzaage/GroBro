@@ -93,6 +93,7 @@ class Client:
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
         self._forward_mqtt_config = forward_mqtt
+        self._ptq_for_raq: dict[str, str] = {}
 
     def start(self):
         LOG.debug("GroBro: Start")
@@ -251,6 +252,19 @@ class Client:
                 if config and (msg_type_4 in (340, 341, 387) or msg_type == 0x0129 or config.serial_number):
                     self.on_config(device_id, config)
                     LOG.info("Received config message for %s", device_id)
+                    # Extract PTQ inverter serial from ShineWeLink dongle config
+                    if msg_type == 0x0129 and len(unscrambled) >= 68:
+                        ptq_serial = unscrambled[38:68].rstrip(b"\x00").decode("ascii", errors="replace").strip()
+                        if ptq_serial.startswith("PTQ"):
+                            self._ptq_for_raq[device_id] = ptq_serial
+                            ptq_config = model.DeviceConfig(serial_number=ptq_serial)
+                            ptq_config.device_type = "55"
+                            if getattr(config, 'model_id', None):
+                                ptq_config.model_id = config.model_id
+                            if getattr(config, 'sw_version', None):
+                                ptq_config.sw_version = config.sw_version
+                            self.on_config(ptq_serial, ptq_config)
+                            LOG.info("Registered PTQ inverter %s behind %s", ptq_serial, device_id)
                 return
 
             # Config READ response (281)
@@ -346,15 +360,19 @@ class Client:
 
             if modbus_message:
                 known_registers = None
-                if device_id.startswith("QMN"):
+                ptq_device_id = self._ptq_for_raq.get(device_id)
+                modbus_device_id = ptq_device_id or device_id
+                if modbus_device_id.startswith("QMN"):
                     known_registers = KNOWN_NEO_REGISTERS
-                elif device_id.startswith("0PVP"):
+                elif modbus_device_id.startswith("0PVP"):
                     known_registers = KNOWN_NOAH_REGISTERS
-                elif device_id.startswith("0HVR"):
+                elif modbus_device_id.startswith("0HVR"):
                     known_registers = KNOWN_NEXA_REGISTERS
-                elif device_id.startswith("HAQ"):
+                elif modbus_device_id.startswith("HAQ"):
                     known_registers = KNOWN_SPF_REGISTERS
-                elif device_id.startswith("RAQ"):
+                elif modbus_device_id.startswith("RAQ"):
+                    known_registers = KNOWN_NEO_REGISTERS
+                elif modbus_device_id.startswith("PTQ"):
                     known_registers = KNOWN_NEO_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
@@ -364,7 +382,7 @@ class Client:
                     modbus_message.function
                     == GrowattModbusFunction.READ_SINGLE_REGISTER
                 ):
-                    state = HomeAssistantHoldingRegisterInput(device_id=device_id)
+                    state = HomeAssistantHoldingRegisterInput(device_id=modbus_device_id)
                     
                     for name, register in known_registers.holding_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)
@@ -383,7 +401,7 @@ class Client:
                     self.on_holding_register_input(state)
 
                 if modbus_message.function == GrowattModbusFunction.READ_INPUT_REGISTER:
-                    state = HomeAssistantInputRegister(device_id=device_id)
+                    state = HomeAssistantInputRegister(device_id=modbus_device_id)
                     
                     for name, register in known_registers.input_registers.items():
                         data_raw = modbus_message.get_data(register.growatt.position)

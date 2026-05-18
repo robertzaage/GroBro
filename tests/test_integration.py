@@ -308,12 +308,14 @@ class TestShineWeLinkIntegration:
                 assert "homeassistant/grobro/RAQ0TEST01/state" in phase1
 
                 helper.send(gc, "c/33/RAQ0TEST01\x10", "ShineWeLinkConfigDump.bin")
-                dev_topic = "homeassistant/device/RAQ0TEST01/config"
-                dev_calls = [c for c in ha_mqtt.publish.call_args_list
-                             if c[0][0] == dev_topic and c[0][1]]
-                assert dev_calls
-                payload = json.loads(dev_calls[-1][0][1])
+                # After config, PTQ inverter appears as separate device
+                ptq_dev_topic = "homeassistant/device/PTQ0TEST01/config"
+                ptq_calls = [c for c in ha_mqtt.publish.call_args_list
+                             if c[0][0] == ptq_dev_topic and c[0][1]]
+                assert ptq_calls
+                payload = json.loads(ptq_calls[-1][0][1])
                 assert "GTSW0000" in payload["dev"]["model"]
+                assert payload["dev"]["identifiers"] == ["PTQ0TEST01"]
             finally:
                 os.chdir(old)
 

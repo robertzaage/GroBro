@@ -278,7 +278,10 @@ class TestClientOnMessage:
         data = (Path(DATA_DIR) / "ShineWeLinkConfigDump.bin").read_bytes()
         msg = _msg("c/33/RAQ0TEST01", data)
         client._client.on_message(None, None, msg)
-        client.on_config.assert_called_once()
+        assert client.on_config.call_count == 2
+        raq_call, ptq_call = client.on_config.call_args_list
+        assert raq_call[0][0] == "RAQ0TEST01"
+        assert ptq_call[0][0].startswith("PTQ")
 
     def test_topic_sanitization_normal(self, client):
         data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()

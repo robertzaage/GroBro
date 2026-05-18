@@ -360,8 +360,10 @@ Offset  Size  Field
 98+     N     TLV config entries (see §2.4) — parsed via `find_config_offset` + `parse_config_type`
 ```
 
-The handler was added in v2.6.0; previously this message type fell through
-unrecognised and the device could not register with Home Assistant.
+**Device identity**: GroBro uses the MQTT topic serial (`c/33/<serial>`) as the HA device
+identifier, not the serial inside the config TLV payload. For ShineWeLink, the topic contains
+the data logger serial (RAQ prefix). The 0x0129 config also extracts the PTQ inverter serial
+and registers it as a separate NEO device in HA with modbus data routed to it.
 
 ### 2.9 NEO protocol notes
 
@@ -473,9 +475,9 @@ The first 4 characters of the serial number in the MQTT topic determine which re
 | `0HVR` | NEXA series | `growatt_nexa_registers.json` |
 | `HAQ` | SPF series | `growatt_spf_registers.json` |
 | `RAQ` | ShineWeLink | `growatt_neo_registers.json` (passthrough for LoRa NEO) |
-| `PTQ` | NEO 1000M-X (LoRa) | `growatt_neo_registers.json` (config messages only; modbus register routing not yet implemented in `ha/client.py`) |
+| `PTQ` | NEO 1000M-X (LoRa) | `growatt_neo_registers.json` — extracted from ShineWeLink 0x0129 config as a separate HA device |
 
-Since v2.6.0, `get_device_type_name('RAQ')` returns `"ShineWeLink"`. The `PTQ` prefix is only implemented in `grobro/client.py` config message handling (line 287), not in `ha/client.py` — `get_known_registers()` and `get_device_type_name()` do not recognize it.
+`get_device_type_name('RAQ')` returns `"ShineWeLink"`. The `PTQ` prefix is now also recognized in `ha/client.py` — `get_known_registers()` returns `KNOWN_NEO_REGISTERS` and `get_device_type_name()` returns `"NEO"`. PTQ serials are automatically extracted from ShineWeLink (RAQ) 0x0129 config messages and registered as separate inverter devices with modbus data routed to them.
 
 The routing is currently duplicated in two places — both must be updated when adding a new prefix:
 
@@ -634,18 +636,7 @@ homeassistant/device/<device_id>/config
 | Number | *holding registers* | Writable holding registers (slots, charge limits, etc.) |
 | Switch | *boolean registers* | On/off toggles mapped to 1/0 values |
 
-### 5.4 Device identity and the FE19 serial pitfall
-
-HA identifies devices by the serial number in the `identifiers` list. GroBro uses the
-**MQTT topic serial** (the serial in `c/33/<serial>`) as the device identifier — not
-the serial from the FE19 config TLV payload.
-
-This distinction matters for ShineWeLink setups: the topic contains the data logger
-serial (RAQ…), but the FE19 TLV contains the data logger's own serial which happens to
-match. For NOAH batteries directly connected, topic and TLV serial are the same. Using the
-topic serial consistently prevents devices from being merged under a wrong identifier.
-
-### 5.5 Command register iteration
+### 5.4 Command register iteration
 
 `iter_command_registers(known_registers)` yields a dict for every writable holding register
 that has a corresponding HA platform (number, switch). This drives the dynamic generation
@@ -876,23 +867,7 @@ For example, a message on topic `c/33/QMN000ABC1D2E3FG` is saved as:
 Because the payload is saved before unscrambling, you must call `unscramble()` on the
 file contents before parsing. The `reg_msg_decoder` tool handles this automatically.
 
-### 8.3 Common pitfalls
-
-| Symptom | Likely cause |
-|---------|-------------|
-| Device not discovered in HA (RAQ/ShineWeLink) | Full config arrives as msg_type `0x0129`, not FE19. Check that v2.6.0+ handler is active. The `0x0129` message has function byte `0x29` and is parsed via `find_config_offset`. |
-| Device_id has garbage suffix (`RAQ0E8H042\x10`) | The MQTT topic from the source broker contains control characters after the serial. GroBro strips non-printable chars from the topic-derived `device_id` to prevent HA identifier corruption. |
-| `parse_grobro` returns `None` | CRC mismatch, wrong `msg_len`, or unknown function code. Check `msg_len == len(buffer[8:])`. |
-| NOAH message not parsed | The 14-zero-byte marker is missing or the subtype at offset 38 does not match a known decoder. |
-| NEO function 3/16 not reaching `parse_grobro` | Regression check: did a NOAH `0x0103`/`0x0110` match consume it? The `return` for NOAH dispatch must be **inside** the `# NOAH dispatch` guard. |
-| Devices merged in HA | FE19 config serial differs from MQTT topic serial (e.g., data logger serial vs inverter serial). Fixed in v2.5.2 by using topic serial for HA identity. |
-| Config read stalls | All inflight config reads time out (60 s) before completing. Check that the device responds to `s/33/<id>` commands. Each timeout logs a warning and advances to the next queued register. |
-| Battery temperature shows `-273.1` | The inverter reports this sentinel when the battery BMS is offline or not yet communicating. It is replaced with `null` before HA publishing. |
-| SPF registers all zero | The SPF inverter may be in standby or not generating. Check `op_mode` register (enum maps in register file). |
-| NEXA shows extra empty battery slots | `MAX_BAT` is set too high or serials are empty. Default `"auto"` falls back to 4 when no serials detected. Set `MAX_BAT=1` to override. |
-| Duplicate discovery topics on broker | Restarting GroBro re-publishes all device discovery payloads. HA handles duplicates gracefully (last wins). Old entity-based discovery is cleaned up via `__migrate_entity_discovery`. |
-
-### 8.4 Testing with a second broker
+### 8.3 Testing with a second broker
 
 The `SOURCE` and `TARGET` env vars can point to entirely separate MQTT brokers. For
 development, running a local Mosquitto as `TARGET` and using a remote TLS broker as

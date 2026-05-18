@@ -76,14 +76,14 @@ def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
         return KNOWN_NEXA_REGISTERS
     if device_id.startswith("HAQ"):
         return KNOWN_SPF_REGISTERS
-    if device_id.startswith("RAQ"):
+    if device_id.startswith("RAQ") or device_id.startswith("PTQ"):
         return KNOWN_NEO_REGISTERS
     return None
 
 
 def get_device_type_name(device_id: str) -> str:
     """Ermittle Klartext-Typname anhand der device_id."""
-    if device_id.startswith("QMN"):
+    if device_id.startswith("QMN") or device_id.startswith("PTQ"):
         return "NEO"
     if device_id.startswith("0PVP"):
         return "NOAH"
@@ -553,7 +553,7 @@ class Client:
             bat_num = _get_bat_number(state_name)
             if bat_num is not None and bat_num > effective_max_bat:
                 continue
-            if "_ser_part_" in state_name:
+            if "_ser_part_" in state_name and state_name.startswith("bat"):
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {
@@ -568,20 +568,25 @@ class Client:
                 "icon": state.homeassistant.icon,
             }
 
-        # Combined battery serial entities
-        for bat_num in range(2, 5):
-            if bat_num > effective_max_bat:
-                continue
-            combined_name = f"bat{bat_num}_serial"
-            uid = f"grobro_{device_id}_{combined_name}"
-            payload["cmps"][uid] = {
-                "platform": "sensor",
-                "name": f"Bat{bat_num} Serial",
-                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
-                "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
-                "unique_id": uid,
-                "icon": "mdi:identifier",
-            }
+        # Combined battery serial entities (NOAH only — has _ser_part_ registers)
+        has_bat_ser_parts = any(
+            name.startswith("bat") and "_ser_part_" in name
+            for name in known_registers.input_registers
+        )
+        if has_bat_ser_parts:
+            for bat_num in range(2, 5):
+                if bat_num > effective_max_bat:
+                    continue
+                combined_name = f"bat{bat_num}_serial"
+                uid = f"grobro_{device_id}_{combined_name}"
+                payload["cmps"][uid] = {
+                    "platform": "sensor",
+                    "name": f"Bat{bat_num} Serial",
+                    "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                    "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
+                    "unique_id": uid,
+                    "icon": "mdi:identifier",
+                }
 
         # Serial Number Entity
         serial_unique_id = f"grobro_{device_id}_serial"
