@@ -1043,8 +1043,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "unit_of_measurement": "%"
       }
     },
     "bat_3_soc_pct": {
@@ -1063,8 +1062,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "unit_of_measurement": "%"
       }
     },
     "bat_4_soc_pct": {
@@ -1083,8 +1081,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "unit_of_measurement": "%"
       }
     },
     "heater": {
@@ -1727,8 +1724,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "unit_of_measurement": "%"
       }
     },
     "discharge_limit": {

@@ -2612,8 +2612,7 @@
         "publish": false,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:battery"
+        "unit_of_measurement": "%"
       }
     },
     "Vbus1": {
@@ -2971,8 +2970,7 @@
         "publish": false,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%",
-        "icon": "mdi:battery"
+        "unit_of_measurement": "%"
       }
     },
     "BMS_BatteryVolt": {
