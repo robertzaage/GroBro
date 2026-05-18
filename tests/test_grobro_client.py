@@ -272,7 +272,7 @@ class TestClientOnMessage:
         data = (Path(DATA_DIR) / "ShineWeLinkFE19_FullConfig.bin").read_bytes()
         msg = _msg("c/33/RAQ0E8H042", data)
         client._client.on_message(None, None, msg)
-        client.on_config.assert_called_once()
+        client.on_config.assert_not_called()
 
     def test_shinewelink_config_0129(self, client):
         data = (Path(DATA_DIR) / "ShineWeLinkConfigDump.bin").read_bytes()

@@ -202,7 +202,7 @@ Dispatch priority in `__on_message`:
 | 1 | Config TLV | 340, 341, 387 | NEO, NOAH | `parser.parse_config_type` → `on_config(device_id, config)` |
 | 2 | Config read response | 281 | All | `parser.parse_config_message` → `on_config_read_response` |
 | 3 | Config write ack | 280 | All | Logged, no callback |
-| 4 | NOAH FE19 config | 0xFE19 | NOAH / ShineWeLink | `parser.parse_noah_fe19` → `on_config(device_id, config)` |
+| 4 | NOAH FE19 config | 0xFE19 | NOAH only | `parser.parse_noah_fe19` → `on_config(device_id, config)` |
 | 5 | ShineWeLink config | 0x0129 (297) | ShineWeLink | `parser.parse_config_type` → `on_config(device_id, config)` |
 | 6 | Other NOAH subtypes | 0x0103–0xFE25 | NOAH / ShineWeLink | Dispatched to NOAH sub-parsers (see §2.7.2) |
 | 7 | EcoTracker JSON | 0x6F64 | NOAH | Published to raw MQTT topic |
@@ -244,6 +244,9 @@ Key ID map (maintained in `parse_config_type`):
 
 Values that cannot be decoded as clean ASCII are stored as raw hex strings.
 
+MAC addresses with masked octets (`XX`) are rejected — all NOAH devices report the
+same non-unique masked MAC, which would cause HA to merge them into one device.
+
 ### 2.5 Config read response (type 281)
 
 Parsed with `config_read_struct = Struct(">4sHH16s14sH1xH2x")` (45 bytes):
@@ -284,8 +287,8 @@ Offset  Size  Field
 
 ### 2.7 NOAH message envelope
 
-NOAH batteries (0PVP) and the ShineWeLink data logger (RAQ) use a different framing on
-top of the standard 8-byte header. The NOAH payload always begins with 14 zero bytes.
+NOAH batteries (0PVP) use a different framing on top of the standard 8-byte header.
+The payload always begins with 14 zero bytes.
 
 ```
 [0:8]    — standard header (msg_type at offset 4, NOAH-specific value)
@@ -322,9 +325,11 @@ FE19 is the most complex NOAH message type. The payload after the NOAH marker is
 - **Dev status** (subtype `0x0001`): A shorter TLV without the serial_number key. The
   `if config and config.serial_number` guard prevents `on_config` from being called.
 
+Only NOAH devices (serial prefix `0PVP`) reach this handler — RAQ FE19 messages
+fall through to the modbus handler instead.
+
 **TLV offset heuristic** (`find_config_offset`): Scans the payload starting at byte `0x1C`
-for a valid key (1–999) followed by a valid length (1–255). This handles the non-standard
-first TLV entry present in ShineWeLink FE19 messages.
+for a valid key (1–999) followed by a valid length (1–255).
 
 #### 2.7.3 `0x0103` holding register encapsulation
 
@@ -348,8 +353,8 @@ NOAH-wrapped data). This is a known area for future improvement.
 
 The ShineWeLink data logger (RAQ) publishes its full device configuration as
 message type `0x0129` (297) at header offset 6, with function byte `0x29` (41)
-at offset 7. This is distinct from the NOAH FE19 framing (which only carries
-dev-status subtypes for this device):
+at offset 7. This is the only RAQ config path — the NOAH FE19 handler rejects
+RAQ-sourced messages via the `0PVP` prefix guard:
 
 ```
 Offset  Size  Field

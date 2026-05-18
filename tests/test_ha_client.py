@@ -447,6 +447,12 @@ class TestClientDeviceInfo:
         info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
         assert info["connections"] == [["mac", "aa:bb:cc:dd:ee:ff"]]
 
+    def test_device_info_with_masked_mac(self, ha_client):
+        cfg = DeviceConfig(serial_number="0PVP0000TEST0001", mac_address="aa:bb:cc:xx:xx:xx")
+        ha_client._config_cache["0PVP0000TEST0001"] = cfg
+        info = ha_client._Client__device_info_from_config("0PVP0000TEST0001")
+        assert "connections" not in info
+
     def test_device_info_with_hw_version(self, ha_client):
         cfg = DeviceConfig(serial_number="0PVP0000TEST0001", hw_version="2.0")
         ha_client._config_cache["0PVP0000TEST0001"] = cfg

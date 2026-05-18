@@ -713,7 +713,9 @@ class Client:
         if getattr(config, "hw_version", None):
             device_info["hw_version"] = config.hw_version
         if getattr(config, "mac_address", None):
-            device_info["connections"] = [["mac", config.mac_address]]
+            import re
+            if re.match(r"^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$", config.mac_address):
+                device_info["connections"] = [["mac", config.mac_address]]
 
         return device_info
 

@@ -345,13 +345,11 @@ class Client:
 
             # NOAH-specific message types (FE19 config, 0103 holding regs, etc.)
             noah_msg = parser.parse_noah_message(unscrambled)
-            if noah_msg:
-                LOG.debug("Parsed NOAH message: type=0x%04X device=%s", noah_msg.get("message_type"), noah_msg.get("device_id", ""))
-                if noah_msg.get("message_type") == 0xFE19:
-                    config = noah_msg.get("config")
-                    if config and config.serial_number:
-                        LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                        self.on_config(device_id, config)
+            if noah_msg and noah_msg.get("message_type") == 0xFE19 and device_id.startswith("0PVP"):
+                config = noah_msg.get("config")
+                if config and config.serial_number:
+                    LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+                    self.on_config(device_id, config)
                     return
 
             # Generic modbus message
