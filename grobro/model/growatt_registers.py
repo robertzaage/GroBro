@@ -166,3 +166,8 @@ with resources.files(__package__).joinpath("growatt_nexa_registers.json").open("
     KNOWN_NEXA_REGISTERS = GroBroRegisters.model_validate(json.load(f))
 with resources.files(__package__).joinpath("growatt_spf_registers.json").open("rb") as f:
     KNOWN_SPF_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+# XH/TL-XH/TL-XH2 hybrid inverter family (ShineWiFi-X2 dongle, ZGQ serial prefix).
+# Provisional: starts as a copy of NEO; actual XH register map needs verification
+# against live data. See https://github.com/robertzaage/GroBro/issues/<TBD>
+with resources.files(__package__).joinpath("growatt_xh_registers.json").open("rb") as f:
+    KNOWN_XH_REGISTERS = GroBroRegisters.model_validate(json.load(f))

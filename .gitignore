@@ -5,3 +5,4 @@ grobro.egg-info
 .coverage
 coverage.xml
 htmlcov/
+.venv/

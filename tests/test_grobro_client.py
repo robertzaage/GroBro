@@ -446,3 +446,32 @@ class TestClientForward:
                 client._Client__on_message_forward_client(None, None, _msg(
                     "s/device1", b"data",
                 ))
+
+
+class TestExtractDeviceId:
+    """Tests for _extract_device_id, which sanitizes the device serial from MQTT topics."""
+
+    def test_clean_neo_serial(self):
+        from grobro.grobro.client import _extract_device_id
+        assert _extract_device_id("c/33/QMN000ABC123") == "QMN000ABC123"
+
+    def test_clean_noah_serial(self):
+        from grobro.grobro.client import _extract_device_id
+        assert _extract_device_id("c/0PVP000ABC123") == "0PVP000ABC123"
+
+    def test_strips_trailing_control_char(self):
+        """ShineWiFi-X2 (XH/XH2 dongle) appends 0x18 after the serial in
+        SUBSCRIBE topics. Must be stripped to produce a clean device_id."""
+        from grobro.grobro.client import _extract_device_id
+        assert _extract_device_id("s/33/ZGQ0F5601J\x18") == "ZGQ0F5601J"
+
+    def test_strips_question_mark(self):
+        """The same XH dongle quirk also produces topics like
+        `s/33/ZGQ0F5601J?\\x18` — the `?` is printable but not a valid
+        serial character, must be stripped."""
+        from grobro.grobro.client import _extract_device_id
+        assert _extract_device_id("s/33/ZGQ0F5601J?\x18") == "ZGQ0F5601J"
+
+    def test_strips_non_alphanumeric(self):
+        from grobro.grobro.client import _extract_device_id
+        assert _extract_device_id("c/X/AB-CD_EF.GH") == "ABCDEFGH"
