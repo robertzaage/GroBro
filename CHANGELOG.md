@@ -1,12 +1,8 @@
 ## v2.5.3
 
-### New Features
-+ ShineWeLink (RAQ) data loggers now fully register in Home Assistant: device type shows as "ShineWeLink", and the full config (model, firmware, MAC) is parsed from the 0x0129 config message
-+ Added `get_device_type_name('RAQ')` returning `"ShineWeLink"` instead of the literal `"RAQ"`
-
 ### Bug Fixes
-+ Fixed MQTT topic serial containing control characters (`\x10`) being used as HA device identifier — non-printable chars are now stripped from the topic-derived device_id
-+ Fixed ShineWeLink config messages (type 0x0129, function 0x29) being silently dropped — previously fell through all dispatch handlers with "Unknown modbus function 41"
++ Fixed MQTT topic serial containing control characters being used as HA device identifier
++ Fixed ShineWeLink config messages (type 0x0129, function 0x29) being silently dropped
 
 ## v2.5.2
 
