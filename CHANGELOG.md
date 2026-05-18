@@ -1,3 +1,8 @@
+## v2.6.3
+
+### Bug Fixes
++ Added missing device class `battery` to individual battery SOC sensors for NOAH and SPF devices, so they display with colored badges in Home Assistant (#181)
+
 ## v2.6.2
 
 ### New Features

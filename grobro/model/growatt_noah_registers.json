@@ -1042,6 +1042,7 @@
         "name": "Battery 2 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -1061,6 +1062,7 @@
         "name": "Battery 3 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -1080,6 +1082,7 @@
         "name": "Battery 4 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
@@ -1723,6 +1726,7 @@
         "name": "Battery 1 SoC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }

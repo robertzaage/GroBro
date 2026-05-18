@@ -377,6 +377,7 @@
         "name": "Battery SOC",
         "publish": true,
         "state_class": "measurement",
+        "device_class": "battery",
         "unit_of_measurement": "%",
         "icon": "mdi:percent"
       }
