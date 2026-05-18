@@ -274,6 +274,29 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
+    def test_shinewelink_config_0129(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkConfigDump.bin").read_bytes()
+        msg = _msg("c/33/RAQ0TEST01", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+
+    def test_topic_sanitization_normal(self, client):
+        data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
+        msg = _msg("c/33/QMN000ABC1D2E3FG", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+        dev_id, _ = client.on_config.call_args[0]
+        assert dev_id == "QMN000ABC1D2E3FG"
+
+    def test_topic_sanitization_control_chars(self, client):
+        data = (Path(DATA_DIR) / "NeoConfigTLV_340.bin").read_bytes()
+        msg = _msg("c/33/QMN000ABC1D2E3FG\x10", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_called_once()
+        dev_id, _ = client.on_config.call_args[0]
+        assert "\x10" not in dev_id
+        assert dev_id == "QMN000ABC1D2E3FG"
+
     def test_shinewelink_fe19_devstatus(self, client):
         data = (Path(DATA_DIR) / "ShineWeLinkFE19_DevStatus1.bin").read_bytes()
         msg = _msg("c/33/RAQ0E8H042", data)

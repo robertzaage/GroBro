@@ -1,8 +1,17 @@
+## v2.5.3
+
+### New Features
++ ShineWeLink (RAQ) data loggers now fully register in Home Assistant: device type shows as "ShineWeLink", and the full config (model, firmware, MAC) is parsed from the 0x0129 config message
++ Added `get_device_type_name('RAQ')` returning `"ShineWeLink"` instead of the literal `"RAQ"`
+
+### Bug Fixes
++ Fixed MQTT topic serial containing control characters (`\x10`) being used as HA device identifier — non-printable chars are now stripped from the topic-derived device_id
++ Fixed ShineWeLink config messages (type 0x0129, function 0x29) being silently dropped — previously fell through all dispatch handlers with "Unknown modbus function 41"
+
 ## v2.5.2
 
 ### Bug Fixes
 + Fixed NOAH FE19 config messages using the config's serial number (data logger serial) as HA device identifier instead of the MQTT topic serial. This caused multiple devices behind a shared data logger to be merged into one device in Home Assistant (#178)
-+ Removed wrong registers introduced in v2.5.0 from NOAH mapping
 
 ## v2.5.1
 

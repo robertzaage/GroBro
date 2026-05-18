@@ -64,7 +64,7 @@ def get_device_type_name(device_id: str) -> str:
     if device_id.startswith("HAQ"):
         return "SPF"
     if device_id.startswith("RAQ"):
-        return "RAQ"
+        return "ShineWeLink"
     return "UNKNOWN"
 
 

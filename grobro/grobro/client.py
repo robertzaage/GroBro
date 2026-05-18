@@ -206,7 +206,7 @@ class Client:
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
-            device_id = msg.topic.split("/")[-1]
+            device_id = "".join(c for c in msg.topic.split("/")[-1] if c.isprintable())
             if GROWATT_CLOUD_ENABLED:
                 if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
                     try:
@@ -240,18 +240,20 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug("Received: %s %s", msg.topic, unscrambled.hex(" "))
 
-            # Config Message
-            msg_type = struct.unpack_from(">H", unscrambled, 4)[0]
-            # NOAH=387 NEO=340,341
-            if msg_type in (387, 340, 341):
+            # Read msg_type from both possible offsets
+            msg_type_4 = struct.unpack_from(">H", unscrambled, 4)[0]
+            msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
+
+            # Config TLV: NEO=340,341 / NOAH=387 at offset 4; ShineWeLink=0x0129 at offset 6
+            if msg_type_4 in (340, 341, 387) or msg_type == 0x0129:
                 config_offset = parser.find_config_offset(unscrambled)
                 config = parser.parse_config_type(unscrambled, config_offset)
-                self.on_config(device_id, config)
-                LOG.info(f"Received config message for {device_id}")
+                if config and (msg_type_4 in (340, 341, 387) or config.serial_number):
+                    self.on_config(device_id, config)
+                    LOG.info("Received config message for %s", device_id)
                 return
 
             # Config READ response (281)
-            msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
             if msg_type == 281:
                 cfg = parser.parse_config_message(unscrambled)
                 LOG.info(

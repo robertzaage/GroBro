@@ -87,7 +87,7 @@ class TestHelpers:
         assert r is not None
 
     def test_get_device_type_name_raq(self):
-        assert get_device_type_name("RAQ0E8H042") == "RAQ"
+        assert get_device_type_name("RAQ0E8H042") == "ShineWeLink"
 
     def test_get_device_type_name_unknown(self):
         assert get_device_type_name("UNKNOWN") == "UNKNOWN"
