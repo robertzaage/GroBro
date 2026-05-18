@@ -831,3 +831,73 @@ class TestEdgeCases:
         cmps = payload.get("cmps", {})
         cmp_names = [v["name"] for v in cmps.values()]
         assert any("Online" in n for n in cmp_names)
+
+
+class TestCombinedSerial:
+    def test_combined_serial_in_state_payload(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = {
+            "bat1_temp": 24,
+            "bat2_ser_part_1": "SN02",
+            "bat2_ser_part_2": "ABCD",
+            "bat2_ser_part_3": "EFGH",
+            "bat2_ser_part_4": "IJKL",
+            "bat3_ser_part_1": "SN03",
+            "bat4_ser_part_1": "SN04",
+            "bat4_ser_part_2": "BAT4",
+        }
+        state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload=dict(payload))
+        ha_client.publish_input_register(state)
+        published = None
+        for entry in ha_client._client.publish.call_args_list:
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                published = json.loads(entry.args[1])
+                break
+        assert published is not None
+        assert published.get("bat1_temp") == 24
+        assert published.get("bat2_serial") == "SN02ABCDEFGHIJKL"
+        assert published.get("bat3_serial") == "SN03"
+        assert published.get("bat4_serial") == "SN04BAT4"
+        assert "bat2_ser_part_1" not in published
+        assert "bat2_ser_part_2" not in published
+        assert "bat2_ser_part_3" not in published
+        assert "bat2_ser_part_4" not in published
+
+    def test_combined_serial_respects_max_bat(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = {
+            "bat1_temp": 24,
+            "bat2_ser_part_1": "SN002",
+            "bat2_ser_part_2": "ABCD",
+            "bat3_ser_part_1": "SN003",
+        }
+        with patch("grobro.ha.client.MAX_BAT", 1):
+            state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload=dict(payload))
+            ha_client.publish_input_register(state)
+        published = None
+        for entry in ha_client._client.publish.call_args_list:
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                published = json.loads(entry.args[1])
+                break
+        assert published is not None
+        assert "bat2_serial" not in published
+        assert "bat3_serial" not in published
+
+    def test_discovery_excludes_ser_part_includes_combined(self):
+        with patch("grobro.ha.client.mqtt.Client") as mc:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                c._Client__publish_device_discovery("0PVP0000TEST0001")
+        discovery_calls = [c for c in mc.return_value.publish.call_args_list
+                           if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
+        assert discovery_calls
+        payload = json.loads(discovery_calls[-1][0][1])
+        cmps = payload.get("cmps", {})
+        cmp_names = [v["name"] for v in cmps.values()]
+        # No ser_part entities
+        assert not any("Ser Part" in n for n in cmp_names)
+        assert not any("ser_part" in n for n in cmp_names)
+        # Combined serial entities present
+        assert any("Bat2 Serial" in n for n in cmp_names)
+        assert any("Bat3 Serial" in n for n in cmp_names)
+        assert any("Bat4 Serial" in n for n in cmp_names)

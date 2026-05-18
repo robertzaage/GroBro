@@ -307,6 +307,20 @@ class Client:
                         else:
                             self._last_energy_values[device_key] = value
 
+        # Combine battery serial parts into single values
+        for bat_num in range(2, 5):
+            parts = []
+            for i in range(1, 5):
+                key = f"bat{bat_num}_ser_part_{i}"
+                val = payload.pop(key, None)
+                if val is not None:
+                    parts.append(str(val))
+            combined = "".join(parts).strip()
+            if combined:
+                payload[f"bat{bat_num}_serial"] = combined
+            else:
+                payload.pop(f"bat{bat_num}_serial", None)
+
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
@@ -539,6 +553,8 @@ class Client:
             bat_num = _get_bat_number(state_name)
             if bat_num is not None and bat_num > effective_max_bat:
                 continue
+            if "_ser_part_" in state_name:
+                continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
@@ -550,6 +566,21 @@ class Client:
                 "state_class": state.homeassistant.state_class,
                 "unit_of_measurement": state.homeassistant.unit_of_measurement,
                 "icon": state.homeassistant.icon,
+            }
+
+        # Combined battery serial entities
+        for bat_num in range(2, 5):
+            if bat_num > effective_max_bat:
+                continue
+            combined_name = f"bat{bat_num}_serial"
+            uid = f"grobro_{device_id}_{combined_name}"
+            payload["cmps"][uid] = {
+                "platform": "sensor",
+                "name": f"Bat{bat_num} Serial",
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
+                "unique_id": uid,
+                "icon": "mdi:identifier",
             }
 
         # Serial Number Entity

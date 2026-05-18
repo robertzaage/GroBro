@@ -505,6 +505,11 @@ serial parts have data (e.g. sanitized test data), falls back to `4`. Set to an
 integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
 in both `publish_input_register` and `__publish_device_discovery`.
 
+After filtering, the four `bat{N}_ser_part_{1-4}` values are concatenated into a
+single `bat{N}_serial` key in the state payload, and the individual part keys are
+removed. Discovery skips `_ser_part_` entities and instead publishes a single
+`Bat{N} Serial` sensor per battery.
+
 ---
 
 ## 4. Extending GroBro
