@@ -4,7 +4,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
 from paho.mqtt.client import MQTTMessage
 
 from grobro import ha, grobro

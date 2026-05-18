@@ -499,8 +499,11 @@ avoids false matches on `batteryCycles` and `batteryPackageQuantity` (common in 
 register files). Both `bat1_temp` and `bat_2_ser_part_1` fall into the same `elif
 name.startswith("bat"):` branch — the code does not distinguish them at the prefix level.
 
-When `MAX_BAT` (env var or config option) is set, registers with `bat_number > MAX_BAT`
-are filtered out before publishing.
+`MAX_BAT` controls how many battery packs appear in HA. Default `"auto"` calls
+`_detect_bat_count(payload)` which checks `bat{2,3,4}_ser_part_1` values. When no
+serial parts have data (e.g. sanitized test data), falls back to `4`. Set to an
+integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
+in both `publish_input_register` and `__publish_device_discovery`.
 
 ---
 
@@ -844,7 +847,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `4` | Limits battery packs published to HA set to `0` for no limit) |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat{N}_ser_part_1` presence; set to a number to override. |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
@@ -881,7 +884,7 @@ file contents before parsing. The `reg_msg_decoder` tool handles this automatica
 | Config read stalls | All inflight config reads time out (60 s) before completing. Check that the device responds to `s/33/<id>` commands. Each timeout logs a warning and advances to the next queued register. |
 | Battery temperature shows `-273.1` | The inverter reports this sentinel when the battery BMS is offline or not yet communicating. It is replaced with `null` before HA publishing. |
 | SPF registers all zero | The SPF inverter may be in standby or not generating. Check `op_mode` register (enum maps in register file). |
-| NEXA shows extra empty battery slots | `MAX_BAT` is set too high or not set (default 4). The system only has 1 battery but reports slots 1–4. Lower `MAX_BAT` or set to the actual battery count. |
+| NEXA shows extra empty battery slots | `MAX_BAT` is set too high or serials are empty. Default `"auto"` falls back to 4 when no serials detected. Set `MAX_BAT=1` to override. |
 | Duplicate discovery topics on broker | Restarting GroBro re-publishes all device discovery payloads. HA handles duplicates gracefully (last wins). Old entity-based discovery is cleaned up via `__migrate_entity_discovery`. |
 
 ### 8.4 Testing with a second broker

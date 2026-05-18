@@ -1,6 +1,6 @@
 name: "GroBro"
 description: "Growatt MQTT Message Broker"
-version: "2.5.3"
+version: "2.6.2"
 slug: "grobro"
 init: false
 url: https://github.com/robertzaage/GroBro
@@ -37,7 +37,7 @@ options:
   DUMP_MESSAGES: false
   DUMP_DIR: "/share/GroBro/dump"
   MAX_SLOTS: 1
-  MAX_BAT: 4
+  MAX_BAT: "auto"
   AVAILABILITY_SENSOR: false
   FILTER_DATA_GLITCHES: false
   TZ: ""
@@ -62,7 +62,7 @@ schema:
   DUMP_DIR: "str?"
   DEVICE_TIMEOUT: "int?"
   MAX_SLOTS: "int?"
-  MAX_BAT: "int?"
+  MAX_BAT: "str?"
   AVAILABILITY_SENSOR: bool
   FILTER_DATA_GLITCHES: bool
   TZ: str

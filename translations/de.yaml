@@ -52,7 +52,7 @@ configuration:
     description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (nur NOAH, max 9). Standard ist 1.
   MAX_BAT:
     name: MAX_BAT
-    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Stelle dies auf die tatsächliche Anzahl deiner Batterien ein. Standard ist 4.
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung anhand der Seriennummern, oder eine Zahl für manuelle Einstellung.
   DUMP_DIR:
     name: DUMP_DIR
     description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.

@@ -31,12 +31,40 @@ DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
 AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
 MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
-MAX_BAT = int(os.getenv("MAX_BAT", "4"))
+MAX_BAT_RAW = os.getenv("MAX_BAT", "auto")
+try:
+    MAX_BAT: int | str = int(MAX_BAT_RAW)
+except ValueError:
+    MAX_BAT = MAX_BAT_RAW
 FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
+_MAX_BAT_CACHE: dict[str, int] = {}
 
 # ------------------- Helpfunctions -------------------
+
+def _detect_bat_count(payload: dict) -> int:
+    count = 1
+    any_found = False
+    for bat_num in range(2, 5):
+        key = f"bat{bat_num}_ser_part_1"
+        val = payload.get(key)
+        if val is not None and str(val).strip():
+            count += 1
+            any_found = True
+    if not any_found:
+        return 4
+    return count
+
+
+def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
+    if isinstance(MAX_BAT, int):
+        return MAX_BAT
+    if payload is not None:
+        c = _detect_bat_count(payload)
+        _MAX_BAT_CACHE[device_id] = c
+        return c
+    return _MAX_BAT_CACHE.get(device_id, 4)
 
 def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
     """Ermittle passende Register-Sammlung anhand device_id-Präfix."""
@@ -227,8 +255,9 @@ class Client:
 
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
+        effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
         # discovery + availability
-        self.__publish_device_discovery(state.device_id)
+        self.__publish_device_discovery(state.device_id, effective_max_bat)
         self.__publish_availability(state.device_id, True)
         if DEVICE_TIMEOUT > 0:
             self.__reset_device_timer(state.device_id)
@@ -250,10 +279,9 @@ class Client:
                     if isinstance(value, (int, float)) and value == -273.1:
                         payload[key] = None
 
-        # Filter out battery values exceeding MAX_BAT
         for key in list(payload.keys()):
             bat_num = _get_bat_number(key)
-            if bat_num is not None and bat_num > MAX_BAT:
+            if bat_num is not None and bat_num > effective_max_bat:
                 del payload[key]
 
         # ENUM Mapping (must come AFTER our replacement!)
@@ -423,11 +451,13 @@ class Client:
                 retain=PUBLISH_SENSORS_RETAINED,
             )
 
-    def __publish_device_discovery(self, device_id: str):
+    def __publish_device_discovery(self, device_id: str, effective_max_bat: int | None = None):
         known_registers = get_known_registers(device_id)
         if not known_registers:
             LOG.info("Unable to publish unknown device type: %s", device_id)
             return
+        if effective_max_bat is None:
+            effective_max_bat = _resolve_max_bat(device_id)
 
         self.__migrate_entity_discovery(device_id, known_registers)
 
@@ -507,7 +537,7 @@ class Client:
             if not state.homeassistant.publish:
                 continue
             bat_num = _get_bat_number(state_name)
-            if bat_num is not None and bat_num > MAX_BAT:
+            if bat_num is not None and bat_num > effective_max_bat:
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
             payload["cmps"][unique_id] = {

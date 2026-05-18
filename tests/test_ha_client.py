@@ -13,6 +13,9 @@ from grobro.ha.client import (
     make_modbus_command,
     iter_command_registers,
     _get_bat_number,
+    _detect_bat_count,
+    _resolve_max_bat,
+    _MAX_BAT_CACHE,
 )
 from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
@@ -679,7 +682,76 @@ class TestMaxBat:
 
     def test_max_bat_default(self):
         from grobro.ha.client import MAX_BAT
-        assert MAX_BAT == 4
+        assert MAX_BAT == "auto"
+
+    def test_detect_bat_count_all_empty(self):
+        payload = {"bat1_temp": 24.0}
+        assert _detect_bat_count(payload) == 4
+
+    def test_detect_bat_count_bat2_present(self):
+        payload = {"bat2_ser_part_1": "ABC123"}
+        assert _detect_bat_count(payload) == 2
+
+    def test_detect_bat_count_bat2_bat3_present(self):
+        payload = {"bat2_ser_part_1": "ABC123", "bat3_ser_part_1": "DEF456"}
+        assert _detect_bat_count(payload) == 3
+
+    def test_detect_bat_count_bat2_bat3_bat4_present(self):
+        payload = {"bat2_ser_part_1": "A", "bat3_ser_part_1": "B", "bat4_ser_part_1": "C"}
+        assert _detect_bat_count(payload) == 4
+
+    def test_resolve_max_bat_int(self):
+        with patch("grobro.ha.client.MAX_BAT", 2):
+            assert _resolve_max_bat("device1") == 2
+            assert _resolve_max_bat("device1", {"bat2_ser_part_1": "X"}) == 2
+
+    def test_resolve_max_bat_auto_caches(self):
+        _MAX_BAT_CACHE.clear()
+        with patch("grobro.ha.client.MAX_BAT", "auto"):
+            payload = {"bat2_ser_part_1": "X", "bat3_ser_part_1": "Y"}
+            assert _resolve_max_bat("device1", payload) == 3
+            assert _MAX_BAT_CACHE.get("device1") == 3
+
+    def test_resolve_max_bat_auto_fallback_no_payload(self):
+        _MAX_BAT_CACHE.clear()
+        with patch("grobro.ha.client.MAX_BAT", "auto"):
+            assert _resolve_max_bat("unknown") == 4
+
+    def test_auto_mode_keeps_all_when_serials_empty(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = {"bat1_temp": 24, "bat2_temp": 25, "bat3_temp": 26, "bat4_temp": 27}
+        with patch("grobro.ha.client.MAX_BAT", "auto"):
+            state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload=dict(payload))
+            ha_client.publish_input_register(state)
+        published = None
+        for entry in ha_client._client.publish.call_args_list:
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                published = json.loads(entry.args[1])
+                break
+        assert published is not None
+        assert published.get("bat1_temp") == 24
+        assert published.get("bat2_temp") == 25
+        assert published.get("bat3_temp") == 26
+        assert published.get("bat4_temp") == 27
+
+    def test_auto_mode_with_bat2_serial_shows_correct_batteries(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        payload = {
+            "bat1_temp": 24, "bat2_temp": 25, "bat3_temp": 26,
+            "bat2_ser_part_1": "SN002",
+        }
+        with patch("grobro.ha.client.MAX_BAT", "auto"):
+            state = HomeAssistantInputRegister(device_id="0PVP0000TEST0002", payload=dict(payload))
+            ha_client.publish_input_register(state)
+        published = None
+        for entry in ha_client._client.publish.call_args_list:
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0002/state":
+                published = json.loads(entry.args[1])
+                break
+        assert published is not None
+        assert published.get("bat1_temp") == 24
+        assert published.get("bat2_temp") == 25
+        assert "bat3_temp" not in published
 
 
 class TestEdgeCases:

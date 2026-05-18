@@ -1,4 +1,7 @@
-## v2.5.3
+## v2.6.2
+
+### New Features
++ `MAX_BAT=auto` is now the default. The number of battery packs is detected automatically. You can still override with `MAX_BAT=1`, `MAX_BAT=2`, etc.
 
 ### Bug Fixes
 + Fixed MQTT topic serial containing control characters being used as HA device identifier

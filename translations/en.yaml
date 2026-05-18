@@ -52,7 +52,7 @@ configuration:
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH only, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
-    description: How many battery packs to display in Home Assistant. Set this to match how many batteries your system has. Default is 4.
+    description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect automatically from serial numbers, or a number to override.
   DUMP_DIR:
     name: DUMP_DIR
     description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share
