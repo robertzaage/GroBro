@@ -303,6 +303,12 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         client.on_config.assert_not_called()
 
+    def test_shinewelink_fe19_devstatus2(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkFE19_DevStatus2.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        client._client.on_message(None, None, msg)
+        client.on_config.assert_not_called()
+
     def test_shinewelink_input_register(self, client):
         data = (Path(DATA_DIR) / "ShineWeLinkReadInputRegisters.bin").read_bytes()
         msg = _msg("c/33/RAQ0E8H042", data)
@@ -314,6 +320,12 @@ class TestClientOnMessage:
         msg = _msg("c/33/RAQ0E8H042", data)
         # Function 3 is parsed by parse_grobro but not routed to a callback
         client._client.on_message(None, None, msg)
+
+    def test_shinewelink_fe25_keepalive(self, client):
+        data = (Path(DATA_DIR) / "ShineWeLinkFE25_Keepalive.bin").read_bytes()
+        msg = _msg("c/33/RAQ0E8H042", data)
+        client._client.on_message(None, None, msg)
+        # keepalive, no callbacks
 
     def test_dump_messages_in_on_message(self, client):
         with patch("grobro.grobro.client.DUMP_MESSAGES", True):

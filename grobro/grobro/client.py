@@ -248,7 +248,7 @@ class Client:
             if msg_type_4 in (340, 341, 387) or msg_type == 0x0129:
                 config_offset = parser.find_config_offset(unscrambled)
                 config = parser.parse_config_type(unscrambled, config_offset)
-                if config and (msg_type_4 in (340, 341, 387) or config.serial_number):
+                if config and (msg_type_4 in (340, 341, 387) or msg_type == 0x0129 or config.serial_number):
                     self.on_config(device_id, config)
                     LOG.info("Received config message for %s", device_id)
                 return
@@ -414,7 +414,7 @@ class Client:
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
-            device_id = msg.topic.split("/")[-1]
+            device_id = "".join(c for c in msg.topic.split("/")[-1] if c.isprintable())
             if not GROWATT_CLOUD_ENABLED:
                 return
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:
