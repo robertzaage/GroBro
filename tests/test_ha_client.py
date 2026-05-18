@@ -244,7 +244,7 @@ class TestClientLifecycle:
 class TestClientConfig:
     def test_set_config_new(self, ha_client):
         cfg = DeviceConfig(serial_number="QMN000ABC1D2E3FG")
-        ha_client.set_config(cfg)
+        ha_client.set_config("QMN000ABC1D2E3FG", cfg)
         assert ha_client._config_cache["QMN000ABC1D2E3FG"] == cfg
         # discovery should attempt publish
         assert ha_client._client.publish.called
@@ -255,7 +255,22 @@ class TestClientConfig:
         ha_client._discovery_cache.append("QMN000ABC1D2E3FG")
         with patch("grobro.ha.client.model.DeviceConfig.from_file") as from_file:
             from_file.return_value = cfg
-            ha_client.set_config(cfg)
+            ha_client.set_config("QMN000ABC1D2E3FG", cfg)
+
+    def test_set_config_topic_serial_trumps_config_serial(self, ha_client):
+        """set_config must use the MQTT topic serial (device_id), not config.serial_number,
+        to avoid merging multiple devices behind a shared data logger (#178)."""
+        topic_serial = "RAQ0TEST01"
+        fe19_serial = "PTQ0TEST01"
+        cfg = DeviceConfig(serial_number=fe19_serial)
+        ha_client.set_config(topic_serial, cfg)
+        assert ha_client._config_cache[topic_serial] == cfg
+        assert fe19_serial not in ha_client._config_cache
+        discovery_topic_called = any(
+            f"/device/{topic_serial}/config" in c[0][0]
+            for c in ha_client._client.publish.call_args_list
+        )
+        assert discovery_topic_called, f"Discovery should use topic serial '{topic_serial}'"
 
 
 class TestClientPublishInput:

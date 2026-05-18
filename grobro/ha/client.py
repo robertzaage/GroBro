@@ -209,16 +209,15 @@ class Client:
 
     # ------------------- Config Handling -------------------
 
-    def set_config(self, config: model.DeviceConfig):
-        device_id = config.serial_number
-        config_path = f"config_{config.device_id}.json"
+    def set_config(self, device_id: str, config: model.DeviceConfig):
+        config_path = f"config_{device_id}.json"
         existing_config = model.DeviceConfig.from_file(config_path)
         if existing_config is None or existing_config != config:
-            LOG.info(f"Saving updated config for {config.device_id}")
+            LOG.info(f"Saving updated config for {device_id}")
             config.to_file(config_path)
         else:
-            LOG.debug(f"No config change for {config.device_id}")
-        self._config_cache[config.device_id] = config
+            LOG.debug(f"No config change for {device_id}")
+        self._config_cache[device_id] = config
 
         if device_id in self._discovery_cache:
             self._discovery_cache.remove(device_id)

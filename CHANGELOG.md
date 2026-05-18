@@ -1,3 +1,8 @@
+## v2.5.2
+
+### Bug Fixes
++ Fixed NOAH FE19 config messages using the config's serial number (data logger serial) as HA device identifier instead of the MQTT topic serial. This caused multiple devices behind a shared data logger to be merged into one device in Home Assistant (#178)
+
 ## v2.5.1
 
 ### Bug Fixes

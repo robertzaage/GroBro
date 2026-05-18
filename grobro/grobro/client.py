@@ -63,7 +63,7 @@ MQTT_PROP_DRY_RUN.UserProperty = [("dry-run", "true")]
 
 
 class Client:
-    on_config: Callable[[model.DeviceConfig], None]
+    on_config: Callable[[str, model.DeviceConfig], None]
     on_input_register: Callable[HomeAssistantInputRegister, None]
     on_holding_register_input: Callable[HomeAssistantHoldingRegisterInput, None]
 
@@ -246,7 +246,7 @@ class Client:
             if msg_type in (387, 340, 341):
                 config_offset = parser.find_config_offset(unscrambled)
                 config = parser.parse_config_type(unscrambled, config_offset)
-                self.on_config(config)
+                self.on_config(device_id, config)
                 LOG.info(f"Received config message for {device_id}")
                 return
 
@@ -335,7 +335,7 @@ class Client:
                     config = noah_msg.get("config")
                     if config and config.serial_number:
                         LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                        self.on_config(config)
+                        self.on_config(device_id, config)
                     return
 
             # Generic modbus message
