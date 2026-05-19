@@ -166,3 +166,10 @@ with resources.files(__package__).joinpath("growatt_nexa_registers.json").open("
     KNOWN_NEXA_REGISTERS = GroBroRegisters.model_validate(json.load(f))
 with resources.files(__package__).joinpath("growatt_spf_registers.json").open("rb") as f:
     KNOWN_SPF_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+# MIN TL-XH2 hybrid inverter family (ShineWiFi-X2 dongle, ZGQ serial prefix).
+# This is gen-2 specifically — XH gen 1 (ShineWiFi-X) uses the legacy port-5279
+# protocol handled by Grott, not GroBro. Starts as a copy of NEO with the same
+# register layout for the inverter core (block 3000-3499); battery/BMS/EPS/BDC
+# register positions are unverified pending an XH2 owner with a battery installed.
+with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("rb") as f:
+    KNOWN_XH2_REGISTERS = GroBroRegisters.model_validate(json.load(f))

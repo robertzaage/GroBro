@@ -5,6 +5,7 @@ Client for the grobro mqtt side, handling messages from/to
 """
 
 import os
+import re
 import struct
 import logging
 import ssl
@@ -25,7 +26,27 @@ from grobro.model.mqtt_config import MQTTConfig
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
-from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS, KNOWN_NOAH_REGISTERS, KNOWN_NEXA_REGISTERS, KNOWN_SPF_REGISTERS
+from grobro.model.growatt_registers import (
+    KNOWN_NEO_REGISTERS,
+    KNOWN_NOAH_REGISTERS,
+    KNOWN_NEXA_REGISTERS,
+    KNOWN_SPF_REGISTERS,
+    KNOWN_XH2_REGISTERS,
+)
+
+
+_DEVICE_ID_RE = re.compile(r"[^A-Za-z0-9]")
+
+
+def _extract_device_id(topic: str) -> str:
+    """Extract the device serial from the last segment of an MQTT topic.
+
+    Growatt device serials are alphanumeric (A-Z, 0-9). Some dongles
+    (e.g. ShineWiFi-X2 / XH family) include stray trailing bytes in the
+    SUBSCRIBE topic, such as `s/33/ZGQ0F5601J?\\x18`. Strip everything
+    that isn't a valid serial character.
+    """
+    return _DEVICE_ID_RE.sub("", topic.split("/")[-1])
 
 
 LOG = logging.getLogger(__name__)
@@ -207,7 +228,7 @@ class Client:
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
-            device_id = "".join(c for c in msg.topic.split("/")[-1] if c.isprintable())
+            device_id = _extract_device_id(msg.topic)
             if GROWATT_CLOUD_ENABLED:
                 if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
                     try:
@@ -301,7 +322,10 @@ class Client:
                         known_registers = KNOWN_NEO_REGISTERS
                     # NEO 1000M-X LoRa (encapsulated)
                     elif cfg["device_id"].startswith("PTQ"):
-                        known_registers = KNOWN_NEO_REGISTERS                        
+                        known_registers = KNOWN_NEO_REGISTERS
+                    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
+                    elif cfg["device_id"].startswith("ZGQ"):
+                        known_registers = KNOWN_XH2_REGISTERS
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -372,6 +396,9 @@ class Client:
                     known_registers = KNOWN_NEO_REGISTERS
                 elif modbus_device_id.startswith("PTQ"):
                     known_registers = KNOWN_NEO_REGISTERS
+                # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
+                elif modbus_device_id.startswith("ZGQ"):
+                    known_registers = KNOWN_XH2_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return
@@ -430,7 +457,7 @@ class Client:
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
-            device_id = "".join(c for c in msg.topic.split("/")[-1] if c.isprintable())
+            device_id = _extract_device_id(msg.topic)
             if not GROWATT_CLOUD_ENABLED:
                 return
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:

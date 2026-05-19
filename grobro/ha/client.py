@@ -19,7 +19,8 @@ from grobro.model.growatt_registers import (
     KNOWN_NEO_REGISTERS,
     KNOWN_NOAH_REGISTERS,
     KNOWN_NEXA_REGISTERS,
-    KNOWN_SPF_REGISTERS
+    KNOWN_SPF_REGISTERS,
+    KNOWN_XH2_REGISTERS,
 )
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_function import (
@@ -81,6 +82,9 @@ def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
         return KNOWN_SPF_REGISTERS
     if device_id.startswith("RAQ") or device_id.startswith("PTQ"):
         return KNOWN_NEO_REGISTERS
+    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
+    if device_id.startswith("ZGQ"):
+        return KNOWN_XH2_REGISTERS
     return None
 
 
@@ -96,6 +100,8 @@ def get_device_type_name(device_id: str) -> str:
         return "SPF"
     if device_id.startswith("RAQ"):
         return "ShineWeLink"
+    if device_id.startswith("ZGQ"):
+        return "MIN-XH2"
     return "UNKNOWN"
 
 
