@@ -2,6 +2,7 @@
 
 ### New Features
 + NEO 2000 inverters (4 MPPT inputs) now expose PV3 and PV4 voltage, current, and power sensors. Detection is automatic - GroBro compares total PV power against individual MPPT sums at runtime. No configuration needed (#182)
++ Added TL-XH2 inverter support (ZGQ serial prefix). The XH2 family shares the NEO register map and exposes grid import/export power, load power, battery state, BMS telemetry, and diagnostic sensors with XH2-specific names and publish defaults (#185)
 
 ### Bug Fixes
 + Added missing device class `battery` to individual battery SOC sensors for NOAH and SPF devices, so they display with colored badges in Home Assistant (#181)
