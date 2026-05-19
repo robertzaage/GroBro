@@ -734,8 +734,7 @@ class TestClientNoahOnMessage:
         assert published.get("out_power") == 356.0
         assert published.get("bat1_temp") == 24.0
         assert published.get("bat_1_soc_pct") == 100
-        assert "bat2_temp" in published
-        assert published["bat2_temp"] is None
+        assert "bat2_temp" not in published
         assert published.get("tot_bat_soc_pct") == 100
         assert published.get("bat_cnt") == 1
         assert published.get("bat_cyclecnt") == 14
@@ -793,15 +792,31 @@ class TestMaxBat:
         payload = {"bat1_temp": 24.0}
         assert _detect_bat_count(payload) == 4
 
-    def test_detect_bat_count_bat2_present(self):
-        payload = {"bat2_ser_part_1": "ABC123"}
+    def test_detect_bat_count_bat_cnt_1_empty_serials(self):
+        """Tower 2: 1 battery, serial parts empty → bat_cnt wins (was returning 4)."""
+        payload = {"bat_cnt": 1, "bat2_ser_part_1": "", "bat3_ser_part_1": "", "bat4_ser_part_1": ""}
+        assert _detect_bat_count(payload) == 1
+
+    def test_detect_bat_count_bat_cnt_overrides_serials(self):
+        """bat_cnt takes priority even when serial parts have values."""
+        payload = {"bat_cnt": 1, "bat2_ser_part_1": "SN002"}
+        assert _detect_bat_count(payload) == 1
+
+    def test_detect_bat_count_bat_cnt_2(self):
+        """Tower 1: 2 batteries."""
+        payload = {"bat_cnt": 2, "bat2_ser_part_1": "SN002"}
         assert _detect_bat_count(payload) == 2
 
-    def test_detect_bat_count_bat2_bat3_present(self):
-        payload = {"bat2_ser_part_1": "ABC123", "bat3_ser_part_1": "DEF456"}
+    def test_detect_bat_count_serial_fallback(self):
+        """No bat_cnt in payload → detect from serial parts."""
+        payload = {"bat2_ser_part_1": "SN002"}
+        assert _detect_bat_count(payload) == 2
+
+    def test_detect_bat_count_serial_multi(self):
+        payload = {"bat2_ser_part_1": "A", "bat3_ser_part_1": "B"}
         assert _detect_bat_count(payload) == 3
 
-    def test_detect_bat_count_bat2_bat3_bat4_present(self):
+    def test_detect_bat_count_serial_all_four(self):
         payload = {"bat2_ser_part_1": "A", "bat3_ser_part_1": "B", "bat4_ser_part_1": "C"}
         assert _detect_bat_count(payload) == 4
 

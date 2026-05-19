@@ -44,6 +44,9 @@ _MAX_BAT_CACHE: dict[str, int] = {}
 # ------------------- Helpfunctions -------------------
 
 def _detect_bat_count(payload: dict) -> int:
+    bat_cnt = payload.get("bat_cnt")
+    if isinstance(bat_cnt, int) and bat_cnt >= 1:
+        return bat_cnt
     count = 1
     any_found = False
     for bat_num in range(2, 5):
