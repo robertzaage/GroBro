@@ -65,5 +65,6 @@ configuration:
   FILTER_DATA_GLITCHES:
     name: FILTER_DATA_GLITCHES
     description: Wenn aktiviert, werden Sprünge in total_increasing-Sensoren (Energiezähler, etc.) unterdrückt, nachdem ein Gerät wieder online geht. Standard ist deaktiviert.
+  TZ:
     name: Zeitzone
     sescription: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.
