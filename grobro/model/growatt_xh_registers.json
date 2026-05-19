@@ -140,7 +140,7 @@
       },
       "homeassistant": {
         "name": "Inverter run state. Indicate the machine status (web page display)",
-        "publish": false,
+        "publish": true,
         "icon": "mdi:alert-circle"
       }
     },
@@ -808,8 +808,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total forward power",
-        "publish": false,
+        "name": "Grid import power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -832,8 +832,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total reverse power",
-        "publish": false,
+        "name": "Grid export power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -856,8 +856,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total load power",
-        "publish": false,
+        "name": "Load power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -876,8 +876,8 @@
         }
       },
       "homeassistant": {
-        "name": "Work time total",
-        "publish": false,
+        "name": "Total work time",
+        "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "s",
         "icon": "mdi:information-outline"
@@ -1115,8 +1115,8 @@
         }
       },
       "homeassistant": {
-        "name": "Today energy to user",
-        "publish": false,
+        "name": "Grid import today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1139,8 +1139,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total energy to user",
-        "publish": false,
+        "name": "Lifetime grid import",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1163,8 +1163,8 @@
         }
       },
       "homeassistant": {
-        "name": "Today energy to grid",
-        "publish": false,
+        "name": "Grid export today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1187,8 +1187,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total energy to grid",
-        "publish": false,
+        "name": "Lifetime grid export",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1211,8 +1211,8 @@
         }
       },
       "homeassistant": {
-        "name": "Today energy of user load",
-        "publish": false,
+        "name": "Load consumption today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1235,8 +1235,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total energy of user load",
-        "publish": false,
+        "name": "Lifetime load consumption",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1301,7 +1301,7 @@
         "name": "PV ISO value",
         "publish": true,
         "state_class": "measurement",
-        "unit_of_measurement": "kΩ",
+        "unit_of_measurement": "k\u03a9",
         "icon": "mdi:omega"
       }
     },
@@ -1417,7 +1417,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -1441,7 +1441,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -1465,7 +1465,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -1489,7 +1489,7 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -1513,7 +1513,7 @@
         "publish": false,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -1557,8 +1557,8 @@
         }
       },
       "homeassistant": {
-        "name": "N Bus inside Voltage",
-        "publish": false,
+        "name": "N bus voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -1682,7 +1682,7 @@
       },
       "homeassistant": {
         "name": "Inverter fault code",
-        "publish": false,
+        "publish": true,
         "icon": "mdi:alert-circle"
       }
     },
@@ -1702,8 +1702,8 @@
         }
       },
       "homeassistant": {
-        "name": "Inverter Warning code",
-        "publish": false,
+        "name": "Inverter warning code",
+        "publish": true,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
       }
@@ -1916,8 +1916,8 @@
         }
       },
       "homeassistant": {
-        "name": "BDC connect state",
-        "publish": false,
+        "name": "Battery DC coupler state",
+        "publish": true,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
       }
@@ -1963,8 +1963,8 @@
         }
       },
       "homeassistant": {
-        "name": "Today discharge energy",
-        "publish": false,
+        "name": "Battery discharged today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -1987,8 +1987,8 @@
         }
       },
       "homeassistant": {
-        "name": "Discharge total energy of storge device",
-        "publish": false,
+        "name": "Lifetime battery discharged",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -2011,8 +2011,8 @@
         }
       },
       "homeassistant": {
-        "name": "Charge energy today",
-        "publish": false,
+        "name": "Battery charged today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -2035,8 +2035,8 @@
         }
       },
       "homeassistant": {
-        "name": "Charge total energy of storge device",
-        "publish": false,
+        "name": "Lifetime battery charged",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -2059,8 +2059,8 @@
         }
       },
       "homeassistant": {
-        "name": "Today energy of AC charge",
-        "publish": false,
+        "name": "AC charge today",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -2083,8 +2083,8 @@
         }
       },
       "homeassistant": {
-        "name": "Total energy of AC charge",
-        "publish": false,
+        "name": "Lifetime AC charge",
+        "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
         "unit_of_measurement": "kWh",
@@ -2561,7 +2561,7 @@
       },
       "homeassistant": {
         "name": "Battery voltage",
-        "publish": false,
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -2585,7 +2585,7 @@
       },
       "homeassistant": {
         "name": "Battery current",
-        "publish": false,
+        "publish": true,
         "state_class": "measurement",
         "device_class": "current",
         "unit_of_measurement": "A",
@@ -2608,8 +2608,8 @@
         }
       },
       "homeassistant": {
-        "name": "State of charge Capacity",
-        "publish": false,
+        "name": "Battery SOC",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
@@ -2732,7 +2732,7 @@
         "publish": false,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -2756,7 +2756,7 @@
         "publish": false,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -2776,8 +2776,8 @@
         }
       },
       "homeassistant": {
-        "name": "Discharge power",
-        "publish": false,
+        "name": "Battery discharge power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -2800,8 +2800,8 @@
         }
       },
       "homeassistant": {
-        "name": "Charge power",
-        "publish": false,
+        "name": "Battery charge power",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
@@ -2902,8 +2902,8 @@
         }
       },
       "homeassistant": {
-        "name": "Status from BMS",
-        "publish": false,
+        "name": "BMS status",
+        "publish": true,
         "icon": "mdi:alert-circle"
       }
     },
@@ -2967,8 +2967,8 @@
         }
       },
       "homeassistant": {
-        "name": "SOC from BMS",
-        "publish": false,
+        "name": "BMS SOC",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
@@ -2991,8 +2991,8 @@
         }
       },
       "homeassistant": {
-        "name": "Battery voltage from BMS",
-        "publish": false,
+        "name": "BMS battery voltage",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
@@ -3015,8 +3015,8 @@
         }
       },
       "homeassistant": {
-        "name": "Battery current from BMS",
-        "publish": false,
+        "name": "BMS battery current",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "current",
         "unit_of_measurement": "A",
@@ -3039,11 +3039,11 @@
         }
       },
       "homeassistant": {
-        "name": "Battery temperature from BMS",
-        "publish": false,
+        "name": "BMS battery temperature",
+        "publish": true,
         "state_class": "measurement",
         "device_class": "temperature",
-        "unit_of_measurement": "°C",
+        "unit_of_measurement": "\u00b0C",
         "icon": "mdi:thermometer"
       }
     },
@@ -3111,8 +3111,8 @@
         }
       },
       "homeassistant": {
-        "name": "Cycle Count from BMS",
-        "publish": false,
+        "name": "BMS cycle count",
+        "publish": true,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
       }
@@ -3133,8 +3133,8 @@
         }
       },
       "homeassistant": {
-        "name": "SOH from BMS",
-        "publish": false,
+        "name": "BMS state of health",
+        "publish": true,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
       }
