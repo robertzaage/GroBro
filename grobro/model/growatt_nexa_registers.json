@@ -1422,7 +1422,8 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%"
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
       }
     },
     "battery2Soc": {
@@ -1445,7 +1446,8 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%"
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
       }
     },
     "battery3Soc": {
@@ -1468,7 +1470,8 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%"
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
       }
     },
     "battery4Soc": {
@@ -1491,7 +1494,8 @@
         "publish": true,
         "state_class": "measurement",
         "device_class": "battery",
-        "unit_of_measurement": "%"
+        "unit_of_measurement": "%",
+        "icon": "mdi:percent"
       }
     },
     "register_71": {
