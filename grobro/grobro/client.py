@@ -31,7 +31,7 @@ from grobro.model.growatt_registers import (
     KNOWN_NOAH_REGISTERS,
     KNOWN_NEXA_REGISTERS,
     KNOWN_SPF_REGISTERS,
-    KNOWN_XH_REGISTERS,
+    KNOWN_XH2_REGISTERS,
 )
 
 
@@ -323,9 +323,9 @@ class Client:
                     # NEO 1000M-X LoRa (encapsulated)
                     elif cfg["device_id"].startswith("PTQ"):
                         known_registers = KNOWN_NEO_REGISTERS
-                    # MIN TL-XH / TL-XH2 hybrid inverters (ShineWiFi-X2 dongle)
+                    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                     elif cfg["device_id"].startswith("ZGQ"):
-                        known_registers = KNOWN_XH_REGISTERS
+                        known_registers = KNOWN_XH2_REGISTERS
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -398,9 +398,9 @@ class Client:
                     known_registers = KNOWN_NEO_REGISTERS
                 elif modbus_device_id.startswith("PTQ"):
                     known_registers = KNOWN_NEO_REGISTERS
-                # MIN TL-XH / TL-XH2 hybrid inverters (ShineWiFi-X2 dongle)
+                # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                 elif modbus_device_id.startswith("ZGQ"):
-                    known_registers = KNOWN_XH_REGISTERS
+                    known_registers = KNOWN_XH2_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return

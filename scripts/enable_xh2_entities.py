@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 One-shot script to enable HA publish for fields useful in a typical
-MIN-XH(2) deployment (grid+load+battery+core diagnostics) and to clean up
+MIN-XH2 deployment (grid+load+battery+core diagnostics) and to clean up
 some confusingly-named entities.
 
-Run from repo root: python scripts/enable_xh_entities.py
+Run from repo root: python scripts/enable_xh2_entities.py
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-JSON_PATH = Path(__file__).resolve().parent.parent / "grobro/model/growatt_xh_registers.json"
+JSON_PATH = Path(__file__).resolve().parent.parent / "grobro/model/growatt_xh2_registers.json"
 
 # Fields to enable + optional rename. Value None = keep existing name.
 ENABLE: dict[str, str | None] = {
