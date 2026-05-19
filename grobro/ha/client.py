@@ -225,6 +225,7 @@ class Client:
                     self._config_cache[config.device_id] = config
 
         self._discovery_payload_cache: dict[str, str] = {}
+        self._neo_pv_count: dict[str, int] = {}
 
     # ------------------- Lifecycle -------------------
 
@@ -256,6 +257,7 @@ class Client:
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
         effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
+        self.__detect_neo_pv_count(state.device_id, state.payload)
         # discovery + availability
         self.__publish_device_discovery(state.device_id, effective_max_bat)
         self.__publish_availability(state.device_id, True)
@@ -465,6 +467,27 @@ class Client:
                 retain=PUBLISH_SENSORS_RETAINED,
             )
 
+    def __detect_neo_pv_count(self, device_id: str, payload: dict) -> None:
+        if not (device_id.startswith("QMN") or device_id.startswith("PTQ")):
+            return
+        if device_id in self._neo_pv_count:
+            return
+
+        pv = payload.get("Ppv", 0) or 0
+        p1 = payload.get("Ppv1", 0) or 0
+        p2 = payload.get("Ppv2", 0) or 0
+        p3 = payload.get("Ppv3", 0) or 0
+        p4 = payload.get("Ppv4", 0) or 0
+
+        if pv > 0:
+            if abs(pv - (p1 + p2 + p3 + p4)) < 10 and (p3 > 0 or p4 > 0):
+                LOG.info("Detected NEO 4-PV-input inverter: %s (Ppv=%s, sum4=%s)", device_id, pv, p1 + p2 + p3 + p4)
+                self._neo_pv_count[device_id] = 4
+                return
+            if abs(pv - (p1 + p2)) < 10:
+                self._neo_pv_count[device_id] = 2
+                return
+
     def __publish_device_discovery(self, device_id: str, effective_max_bat: int | None = None):
         known_registers = get_known_registers(device_id)
         if not known_registers:
@@ -549,7 +572,8 @@ class Client:
         # States
         for state_name, state in known_registers.input_registers.items():
             if not state.homeassistant.publish:
-                continue
+                if not (self._neo_pv_count.get(device_id) == 4 and state_name in ("Vpv3", "Ipv3", "Ppv3", "Vpv4", "Ipv4", "Ppv4", "Epv3_today", "Epv3_total")):
+                    continue
             bat_num = _get_bat_number(state_name)
             if bat_num is not None and bat_num > effective_max_bat:
                 continue

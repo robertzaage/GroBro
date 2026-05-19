@@ -383,6 +383,28 @@ header with no additional framing:
 - **CRC**: NEO messages include a 2-byte CRC-16 (Modbus variant) at the end of every payload.
   `parse_grobro` validates this before parsing registers.
 
+- **PV input count**: NEO inverters come in 2-input (NEO 800/1000M-X) and 4-input (NEO 2000)
+  variants. GroBro detects the hardware variant at runtime by comparing total PV power against
+  the sum of individual MPPT powers:
+
+  ```python
+  # In ha/client.py __detect_neo_pv_count():
+  if abs(Ppv - (Ppv1+Ppv2+Ppv3+Ppv4)) < 10 and (Ppv3 > 0 or Ppv4 > 0):
+      count = 4  # NEO 2000
+  elif abs(Ppv - (Ppv1+Ppv2)) < 10:
+      count = 2  # NEO 800 / 1000M-X
+  ```
+
+  Detection runs once per device on the first payload with `Ppv > 0` (i.e. daylight hours).
+  The result is cached in `Client._neo_pv_count` and persists for the lifetime of the process.
+  Until detection fires, PV3/PV4 sensors remain hidden. Once detected as a 4-input inverter,
+  the discovery payload is re-published with the extra sensors enabled.
+
+  PV3/PV4 voltage, current, and power registers already exist in `growatt_neo_registers.json`
+  with `publish: false`. The NEO 2000 stores 32-bit power values across two adjacent registers
+  (e.g. Ppv3 at 3013||3014 with `size: 4`). The even register carries `0`, the odd register
+  carries the real scaled power — the 32-bit read correctly distills the true value.
+
 ### 2.10 NEXA / SPF notes
 
 NEXA batteries (0HVR) and SPF inverters (HAQ) share the same protocol framing as NEO. Their

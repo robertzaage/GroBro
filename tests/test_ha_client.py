@@ -21,6 +21,7 @@ from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMess
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 from grobro.model.mqtt_config import MQTTConfig
 from grobro.model.device_config import DeviceConfig
+from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.grobro.parser import unscramble
 
 
@@ -489,6 +490,104 @@ class TestClientDiscovery:
         assert any("Ppv/config" in t for t in topics)
         assert any("Fac/config" in t for t in topics)
         assert any("Inverter_Status/config" in t for t in topics)
+
+
+class TestNeoPvCountDetection:
+    def test_neo2000_detects_4_inputs_from_fixture(self, ha_client):
+        payload = _load_payload("NeoInputRegister_NEO2000.bin")
+        device_id = "QMN0ANONYMIZED01"
+        ha_client._Client__detect_neo_pv_count(device_id, payload)
+        assert ha_client._neo_pv_count.get(device_id) == 4
+
+    def test_non_neo_not_detected(self, ha_client):
+        ha_client._Client__detect_neo_pv_count(
+            "0PVP0000TEST0001", {"Ppv": 500, "Ppv1": 250, "Ppv2": 250}
+        )
+        assert "0PVP0000TEST0001" not in ha_client._neo_pv_count
+
+    def test_ptq_detected(self, ha_client):
+        ha_client._Client__detect_neo_pv_count(
+            "PTQ0TEST1234567", {"Ppv": 600, "Ppv1": 150, "Ppv2": 150, "Ppv3": 150, "Ppv4": 150}
+        )
+        assert ha_client._neo_pv_count.get("PTQ0TEST1234567") == 4
+
+    def test_zero_power_no_detection(self, ha_client):
+        ha_client._Client__detect_neo_pv_count(
+            "QMN000TESTDEVICE1", {"Ppv": 0, "Ppv1": 0, "Ppv2": 0, "Ppv3": 0, "Ppv4": 0}
+        )
+        assert "QMN000TESTDEVICE1" not in ha_client._neo_pv_count
+
+    def test_already_cached_returns_early(self, ha_client):
+        ha_client._neo_pv_count["QMN000CACHED1"] = 2
+        ha_client._Client__detect_neo_pv_count(
+            "QMN000CACHED1", {"Ppv": 999, "Ppv1": 100, "Ppv2": 100, "Ppv3": 400, "Ppv4": 400}
+        )
+        assert ha_client._neo_pv_count["QMN000CACHED1"] == 2
+
+    def test_2_input_neo_detected(self, ha_client):
+        ha_client._Client__detect_neo_pv_count(
+            "QMN000TEST2IN", {"Ppv": 500.0, "Ppv1": 250.0, "Ppv2": 250.0, "Ppv3": 0, "Ppv4": 0}
+        )
+        assert ha_client._neo_pv_count.get("QMN000TEST2IN") == 2
+
+    def test_sum4_mismatch_no_detection(self, ha_client):
+        ha_client._Client__detect_neo_pv_count(
+            "QMN000MISMATCH", {"Ppv": 500.0, "Ppv1": 100.0, "Ppv2": 100.0, "Ppv3": 100.0, "Ppv4": 100.0}
+        )
+        assert "QMN000MISMATCH" not in ha_client._neo_pv_count
+
+
+class TestNeoPvCountDiscovery:
+    def _get_discovery_payload(self, ha_client, device_id):
+        for call_args in ha_client._client.publish.call_args_list:
+            if call_args.args[0] == f"homeassistant/device/{device_id}/config" and call_args.args[1]:
+                return json.loads(call_args.args[1])
+        return None
+
+    def test_pv3_pv4_included_when_count_4(self, ha_client):
+        ha_client._neo_pv_count["QMN000TESTDISC1"] = 4
+        ha_client._Client__publish_device_discovery("QMN000TESTDISC1")
+        payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC1")
+        assert payload is not None
+        cmps = payload["cmps"]
+        assert "grobro_QMN000TESTDISC1_Vpv3" in cmps
+        assert "grobro_QMN000TESTDISC1_Ipv3" in cmps
+        assert "grobro_QMN000TESTDISC1_Ppv3" in cmps
+        assert "grobro_QMN000TESTDISC1_Vpv4" in cmps
+        assert "grobro_QMN000TESTDISC1_Ipv4" in cmps
+        assert "grobro_QMN000TESTDISC1_Ppv4" in cmps
+
+    def test_pv3_pv4_excluded_when_no_count(self, ha_client):
+        ha_client._Client__publish_device_discovery("QMN000TESTDISC2")
+        payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC2")
+        assert payload is not None
+        cmps = payload["cmps"]
+        assert "grobro_QMN000TESTDISC2_Vpv3" not in cmps
+        assert "grobro_QMN000TESTDISC2_Ppv3" not in cmps
+        assert "grobro_QMN000TESTDISC2_Vpv4" not in cmps
+        assert "grobro_QMN000TESTDISC2_Ppv4" not in cmps
+
+    def test_pv3_pv4_excluded_when_count_2(self, ha_client):
+        ha_client._neo_pv_count["QMN000TESTDISC3"] = 2
+        ha_client._Client__publish_device_discovery("QMN000TESTDISC3")
+        payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC3")
+        assert payload is not None
+        cmps = payload["cmps"]
+        assert "grobro_QMN000TESTDISC3_Vpv3" not in cmps
+        assert "grobro_QMN000TESTDISC3_Ppv3" not in cmps
+        assert "grobro_QMN000TESTDISC3_Vpv4" not in cmps
+        assert "grobro_QMN000TESTDISC3_Ppv4" not in cmps
+
+    def test_discovery_runs_after_detection(self, ha_client):
+        payload = _load_payload("NeoInputRegister_NEO2000.bin")
+        device_id = "QMN0ANONYMIZED01"
+        state = HomeAssistantInputRegister(device_id=device_id, payload=payload)
+        ha_client.publish_input_register(state)
+        disc = self._get_discovery_payload(ha_client, device_id)
+        assert disc is not None
+        cmps = disc["cmps"]
+        assert "grobro_QMN0ANONYMIZED01_Vpv3" in cmps
+        assert "grobro_QMN0ANONYMIZED01_Ppv3" in cmps
 
 
 class TestClientAvailability:
