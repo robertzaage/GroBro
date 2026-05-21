@@ -1,3 +1,8 @@
+## Unreleased
+
+### New Features
++ NEO inverters now expose an **Inverter Power** switch (holding register 0). Sending OFF stops the inverter; ON re-enables it. This complements `output_power_limit` (register 3), which can't reach a true off due to the firmware enforcing a ~30 W floor at 0 %. Verified against a NEO 800M-X with GroBro running locally and no Growatt cloud session.
+
 ## v2.7.2
 
 ### New Features
