@@ -9,7 +9,6 @@
 + Fixed NOAH battery devices being merged into one in Home Assistant. All NOAH devices report the same non-unique MAC address (`AA:BB:CC:DD:EE:XX`), which caused Home Assistant's device registry to treat them as the same device. The MAC is now validated and masked MACs like this are rejected and no longer used for device matching (#178)
 + Fixed missing TZ definition in German translation (#183)
 + Fixed `MAX_BAT=auto` showing phantom empty batteries, battery count is now read from the device's own `bat_cnt` register instead of relying solely on serial-number register presence (#187)
-+ Restored icon fields on battery SOC sensors that were incorrectly removed
 
 ## v2.6.2
 
