@@ -188,3 +188,12 @@ Currently, dynamic adjustment of AC charging power (up to 700W) is handled entir
 *   Accidentally bypassing the native BMS and charging electronics limits can result in catastrophic hardware failure, severe thermal runaway, or an explosion/fire hazard. Let the native electronics make the final call on charging. 
 
 *(Note: The technical insights in this section were provided by a Growatt employee acting out of personal enthusiasm for the Home Assistant community. Growatt does not officially support this project at this time, and these insights do not represent official company directives).*
+
+### 4. NEO Inverter Power Switch (Register 0)
+The NEO holding-register map exposes an **Inverter Power** switch on register 0 (function `0x06` Modbus write, value `0x0000` = OFF, `0x0001` = ON). This is the same command Growatt's cloud sends when the user taps on/off in ShinePhone, and it works against the local broker without an active cloud session.
+
+Use it when you need a true off — the existing `output_power_limit` (Reg 3) enforces a hardware floor of ~30 W at 0 %, so it can't fully stop AC output. The on/off switch can.
+
+Caveats:
+*   EEPROM-wear characteristics of register 0 are not documented. Until verified, treat it as a coarse-grained control: occasional automation triggers (e.g., negative grid pricing, export caps), not high-frequency dynamic control. Use `output_power_limit` for continuous setpoint loops.
+*   After an OFF, the inverter takes several seconds to actually drop AC output (cloud-style command propagation delay). The HA-side `Inverter_Status` sensor (`StandbyStatus`/`NormalStatus`) reflects the real state.

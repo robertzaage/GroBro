@@ -62,6 +62,24 @@
     }
   },
   "holding_registers": {
+    "inverter_power": {
+      "growatt": {
+        "position": {
+          "register_no": 0,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Inverter Power",
+        "type": "switch",
+        "icon": "mdi:power"
+      }
+    },
     "output_power_limit": {
       "growatt": {
         "position": {
