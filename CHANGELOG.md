@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 + Fixed NEXA and NOAH devices crashing the parser every hour when sending holding register dumps (message type 0x0103). These messages are now properly decoded and their sensor values are published to Home Assistant (#198)
++ Fixed NEXA household load sensors showing wrong values when the load is negative (e.g. exporting to grid). The registers are now parsed as signed values (#195)
 
 ## v2.7.2
 
