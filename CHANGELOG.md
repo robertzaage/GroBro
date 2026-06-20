@@ -1,3 +1,8 @@
+## v2.7.4
+
+### Bug Fixes
++ Fixed v2.7.3 regression: NEXA 0x0103 holding register dumps no longer publish invalid config values (e.g. `charge_limit: 0`), which caused Home Assistant warnings. The dump is now routed through the input register path, keeping holding register configs untouched (#198)
+
 ## v2.7.3
 
 ### New Features
