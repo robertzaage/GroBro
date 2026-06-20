@@ -68,3 +68,6 @@ configuration:
   TZ:
     name: Timezone
     description: Configure your local timezone to ensure all application logs and system events are recorded with accurate localized timestamps.
+  KEEP_BATTERY_POSITION:
+    name: KEEP_BATTERY_POSITION
+    description: When enabled, GroBro tracks NOAH battery serial numbers across position changes and logs a warning if a battery moves to a different slot. Default is false.

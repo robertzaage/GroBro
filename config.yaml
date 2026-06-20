@@ -1,6 +1,6 @@
 name: "GroBro"
 description: "Growatt MQTT Message Broker"
-version: "2.7.2"
+version: "2.7.3"
 slug: "grobro"
 init: false
 url: https://github.com/robertzaage/GroBro
@@ -41,6 +41,7 @@ options:
   AVAILABILITY_SENSOR: false
   FILTER_DATA_GLITCHES: false
   TZ: ""
+  KEEP_BATTERY_POSITION: false
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -66,3 +67,4 @@ schema:
   AVAILABILITY_SENSOR: bool
   FILTER_DATA_GLITCHES: bool
   TZ: str
+  KEEP_BATTERY_POSITION: bool

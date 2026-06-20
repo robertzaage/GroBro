@@ -18,7 +18,6 @@ from grobro.ha.client import (
     _resolve_max_bat,
     _MAX_BAT_CACHE,
     _LAST_BAT_SERIALS,
-    KEEP_BATTERY_POSITION,
 )
 from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
