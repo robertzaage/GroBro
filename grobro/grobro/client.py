@@ -20,6 +20,7 @@ from grobro.grobro import parser
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.model.modbus_message import GrowattModbusBlock
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_message import GrowattModbusMessage
 from grobro.model.mqtt_config import MQTTConfig
@@ -367,17 +368,35 @@ class Client:
                 self._client.publish(topic, eco["data"], retain=PUBLISH_SENSORS_RETAINED)
                 return
 
+            modbus_message = None
+
             # NOAH-specific message types (FE19 config, 0103 holding regs, etc.)
             noah_msg = parser.parse_noah_message(unscrambled)
-            if noah_msg and noah_msg.get("message_type") == 0xFE19 and device_id.startswith("0PVP"):
-                config = noah_msg.get("config")
-                if config and config.serial_number:
-                    LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                    self.on_config(device_id, config)
-                    return
+            if noah_msg:
+                if noah_msg.get("message_type") == 0xFE19 and device_id.startswith("0PVP"):
+                    config = noah_msg.get("config")
+                    if config and config.serial_number:
+                        LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+                        self.on_config(device_id, config)
+                        return
 
-            # Generic modbus message
-            modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
+                if noah_msg.get("message_type") == 0x0103:
+                    registers = noah_msg.get("registers", [])
+                    if registers:
+                        block = GrowattModbusBlock(
+                            start=0,
+                            end=len(registers) - 1,
+                            values=b"".join(struct.pack(">H", v) for v in registers),
+                        )
+                        modbus_message = GrowattModbusMessage(
+                            unknown=0,
+                            device_id=noah_msg["device_id"],
+                            function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                            register_blocks=[block],
+                        )
+
+            if modbus_message is None:
+                modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
             LOG.debug("Received modbus message: %s", modbus_message)
 
             if modbus_message:

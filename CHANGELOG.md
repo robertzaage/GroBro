@@ -1,3 +1,8 @@
+## v2.7.3
+
+### Bug Fixes
++ Fixed NEXA and NOAH devices crashing the parser every hour when sending holding register dumps (message type 0x0103). These messages are now properly decoded and their sensor values are published to Home Assistant (#198)
+
 ## v2.7.2
 
 ### New Features

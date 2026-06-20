@@ -169,6 +169,9 @@ class GrowattModbusMessage(BaseModel):
 
             while len(buffer) > offset + 6:
                 block = GrowattModbusBlock.parse_grobro(buffer[offset:])
+                if block is None:
+                    LOG.warning("Failed to parse modbus block at offset %d", offset)
+                    break
                 register_blocks.append(block)
                 offset += block.size()
 
