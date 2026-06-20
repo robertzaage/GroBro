@@ -391,7 +391,7 @@ class Client:
                         modbus_message = GrowattModbusMessage(
                             unknown=0,
                             device_id=noah_msg["device_id"],
-                            function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                            function=GrowattModbusFunction.READ_INPUT_REGISTER,
                             register_blocks=[block],
                         )
 
