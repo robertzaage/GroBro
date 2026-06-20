@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,6 +17,8 @@ from grobro.ha.client import (
     _detect_bat_count,
     _resolve_max_bat,
     _MAX_BAT_CACHE,
+    _LAST_BAT_SERIALS,
+    KEEP_BATTERY_POSITION,
 )
 from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
@@ -1009,7 +1012,7 @@ class TestCombinedSerial:
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
-                           if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
+                           if "device" in c[0][0] and "config" in c[0][0] and c[1]]
         assert discovery_calls
         payload = json.loads(discovery_calls[-1][0][1])
         cmps = payload.get("cmps", {})
@@ -1021,3 +1024,68 @@ class TestCombinedSerial:
         assert any("Bat2 Serial" in n for n in cmp_names)
         assert any("Bat3 Serial" in n for n in cmp_names)
         assert any("Bat4 Serial" in n for n in cmp_names)
+
+
+class TestBatteryPositionWatch:
+    def setup_method(self):
+        _LAST_BAT_SERIALS.clear()
+
+    def test_position_change_detected(self, ha_client, caplog):
+        caplog.set_level(logging.WARNING)
+        with patch("grobro.ha.client.KEEP_BATTERY_POSITION", True):
+            # First call: SN002 at Bat2, SN003 at Bat3
+            state1 = HomeAssistantInputRegister(
+                device_id="0PVP0000TEST0001",
+                payload={"bat2_ser_part_1": "SN002", "bat3_ser_part_1": "SN003"},
+            )
+            ha_client.publish_input_register(state1)
+            caplog.clear()
+
+            # Second call: SN003 now at Bat2 (moved from Bat3)
+            state2 = HomeAssistantInputRegister(
+                device_id="0PVP0000TEST0001",
+                payload={"bat2_ser_part_1": "SN003"},
+            )
+            ha_client.publish_input_register(state2)
+
+        assert "SN003" in caplog.text
+        assert "Bat3" in caplog.text
+        assert "Bat2" in caplog.text
+        assert "re-enumeration" in caplog.text
+
+    def test_no_warning_stable_positions(self, ha_client, caplog):
+        caplog.set_level(logging.WARNING)
+        with patch("grobro.ha.client.KEEP_BATTERY_POSITION", True):
+            state1 = HomeAssistantInputRegister(
+                device_id="0PVP0000TEST0001",
+                payload={"bat2_ser_part_1": "SN002", "bat3_ser_part_1": "SN003"},
+            )
+            ha_client.publish_input_register(state1)
+            caplog.clear()
+
+            state2 = HomeAssistantInputRegister(
+                device_id="0PVP0000TEST0001",
+                payload={"bat2_ser_part_1": "SN002", "bat3_ser_part_1": "SN003"},
+            )
+            ha_client.publish_input_register(state2)
+
+        assert "moved" not in caplog.text
+        assert "re-enumeration" not in caplog.text
+
+    def test_disabled_by_default(self, ha_client, caplog):
+        caplog.set_level(logging.WARNING)
+        state1 = HomeAssistantInputRegister(
+            device_id="0PVP0000TEST0001",
+            payload={"bat2_ser_part_1": "SN002", "bat3_ser_part_1": "SN003"},
+        )
+        ha_client.publish_input_register(state1)
+        caplog.clear()
+
+        state2 = HomeAssistantInputRegister(
+            device_id="0PVP0000TEST0001",
+            payload={"bat2_ser_part_1": "SN003"},
+        )
+        ha_client.publish_input_register(state2)
+
+        assert "moved" not in caplog.text
+        assert "re-enumeration" not in caplog.text

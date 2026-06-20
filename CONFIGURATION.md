@@ -121,6 +121,7 @@ docker run --detach \
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
 | `MAX_BAT`       | ❌ No    | Battery pack count in Home Assistant. Default `"auto"` detects from serial number presence. Set to a number (e.g. `1`) to override. |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
+| `KEEP_BATTERY_POSITION` | ❌ No | Set to `true` to enable NOAH battery position change detection. When the inverter re-enumerates its battery stack and a battery moves to a different slot, a warning is logged. Default is `false`. |
 
 # Example Setup with DuckDNS and HA-MQTT
 

@@ -38,9 +38,11 @@ try:
 except ValueError:
     MAX_BAT = MAX_BAT_RAW
 FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
+KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
+_LAST_BAT_SERIALS: dict[str, dict[int, str]] = {}
 
 # ------------------- Helpfunctions -------------------
 
@@ -331,6 +333,24 @@ class Client:
                 payload[f"bat{bat_num}_serial"] = combined
             else:
                 payload.pop(f"bat{bat_num}_serial", None)
+
+        # Detect battery position changes when enabled
+        if KEEP_BATTERY_POSITION:
+            current_serials: dict[int, str] = {}
+            for bat_num in range(2, 5):
+                key = f"bat{bat_num}_serial"
+                if key in payload and payload[key]:
+                    current_serials[bat_num] = str(payload[key])
+            prev_serials = _LAST_BAT_SERIALS.get(state.device_id, {})
+            if prev_serials and current_serials:
+                for pos, serial in current_serials.items():
+                    for prev_pos, prev_serial in prev_serials.items():
+                        if serial == prev_serial and pos != prev_pos:
+                            LOG.warning(
+                                "Battery %s moved from Bat%d to Bat%d for device %s — inverter re-enumeration detected",
+                                serial, prev_pos, pos, state.device_id,
+                            )
+            _LAST_BAT_SERIALS[state.device_id] = current_serials
 
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"

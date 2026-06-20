@@ -1,5 +1,8 @@
 ## v2.7.3
 
+### New Features
++ Added `KEEP_BATTERY_POSITION` option (default: off). When enabled, GroBro tracks NOAH battery serial numbers across position changes and logs a warning if the inverter stack re-enumerates and a battery moves to a different slot (#196)
+
 ### Bug Fixes
 + Fixed NEXA and NOAH devices crashing the parser every hour when sending holding register dumps (message type 0x0103). These messages are now properly decoded and their sensor values are published to Home Assistant (#198)
 + Fixed NEXA household load sensors showing wrong values when the load is negative (e.g. exporting to grid). The registers are now parsed as signed values (#195)
