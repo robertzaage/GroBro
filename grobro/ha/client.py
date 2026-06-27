@@ -442,10 +442,6 @@ class Client:
             if cmd_type == "switch":
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
-            elif cmd_type == "time":
-                hour, minute = map(int, raw_value)
-                parsed_value = (hour << 8) | minute
-
             else:
                 parsed_value = int(raw_value)
 
