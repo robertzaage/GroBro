@@ -373,7 +373,7 @@ class Client:
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
-        if len(parts) != 5 or parts[0] not in {"number", "button", "switch", "config"}:
+        if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "config"}:
             return
         cmd_type, _, device_id, cmd_name, action = parts
 
