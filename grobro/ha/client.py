@@ -442,6 +442,9 @@ class Client:
             if cmd_type == "switch":
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
+            elif cmd_type == "time":
+                parsed_value = int(raw_value)
+ 
             else:
                 parsed_value = int(raw_value)
 
