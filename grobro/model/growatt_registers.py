@@ -55,9 +55,9 @@ class GrowattRegisterDataType(BaseModel):
             return round(value, 3)
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
             value = struct.unpack(unpack_type, data_raw)[0]
-            h = value // 256
-            m = value % 256
-            return (h * 100) + m
+            hour = (value >> 8) & 0xFF
+            minute = value & 0xFF
+            return f"{hour:02d}:{minute:02d}"
         elif self.data_type in [GrowattRegisterDataTypes.INT, GrowattRegisterDataTypes.SIGNED_INT]:
             value = struct.unpack(unpack_type, data_raw)[0]
             return value
