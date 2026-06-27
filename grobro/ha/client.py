@@ -443,7 +443,7 @@ class Client:
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
             elif cmd_type == "time":
-                hour, minute = map(int, raw_value.split(":"))
+                hour, minute = map(int, raw_value)
                 parsed_value = (hour << 8) | minute
 
             elif "_start_time" in cmd_name or "_end_time" in cmd_name:
