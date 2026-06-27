@@ -76,10 +76,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -97,10 +94,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -176,10 +170,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -197,10 +188,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -276,10 +264,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -297,10 +282,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -376,10 +358,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -397,10 +376,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -476,10 +452,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -497,10 +470,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -576,10 +546,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -597,10 +564,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -676,10 +640,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -697,10 +658,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -776,10 +734,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -797,10 +752,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -876,10 +828,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -897,10 +846,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
