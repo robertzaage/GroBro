@@ -443,7 +443,12 @@ class Client:
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
             elif cmd_type == "time":
-                parsed_value = int(raw_value)
+                raw_value = raw_value.zfill(4)
+
+                hour = int(raw_value[:2])
+                minute = int(raw_value[2:])
+
+                parsed_value = (hour << 8) | minute
  
             else:
                 parsed_value = int(raw_value)
