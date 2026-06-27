@@ -387,7 +387,7 @@ class Client:
         # Buttons
         if cmd_type == "button":
             if cmd_name == "read_all":
-		# Send all modbus reads first
+                # Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
                     if name.startswith("slot"):
                         try:
@@ -395,85 +395,100 @@ class Client:
                                 continue
                         except ValueError:
                             continue
+
                     pos = register.growatt.position
-                    self.on_command(make_modbus_command(
-                        device_id,
-                        GrowattModbusFunction.READ_SINGLE_REGISTER,
-                        pos.register_no,
-                    ))
+                    self.on_command(
+                        make_modbus_command(
+                            device_id,
+                            GrowattModbusFunction.READ_SINGLE_REGISTER,
+                            pos.register_no,
+                        )
+                    )
 
                 # Queue config reads
                 if self.on_config_read:
                     with self._config_read_lock:
                         q = self._config_read_queues.setdefault(device_id, deque())
+
                         for cfg in known_registers.config_registers.values():
                             q.append(cfg.growatt.register_no)
 
                     # give the datalogger time to answer modbus reads
                     Timer(
-                        3.0,  # small delay is enough
+                        3.0,
                         self.__kickoff_next_config_read,
                         args=(device_id,),
                     ).start()
 
                 return
-                
+
             if action == "read":
                 pos = known_registers.holding_registers[cmd_name].growatt.position
-                self.on_command(make_modbus_command(
-                    device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
-                ))
+
+                self.on_command(
+                    make_modbus_command(
+                        device_id,
+                        GrowattModbusFunction.READ_SINGLE_REGISTER,
+                        pos.register_no,
+                    )
+                )
+
                 return
 
-        # Number / Switch
-		if cmd_type in {"number", "switch", "time"} and action == "set":
-		    raw_value = msg.payload.decode().strip()
+        # Number / Switch / Time
+        if cmd_type in {"number", "switch", "time"} and action == "set":
+            raw_value = msg.payload.decode().strip()
 
-		    if cmd_type == "switch":
-		        parsed_value = 1 if raw_value.upper() == "ON" else 0
+            if cmd_type == "switch":
+                parsed_value = 1 if raw_value.upper() == "ON" else 0
 
-		    elif cmd_type == "time":
-		        hour, minute = map(int, raw_value.split(":"))
-		        parsed_value = (hour << 8) | minute
+            elif cmd_type == "time":
+                hour, minute = map(int, raw_value.split(":"))
+                parsed_value = (hour << 8) | minute
 
-		    elif "_start_time" in cmd_name or "_end_time" in cmd_name:
-		        hour, minute = divmod(int(raw_value), 100)
-		        parsed_value = (hour << 8) | minute
+            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
+                hour, minute = divmod(int(raw_value), 100)
+                parsed_value = (hour << 8) | minute
 
-		    else:
-		        parsed_value = int(raw_value)
+            else:
+                parsed_value = int(raw_value)
 
-		    pos = known_registers.holding_registers[cmd_name].growatt.position
-		    LOG.debug(
-		        "Setting %s register %s to value %s",
-		        cmd_name,
-		        pos.register_no,
-		        parsed_value,
-		    )
+            pos = known_registers.holding_registers[cmd_name].growatt.position
 
-		    # write
-		    self.on_command(
-		        make_modbus_command(
-		            device_id,
-		            GrowattModbusFunction.PRESET_SINGLE_REGISTER,
-		            pos.register_no,
-		            parsed_value,
-		        )
-		    )
+            LOG.debug(
+                "Setting %s register %s to value %s",
+                cmd_name,
+                pos.register_no,
+                parsed_value,
+            )
 
-		    # read-after-write
-		    LOG.debug(
-		        "Triggering read-after-write for Command %s register %s",
-		        cmd_name,
-		        pos.register_no,
-		    )
-		    self.on_command(
-		        make_modbus_command(
-		            device_id,
-		            GrowattModbusFunction.READ_SINGLE_REGISTER,
-		            pos.register_no,
-		        )
-		    )
+            # write
+            self.on_command(
+                make_modbus_command(
+                    device_id,
+                    GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                    pos.register_no,
+                    parsed_value,
+                )
+            )
+
+            # read-after-write
+            LOG.debug(
+                "Triggering read-after-write for Command %s register %s",
+                cmd_name,
+                pos.register_no,
+            )
+
+            self.on_command(
+                make_modbus_command(
+                    device_id,
+                    GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    pos.register_no,
+                )
+            )
+
+            return
+
         # Config
         if parts[0] == "config" and action == "set":
             register_no = int(cmd_name)
