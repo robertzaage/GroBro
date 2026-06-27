@@ -446,10 +446,6 @@ class Client:
                 hour, minute = map(int, raw_value)
                 parsed_value = (hour << 8) | minute
 
-            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
-                hour, minute = divmod(int(raw_value), 100)
-                parsed_value = (hour << 8) | minute
-
             else:
                 parsed_value = int(raw_value)
 
