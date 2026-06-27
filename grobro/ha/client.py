@@ -442,8 +442,8 @@ class Client:
             if cmd_type == "switch":
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
-            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
-                hour, minute = divmod(int(raw_value), 100)
+            elif cmd_type == "time":
+                hour, minute = map(int, raw_value.split(":")[:2])
                 parsed_value = (hour * 256) + minute
  
             else:
