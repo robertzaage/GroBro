@@ -221,7 +221,7 @@ class Client:
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         # Subscriptions
-        for cmd_type in ["number", "button", "switch", "config"]:
+        for cmd_type in ["number", "time", "button", "switch", "config"]:
             for action in ["set", "read"]:
                 topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
@@ -426,29 +426,54 @@ class Client:
                 return
 
         # Number / Switch
-        if cmd_type in {"number", "switch"} and action == "set":
-            raw_value = msg.payload.decode()
-            if cmd_type == "switch":
-                parsed_value = 1 if raw_value.upper() == "ON" else 0
-            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
-                hour, minute = divmod(int(raw_value), 100)
-                parsed_value = (hour * 256) + minute
-            else:
-                parsed_value = int(raw_value)
+		if cmd_type in {"number", "switch", "time"} and action == "set":
+		    raw_value = msg.payload.decode().strip()
 
-            pos = known_registers.holding_registers[cmd_name].growatt.position
-            LOG.debug("Setting %s register %s to value %s", cmd_name, pos.register_no, parsed_value)
+		    if cmd_type == "switch":
+		        parsed_value = 1 if raw_value.upper() == "ON" else 0
 
-            # write
-            self.on_command(make_modbus_command(
-                device_id, GrowattModbusFunction.PRESET_SINGLE_REGISTER, pos.register_no, parsed_value
-            ))
-            # read-after-write
-            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name, pos.register_no)
-            self.on_command(make_modbus_command(
-                device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
-            ))
+		    elif cmd_type == "time":
+		        hour, minute = map(int, raw_value.split(":"))
+		        parsed_value = (hour << 8) | minute
 
+		    elif "_start_time" in cmd_name or "_end_time" in cmd_name:
+		        hour, minute = divmod(int(raw_value), 100)
+		        parsed_value = (hour << 8) | minute
+
+		    else:
+		        parsed_value = int(raw_value)
+
+		    pos = known_registers.holding_registers[cmd_name].growatt.position
+		    LOG.debug(
+		        "Setting %s register %s to value %s",
+		        cmd_name,
+		        pos.register_no,
+		        parsed_value,
+		    )
+
+		    # write
+		    self.on_command(
+		        make_modbus_command(
+		            device_id,
+		            GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+		            pos.register_no,
+		            parsed_value,
+		        )
+		    )
+
+		    # read-after-write
+		    LOG.debug(
+		        "Triggering read-after-write for Command %s register %s",
+		        cmd_name,
+		        pos.register_no,
+		    )
+		    self.on_command(
+		        make_modbus_command(
+		            device_id,
+		            GrowattModbusFunction.READ_SINGLE_REGISTER,
+		            pos.register_no,
+		        )
+		    )
         # Config
         if parts[0] == "config" and action == "set":
             register_no = int(cmd_name)
