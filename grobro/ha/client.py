@@ -442,13 +442,9 @@ class Client:
             if cmd_type == "switch":
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
 
-            elif cmd_type == "time":
-                raw_value = raw_value.zfill(4)
-
-                hour = int(raw_value[:2])
-                minute = int(raw_value[2:])
-
-                parsed_value = (hour << 8) | minute
+            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
+                hour, minute = divmod(int(raw_value), 100)
+                parsed_value = (hour * 256) + minute
  
             else:
                 parsed_value = int(raw_value)
