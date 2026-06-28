@@ -454,10 +454,15 @@ class Client:
             LOG.error(f"Processing message: {e}")
 
     def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
+        LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
             device_id = _extract_device_id(msg.topic)
+
+            unscrambled = parser.unscramble(msg.payload)
+            LOG.debug("Received Growatt forward: %s %s", msg.topic, unscrambled.hex(" "))
+
             if not GROWATT_CLOUD_ENABLED:
                 return
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:
