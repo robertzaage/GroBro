@@ -2242,6 +2242,74 @@
         "state_class": "measurement",
         "icon": "mdi:thermometer"
       }
+    },
+    "fw_part_1": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Part 1",
+        "publish": true,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_part_2": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Part 2",
+        "publish": true,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_part_3": {
+      "growatt": {
+        "position": {
+          "register_no": 120,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Part 3",
+        "publish": true,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_part_4": {
+      "growatt": {
+        "position": {
+          "register_no": 120,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Part 4",
+        "publish": true,
+        "icon": "mdi:information"
+      }
     }
   }
 }
