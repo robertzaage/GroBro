@@ -641,6 +641,31 @@ class Client:
                     "icon": "mdi:identifier",
                 }
 
+        # Combined firmware version (NOAH = 3 parts, NEXA = 4 parts)
+        fw_parts = sorted(
+            name
+            for name in known_registers.input_registers
+            if name.startswith("fw_part_")
+        )
+
+        if fw_parts:
+            combined_name = "firmware_version"
+            firmware_unique_id = f"grobro_{device_id}_{combined_name}"
+
+            value_template = ".".join(
+                f"{{{{ value_json['{part}'] }}}}"
+                for part in fw_parts
+            )
+
+            payload["cmps"][firmware_unique_id] = {
+                "platform": "sensor",
+                "name": "Firmware Version",
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "value_template": value_template,
+                "unique_id": firmware_unique_id,
+                "icon": "mdi:information",
+            }
+
         # Serial Number Entity
         serial_unique_id = f"grobro_{device_id}_serial"
         payload["cmps"][serial_unique_id] = {
