@@ -649,7 +649,7 @@ class Client:
         )
 
         if fw_version_parts:
-            combined_name = "firmware_version"
+            combined_name = "fw_version"
             firmware_unique_id = f"grobro_{device_id}_{combined_name}"
 
             value_template = ".".join(

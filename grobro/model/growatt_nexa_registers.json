@@ -2256,7 +2256,7 @@
       },
       "homeassistant": {
         "name": "Firmware Version Part 1",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:information"
       }
     },
@@ -2273,7 +2273,7 @@
       },
       "homeassistant": {
         "name": "Firmware Version Part 2",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:information"
       }
     },
@@ -2290,7 +2290,7 @@
       },
       "homeassistant": {
         "name": "Firmware Version Part 3",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:information"
       }
     },
@@ -2307,7 +2307,7 @@
       },
       "homeassistant": {
         "name": "Firmware Version Part 4",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:information"
       }
     }
