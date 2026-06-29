@@ -1920,6 +1920,57 @@
         "publish": true,
         "icon": "mdi:counter"
       }
+    },
+    "fw_version_part_1": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 1",
+        "publish": false,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_version_part_2": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 2",
+        "publish": false,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_version_part_3": {
+      "growatt": {
+        "position": {
+          "register_no": 120,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 3",
+        "publish": false,
+        "icon": "mdi:information"
+      }
     }
   }
 }
