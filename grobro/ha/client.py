@@ -184,7 +184,7 @@ def iter_command_registers(known_registers: GroBroRegisters):
 # ------------------- Client-Class -------------------
 
 class Client:
-    on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]]
+    on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]] = None
     on_config_command: Optional[Callable[[str, int, str], None]] = None
     on_config_read: Optional[Callable[[str, int], None]] = None
     on_config_read_response: Callable[[str, int], None] | None = None
@@ -221,7 +221,7 @@ class Client:
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         # Subscriptions
-        for cmd_type in ["number", "button", "switch", "config"]:
+        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
             for action in ["set", "read"]:
                 topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
@@ -373,7 +373,7 @@ class Client:
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
-        if len(parts) != 5 or parts[0] not in {"number", "button", "switch", "config"}:
+        if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "select", "config"}:
             return
         cmd_type, _, device_id, cmd_name, action = parts
 
@@ -387,7 +387,7 @@ class Client:
         # Buttons
         if cmd_type == "button":
             if cmd_name == "read_all":
-		# Send all modbus reads first
+                # Send all modbus reads first
                 for name, register in known_registers.holding_registers.items():
                     if name.startswith("slot"):
                         try:
@@ -395,62 +395,140 @@ class Client:
                                 continue
                         except ValueError:
                             continue
+
                     pos = register.growatt.position
-                    self.on_command(make_modbus_command(
-                        device_id,
-                        GrowattModbusFunction.READ_SINGLE_REGISTER,
-                        pos.register_no,
-                    ))
+                    self.on_command(
+                        make_modbus_command(
+                            device_id,
+                            GrowattModbusFunction.READ_SINGLE_REGISTER,
+                            pos.register_no,
+                        )
+                    )
 
                 # Queue config reads
                 if self.on_config_read:
                     with self._config_read_lock:
                         q = self._config_read_queues.setdefault(device_id, deque())
+
                         for cfg in known_registers.config_registers.values():
                             q.append(cfg.growatt.register_no)
 
                     # give the datalogger time to answer modbus reads
                     Timer(
-                        3.0,  # small delay is enough
+                        3.0,
                         self.__kickoff_next_config_read,
                         args=(device_id,),
                     ).start()
 
                 return
-                
+
             if action == "read":
-                pos = known_registers.holding_registers[cmd_name].growatt.position
-                self.on_command(make_modbus_command(
-                    device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
-                ))
+                reg = known_registers.holding_registers.get(cmd_name)
+                if not reg:
+                    LOG.error(
+                        "Unknown read command %s for device %s",
+                        cmd_name,
+                        device_id,
+                    )
+                    return
+
+                pos = reg.growatt.position
+
+                self.on_command(
+                    make_modbus_command(
+                        device_id,
+                        GrowattModbusFunction.READ_SINGLE_REGISTER,
+                        pos.register_no,
+                    )
+                )
+
+                return
+                
+        # Number / Switch / Time / Select
+        if cmd_type in {"number", "switch", "time", "select"} and action == "set":
+            raw_value = msg.payload.decode().strip()
+
+            reg = known_registers.holding_registers.get(cmd_name)
+            if not reg:
+                LOG.error(
+                    "Unknown holding register %s for device %s",
+                    cmd_name,
+                    device_id,
+                )
                 return
 
-        # Number / Switch
-        if cmd_type in {"number", "switch"} and action == "set":
-            raw_value = msg.payload.decode()
             if cmd_type == "switch":
                 parsed_value = 1 if raw_value.upper() == "ON" else 0
-            elif "_start_time" in cmd_name or "_end_time" in cmd_name:
-                hour, minute = divmod(int(raw_value), 100)
+
+            elif cmd_type == "time":
+                hour, minute = map(int, raw_value.split(":")[:2])
                 parsed_value = (hour * 256) + minute
+
+            elif cmd_type == "select":
+                options = getattr(
+                    reg.homeassistant,
+                    "options",
+                    None,
+                )
+
+                if options:
+                    reverse_options = {
+                        value: int(key)
+                        for key, value in options.items()
+                    }
+
+                    if raw_value not in reverse_options:
+                        LOG.error(
+                            "Unknown select value %s for %s",
+                            raw_value,
+                            cmd_name,
+                        )
+                        return
+
+                    parsed_value = reverse_options[raw_value]
+
+                else:
+                    parsed_value = int(raw_value)
+
             else:
                 parsed_value = int(raw_value)
 
-            pos = known_registers.holding_registers[cmd_name].growatt.position
-            LOG.debug("Setting %s register %s to value %s", cmd_name, pos.register_no, parsed_value)
+            pos = reg.growatt.position
 
-            # write
-            self.on_command(make_modbus_command(
-                device_id, GrowattModbusFunction.PRESET_SINGLE_REGISTER, pos.register_no, parsed_value
-            ))
-            # read-after-write
-            LOG.debug("Triggering read-after-write for Command %s register %s", cmd_name, pos.register_no)
-            self.on_command(make_modbus_command(
-                device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, pos.register_no
-            ))
+            LOG.debug(
+                "Setting %s register %s to value %s",
+                cmd_name,
+                pos.register_no,
+                parsed_value,
+            )
+
+            self.on_command(
+                make_modbus_command(
+                    device_id,
+                    GrowattModbusFunction.PRESET_SINGLE_REGISTER,
+                    pos.register_no,
+                    parsed_value,
+                )
+            )
+
+            LOG.debug(
+                "Triggering read-after-write for Command %s register %s",
+                cmd_name,
+                pos.register_no,
+            )
+
+            self.on_command(
+                make_modbus_command(
+                    device_id,
+                    GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    pos.register_no,
+                )
+            )
+
+            return
 
         # Config
-        if parts[0] == "config" and action == "set":
+        if cmd_type == "config" and action == "set":
             register_no = int(cmd_name)
             raw_value = msg.payload.decode().strip()
 
@@ -554,6 +632,14 @@ class Client:
             unique_id = f"grobro_{device_id}_cmd_{entry['name']}"
             platform = ha.type
 
+            ha_data = ha.model_dump(exclude_none=True)
+
+            # Home Assistant erwartet bei Select eine Liste, kein Dict
+            if platform == "select":
+                options = ha_data.get("options")
+                if isinstance(options, dict):
+                    ha_data["options"] = list(options.values())
+
             payload["cmps"][unique_id] = {
                 "platform": platform,
                 "name": ha.name,
@@ -566,9 +652,8 @@ class Client:
                     f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
                     f"{device_id}/{entry['state_id']}/get"
                 ),
-                **ha.model_dump(exclude_none=True),
+                **ha_data,
             }
-
         # Config command: Restart Datalogger (Register 32 / Value 1)
         restart_uid = f"grobro_{device_id}_restart_datalogger"
         payload["cmps"][restart_uid] = {
@@ -640,7 +725,7 @@ class Client:
                     "unique_id": uid,
                     "icon": "mdi:identifier",
                 }
-
+                
         # Combined firmware version (NOAH = 3 parts, NEXA = 4 parts)
         fw_version_parts = sorted(
             name
@@ -665,7 +750,7 @@ class Client:
                 "unique_id": firmware_unique_id,
                 "icon": "mdi:information",
             }
-
+                
         # Serial Number Entity
         serial_unique_id = f"grobro_{device_id}_serial"
         payload["cmps"][serial_unique_id] = {
@@ -675,7 +760,7 @@ class Client:
             "unique_id": serial_unique_id,
             "icon": "mdi:identifier",
         }
-
+        
         # Device Type Entity
         type_unique_id = f"grobro_{device_id}_type"
         payload["cmps"][type_unique_id] = {
@@ -706,6 +791,7 @@ class Client:
             # trotzdem States aktualisieren
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
+            self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/sw_version", device_id, retain=True)
             return
 
         LOG.info("Publishing updated discovery for %s", device_id)
@@ -860,4 +946,3 @@ class Client:
 
         # continue with next queued read
         self.__kickoff_next_config_read(device_id)
-
