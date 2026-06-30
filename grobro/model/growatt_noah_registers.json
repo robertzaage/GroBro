@@ -76,10 +76,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -97,10 +94,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -112,16 +106,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot1_power": {
@@ -176,10 +180,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -197,10 +198,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -212,16 +210,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot2_power": {
@@ -276,10 +284,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -297,10 +302,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -312,16 +314,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot3_power": {
@@ -376,10 +388,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -397,10 +406,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -412,16 +418,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot4_power": {
@@ -476,10 +492,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -497,10 +510,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -512,16 +522,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot5_power": {
@@ -576,10 +596,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -597,10 +614,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -612,16 +626,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot6_power": {
@@ -676,10 +700,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -697,10 +718,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -712,16 +730,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot7_power": {
@@ -776,10 +804,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -797,10 +822,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -812,16 +834,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot8_power": {
@@ -876,10 +908,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -897,10 +926,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -912,16 +938,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 Mode",
-        "type": "number",
-        "min": 0,
-        "max": 2,
-        "step": 1
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "slot9_power": {
