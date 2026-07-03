@@ -1347,7 +1347,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 1",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1364,7 +1364,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 2",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1381,7 +1381,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 3",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1398,7 +1398,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 4",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
