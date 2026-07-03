@@ -359,7 +359,7 @@ class Client:
                 )
                 return
 
-            # NOAH EcoTracker JSON data (0x6F64)
+            # NOAH/NEXA EcoTracker JSON data (0x6F64)
             if msg_type == 0x6F64:
                 eco = parser.parse_noah_6f64(unscrambled)
                 LOG.debug("EcoTracker data for %s: %s", eco["device_id"], eco["data"])
@@ -367,14 +367,15 @@ class Client:
                 self._client.publish(topic, eco["data"], retain=PUBLISH_SENSORS_RETAINED)
                 return
 
-            # NOAH-specific message types (FE19 config, 0103 holding regs, etc.)
+            # NOAH/NEXA-specific message types (FE19 config, 0103 holding regs, etc.)
             noah_msg = parser.parse_noah_message(unscrambled)
-            if noah_msg and noah_msg.get("message_type") == 0xFE19 and device_id.startswith("0PVP"):
-                config = noah_msg.get("config")
-                if config and config.serial_number:
-                    LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                    self.on_config(device_id, config)
-                    return
+            if noah_msg and noah_msg.get("message_type") == 0xFE19:
+                if device_id.startswith("0PVP") or device_id.startswith("0HVR"):
+                    config = noah_msg.get("config")
+                    if config and config.serial_number:
+                        LOG.info("Received config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+                        self.on_config(device_id, config)
+                        return
 
             # Generic modbus message
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
