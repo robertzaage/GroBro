@@ -202,10 +202,10 @@ Dispatch priority in `__on_message`:
 | 1 | Config TLV | 340, 341, 387 | NEO, NOAH | `parser.parse_config_type` → `on_config(device_id, config)` |
 | 2 | Config read response | 281 | All | `parser.parse_config_message` → `on_config_read_response` |
 | 3 | Config write ack | 280 | All | Logged, no callback |
-| 4 | NOAH FE19 config | 0xFE19 | NOAH only | `parser.parse_noah_fe19` → `on_config(device_id, config)` |
+| 4 | NOAH FE19 config | 0xFE19 | NOAH, NEXA | `parser.parse_noah_fe19` → `on_config(device_id, config)` |
 | 5 | ShineWeLink config | 0x0129 (297) | ShineWeLink | `parser.parse_config_type` → `on_config(device_id, config)` |
 | 6 | Other NOAH subtypes | 0x0103–0xFE25 | NOAH / ShineWeLink | Dispatched to NOAH sub-parsers (see §2.7.2) |
-| 7 | EcoTracker JSON | 0x6F64 | NOAH | Published to raw MQTT topic |
+| 7 | Smart Meter JSON | 0x6F64 | NOAH, NEXA | Published to raw MQTT topic |
 | 8 | Generic modbus | 3, 4, 5, 6, 16, 100 | All | `GrowattModbusMessage.parse_grobro` → routed by function code |
 
 The `function` field at byte 7 determines the modbus function:
@@ -308,7 +308,7 @@ The payload always begins with 14 zero bytes.
 | `0xFE18` | `parse_noah_fe18` | Datetime set command / response |
 | `0xFE19` | `parse_noah_fe19` | Device config (subtype `0x0020`) or status (subtype `0x0001`) |
 | `0xFE25` | `parse_noah_fe25` | Heartbeat / keepalive (all zeros) |
-| `0x6F64` | `parse_noah_6f64` | EcoTracker JSON data |
+| `0x6F64` | `parse_noah_6f64` | Smart Meter (EcoTracker, Shelly etc.) JSON data |
 
 #### 2.7.2 FE19 config / status
 
@@ -325,7 +325,7 @@ FE19 is the most complex NOAH message type. The payload after the NOAH marker is
 - **Dev status** (subtype `0x0001`): A shorter TLV without the serial_number key. The
   `if config and config.serial_number` guard prevents `on_config` from being called.
 
-Only NOAH devices (serial prefix `0PVP`) reach this handler — RAQ FE19 messages
+Only NOAH (serial prefix `0PVP`) and NEXA devices (serial prefix `0HVR`) reach this handler — RAQ FE19 messages
 fall through to the modbus handler instead.
 
 **TLV offset heuristic** (`find_config_offset`): Scans the payload starting at byte `0x1C`
