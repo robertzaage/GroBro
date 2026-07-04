@@ -23,7 +23,7 @@ def test_parse_noah_6f64():
     result = parser.parse_noah_6f64(bytes(data))
     assert result["message_type"] == 0x6F64
     assert result["device_id"] == device_id
-    assert result["eco_tracker_sn"] == eco_sn
+    assert result["smart_meter_sn"] == eco_sn
     assert "2026-05-15T17:12:09.001" in result["timestamp"]
     assert json.loads(result["data"])["t_act"] == 150
 
