@@ -570,6 +570,209 @@
         "unit_of_measurement": "kWh",
         "icon": "mdi:power-plug"
       }
+    },
+    "Vac_RS": {
+      "growatt": {
+        "position": { "register_no": 3038, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "AC L-L voltage R-S",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "Vac_ST": {
+      "growatt": {
+        "position": { "register_no": 3039, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "AC L-L voltage S-T",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "Vac_TR": {
+      "growatt": {
+        "position": { "register_no": 3040, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "AC L-L voltage T-R",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "Temp1": {
+      "growatt": {
+        "position": { "register_no": 3093, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "Temperature 1",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "Temp2": {
+      "growatt": {
+        "position": { "register_no": 3094, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "Temperature 2",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "Temp3": {
+      "growatt": {
+        "position": { "register_no": 3095, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "Temperature 3",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "P_Bus_Voltage": {
+      "growatt": {
+        "position": { "register_no": 3098, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "P-Bus voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash-triangle"
+      }
+    },
+    "N_Bus_Voltage": {
+      "growatt": {
+        "position": { "register_no": 3099, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "N-Bus voltage",
+        "publish": false,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash-triangle"
+      }
+    },
+    "RealOPPercent": {
+      "growatt": {
+        "position": { "register_no": 3101, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 1.0 }
+        }
+      },
+      "homeassistant": {
+        "name": "Operating capacity",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:gauge"
+      }
+    },
+    "DCI_R": {
+      "growatt": {
+        "position": { "register_no": 3088, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "DC injection phase R",
+        "publish": false,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "mA",
+        "icon": "mdi:current-dc"
+      }
+    },
+    "DCI_S": {
+      "growatt": {
+        "position": { "register_no": 3089, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "DC injection phase S",
+        "publish": false,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "mA",
+        "icon": "mdi:current-dc"
+      }
+    },
+    "DCI_T": {
+      "growatt": {
+        "position": { "register_no": 3090, "offset": 0, "size": 2 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "delta": 0.0, "multiplier": 0.1 }
+        }
+      },
+      "homeassistant": {
+        "name": "DC injection phase T",
+        "publish": false,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "mA",
+        "icon": "mdi:current-dc"
+      }
     }
   }
 }
