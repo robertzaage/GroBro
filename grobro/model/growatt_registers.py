@@ -173,3 +173,10 @@ with resources.files(__package__).joinpath("growatt_spf_registers.json").open("r
 # register positions are unverified pending an XH2 owner with a battery installed.
 with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("rb") as f:
     KNOWN_XH2_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+# MOD 3-phase inverter family (ShineWiFi-X dongle).
+# Similar register block layout (3000-3499) to NEO but with key differences:
+# - Phase powers are u16*0.1 instead of u32*0.1
+# - Pac total at reg 3020 (u16) instead of 3019 (u32)
+# - Pac1 at 3025, Pac2 at 3029, Pac3 at 3033
+with resources.files(__package__).joinpath("growatt_mod_registers.json").open("rb") as f:
+    KNOWN_MOD_REGISTERS = GroBroRegisters.model_validate(json.load(f))

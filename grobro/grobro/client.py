@@ -32,6 +32,7 @@ from grobro.model.growatt_registers import (
     KNOWN_NEXA_REGISTERS,
     KNOWN_SPF_REGISTERS,
     KNOWN_XH2_REGISTERS,
+    KNOWN_MOD_REGISTERS,
 )
 
 
@@ -326,6 +327,9 @@ class Client:
                     # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                     elif cfg["device_id"].startswith("ZGQ"):
                         known_registers = KNOWN_XH2_REGISTERS
+                    # MOD-series 3-phase inverters
+                    elif cfg["device_id"].startswith("VWQ"):
+                        known_registers = KNOWN_MOD_REGISTERS
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -400,6 +404,9 @@ class Client:
                 # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                 elif modbus_device_id.startswith("ZGQ"):
                     known_registers = KNOWN_XH2_REGISTERS
+                # MOD-series 3-phase inverters
+                elif modbus_device_id.startswith("VWQ"):
+                    known_registers = KNOWN_MOD_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return
