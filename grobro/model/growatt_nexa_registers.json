@@ -30,6 +30,20 @@
         "type": "text"
       }
     },
+    "mqtt_ip": {
+      "growatt": {
+        "register_no": 17,
+        "data": {
+          "data_type": "STRING"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "MQTT IP",
+        "type": "text",
+        "icon": "mdi:ip-network"
+      }
+    },
     "mqtt_port": {
       "growatt": {
         "register_no": 18,
@@ -163,10 +177,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -184,10 +195,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 1 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -263,10 +271,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -284,10 +289,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 2 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -363,10 +365,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -384,10 +383,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 3 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -463,10 +459,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -484,10 +477,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 4 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -563,10 +553,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -584,10 +571,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 5 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -663,10 +647,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -684,10 +665,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 6 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -763,10 +741,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -784,10 +759,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 7 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -863,10 +835,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -884,10 +853,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 8 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -963,10 +929,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 Start Time",
-        "type": "number",
-        "min": 0,
-        "max": 2358,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-start"
       }
     },
@@ -984,10 +947,7 @@
       "homeassistant": {
         "publish": true,
         "name": "Slot 9 End Time",
-        "type": "number",
-        "min": 0,
-        "max": 2359,
-        "step": 1,
+        "type": "time",
         "icon": "mdi:clock-end"
       }
     },
@@ -1294,7 +1254,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 1.0
@@ -1318,7 +1278,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 1.0
@@ -1347,7 +1307,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 1",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1364,7 +1324,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 2",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1381,7 +1341,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 3",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -1398,7 +1358,7 @@
       },
       "homeassistant": {
         "name": "Serial Part 4",
-        "publish": true,
+        "publish": false,
         "icon": "mdi:identifier"
       }
     },
@@ -2241,6 +2201,74 @@
         "publish": true,
         "state_class": "measurement",
         "icon": "mdi:thermometer"
+      }
+    },
+    "fw_version_part_1": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 1",
+        "publish": false,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_version_part_2": {
+      "growatt": {
+        "position": {
+          "register_no": 119,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 2",
+        "publish": false,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_version_part_3": {
+      "growatt": {
+        "position": {
+          "register_no": 120,
+          "offset": 0,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 3",
+        "publish": false,
+        "icon": "mdi:information"
+      }
+    },
+    "fw_version_part_4": {
+      "growatt": {
+        "position": {
+          "register_no": 120,
+          "offset": 1,
+          "size": 1
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Firmware Version Part 4",
+        "publish": false,
+        "icon": "mdi:information"
       }
     }
   }

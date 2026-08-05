@@ -32,6 +32,7 @@ from grobro.model.growatt_registers import (
     KNOWN_NEXA_REGISTERS,
     KNOWN_SPF_REGISTERS,
     KNOWN_XH2_REGISTERS,
+    KNOWN_MOD_REGISTERS,
 )
 
 
@@ -326,6 +327,9 @@ class Client:
                     # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                     elif cfg["device_id"].startswith("ZGQ"):
                         known_registers = KNOWN_XH2_REGISTERS
+                    # MOD-series 3-phase inverters
+                    elif cfg["device_id"].startswith("VWQ"):
+                        known_registers = KNOWN_MOD_REGISTERS
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -359,22 +363,23 @@ class Client:
                 )
                 return
 
-            # NOAH EcoTracker JSON data (0x6F64)
+            # NOAH/NEXA Smart Meter (EcoTracker, Shelly etc.) JSON data (0x6F64)
             if msg_type == 0x6F64:
-                eco = parser.parse_noah_6f64(unscrambled)
-                LOG.debug("EcoTracker data for %s: %s", eco["device_id"], eco["data"][:80])
-                topic = f"{HA_BASE_TOPIC}/sensor/grobro/{eco['device_id']}/eco_tracker/state"
-                self._client.publish(topic, eco["data"], retain=PUBLISH_SENSORS_RETAINED)
+                smart_meter = parser.parse_noah_6f64(unscrambled)
+                LOG.debug("Smart Meter data for %s: %s", smart_meter["device_id"], smart_meter["data"])
+                topic = f"{HA_BASE_TOPIC}/sensor/grobro/{smart_meter['device_id']}/smart_meter/state"
+                self._client.publish(topic, smart_meter["data"], retain=PUBLISH_SENSORS_RETAINED)
                 return
 
-            # NOAH-specific message types (FE19 config, 0103 holding regs, etc.)
+            # NOAH/NEXA-specific message types (FE19 config, 0103 holding regs, etc.)
             noah_msg = parser.parse_noah_message(unscrambled)
-            if noah_msg and noah_msg.get("message_type") == 0xFE19 and device_id.startswith("0PVP"):
-                config = noah_msg.get("config")
-                if config and config.serial_number:
-                    LOG.info("Received NOAH config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                    self.on_config(device_id, config)
-                    return
+            if noah_msg and noah_msg.get("message_type") == 0xFE19:
+                if device_id.startswith("0PVP") or device_id.startswith("0HVR"):
+                    config = noah_msg.get("config")
+                    if config and config.serial_number:
+                        LOG.info("Received config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+                        self.on_config(device_id, config)
+                        return
 
             # Generic modbus message
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
@@ -399,6 +404,9 @@ class Client:
                 # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
                 elif modbus_device_id.startswith("ZGQ"):
                     known_registers = KNOWN_XH2_REGISTERS
+                # MOD-series 3-phase inverters
+                elif modbus_device_id.startswith("VWQ"):
+                    known_registers = KNOWN_MOD_REGISTERS
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return
@@ -454,10 +462,15 @@ class Client:
             LOG.error(f"Processing message: {e}")
 
     def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
+        LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
         if DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
             device_id = _extract_device_id(msg.topic)
+
+            unscrambled = parser.unscramble(msg.payload)
+            LOG.debug("Received Growatt forward: %s %s", msg.topic, unscrambled.hex(" "))
+
             if not GROWATT_CLOUD_ENABLED:
                 return
             if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:

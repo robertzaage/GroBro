@@ -62,23 +62,23 @@ docker run --detach \
 
 ### 4. Setup the Growatt Device
 
-Open the ShinePhone app and tap on `Devices List`. Select the inverter you want to configure for your own MQTT server and tap `Configure`.
-Make sure you are within Bluetooth range and the inverter is powered on. Configuration cannot be performed at night when the inverter is off.
+_Note: Server and IP configuration isn't possible through the ShinePhone app anymore._
 
-![Step 1](assets/config_menu_1.png)
+Open the [openapi.growatt.com](https://openapi.growatt.com) dashboard and click on `All Devices` in the `My Photovoltaic Devices` section. Select the inverter or battery you want to configure for your own MQTT server and tap `Datalogger Setting`.
+Configuration cannot be performed at night when the inverter is off and not connected to the internet.
 
-Next, tap `Advanced` and open the `Server settings` tab. Tap the lock icon and enter the password, which is based on the current date:
+![Step 1](assets/config_dashboard.png)
+
+Next, click `All Devices` in the `My Photovoltaic Devices` section. After that select the device you want to reconfigure and click `Datalogger Setting`.
+
+![Step 2](assets/config_menu.png)
+
+First enter the password, which is based on the current date:
 
 `growatt<YYYYMMDD>`
 
-Then tap `Yes`.
-
-![Step 2](assets/config_menu_2.png)
-
-Once unlocked, the settings can be modified. For `Server domain name/IP`, choose `Manual` and enter the address of your Mosquitto instance configured for TLS. Do the same for the `Port` field.
-Return to the main configuration screen and tap `Configure immediately`. You can ignore the final step when the app attempts to connect to the Growatt cloud. After that, you may close the app.
-
-![Step 3](assets/config_menu_3.png)
+Only when entered correctly the settings can be modified. For `Set Domain`, enter the address of your Mosquitto instance configured for TLS. Do the same for the `Port` field.
+Next, click `Yes`.
 
 Additionally: Block the device from accessing the internet after configuration to prevent it from reverting settings or syncing with the cloud.
 
@@ -121,6 +121,7 @@ docker run --detach \
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
 | `MAX_BAT`       | ❌ No    | Battery pack count in Home Assistant. Default `"auto"` detects from serial number presence. Set to a number (e.g. `1`) to override. |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
+| `KEEP_BATTERY_POSITION` | ❌ No | Set to `true` to enable NOAH battery position change detection. When the inverter re-enumerates its battery stack and a battery moves to a different slot, a warning is logged. Default is `false`. |
 
 # Example Setup with DuckDNS and HA-MQTT
 

@@ -55,22 +55,21 @@ class GrowattRegisterDataType(BaseModel):
             return round(value, 3)
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
             value = struct.unpack(unpack_type, data_raw)[0]
-            h = value // 256
-            m = value % 256
-            return (h * 100) + m
+            hour = (value >> 8) & 0xFF
+            minute = value & 0xFF
+            return f"{hour:02d}:{minute:02d}"
         elif self.data_type in [GrowattRegisterDataTypes.INT, GrowattRegisterDataTypes.SIGNED_INT]:
             value = struct.unpack(unpack_type, data_raw)[0]
             return value
         elif self.data_type == GrowattRegisterDataTypes.ENUM:
             opts = self.enum_options
             value = struct.unpack(unpack_type, data_raw)[0]
+
             if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
                 return None  # TODO: implement
+
             elif opts.enum_type == GrowattRegisterEnumTypes.INT_MAP:
-                enum_value = opts.values.get(int(value), None)
-                if not enum_value:
-                    return None
-                return value
+                return opts.values.get(int(value), "unknown")
 
 
 class GrowattRegisterPosition(BaseModel):
@@ -95,7 +94,8 @@ class HomeAssistantHoldingRegister(BaseModel):
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
-
+    options: Optional[dict[str, str]] = None
+    
     model_config = ConfigDict(extra="forbid")
 
 
@@ -173,3 +173,10 @@ with resources.files(__package__).joinpath("growatt_spf_registers.json").open("r
 # register positions are unverified pending an XH2 owner with a battery installed.
 with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("rb") as f:
     KNOWN_XH2_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+# MOD 3-phase inverter family (ShineWiFi-X dongle).
+# Similar register block layout (3000-3499) to NEO but with key differences:
+# - Phase powers are u16*0.1 instead of u32*0.1
+# - Pac total at reg 3020 (u16) instead of 3019 (u32)
+# - Pac1 at 3025, Pac2 at 3029, Pac3 at 3033
+with resources.files(__package__).joinpath("growatt_mod_registers.json").open("rb") as f:
+    KNOWN_MOD_REGISTERS = GroBroRegisters.model_validate(json.load(f))

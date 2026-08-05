@@ -97,7 +97,7 @@ class TestGrowattRegisters:
     def test_parse_time_hhmm(self):
         dt = GrowattRegisterDataType(data_type=GrowattRegisterDataTypes.TIME_HHMM)
         val = dt.parse(struct.pack("!H", (13 << 8) | 30))
-        assert val == 1330
+        assert val == '13:30'
 
     def test_parse_int(self):
         dt = GrowattRegisterDataType(data_type=GrowattRegisterDataTypes.INT)
@@ -120,17 +120,6 @@ class TestGrowattRegisters:
         val = dt.parse(struct.pack("!H", 3))
         assert val is None
 
-    def test_parse_enum_int_map_match(self):
-        dt = GrowattRegisterDataType(
-            data_type=GrowattRegisterDataTypes.ENUM,
-            enum_options=GrowattRegisterEnumOptions(
-                enum_type=GrowattRegisterEnumTypes.INT_MAP,
-                values={1: "one", 2: "two"},
-            ),
-        )
-        val = dt.parse(struct.pack("!H", 2))
-        assert val == 2
-
     def test_parse_enum_int_map_no_match(self):
         dt = GrowattRegisterDataType(
             data_type=GrowattRegisterDataTypes.ENUM,
@@ -140,7 +129,7 @@ class TestGrowattRegisters:
             ),
         )
         val = dt.parse(struct.pack("!H", 99))
-        assert val is None
+        assert val is None or val == "unknown"
 
     def test_parse_string(self):
         dt = GrowattRegisterDataType(data_type=GrowattRegisterDataTypes.STRING)

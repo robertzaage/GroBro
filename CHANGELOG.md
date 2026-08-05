@@ -1,7 +1,21 @@
-## Unreleased
+## v2.7.5
+
+### Bug Fixes
++ Reverted the 0x0103 holding register dump handler introduced in v2.7.3. It caused all-zero sensor readings for some users, disturbing automations. The original warning messages from unknown message type 259 will reappear in logs (#198)
+
+## v2.7.4
+
+### Bug Fixes
++ Fixed v2.7.3 regression: 0x0103 dumps no longer publish invalid config values like `charge_limit: 0` (#198)
+
+## v2.7.3
 
 ### New Features
-+ NEO inverters now expose an **Inverter Power** switch (holding register 0). Sending OFF stops the inverter; ON re-enables it. This complements `output_power_limit` (register 3), which can't reach a true off due to the firmware enforcing a ~30 W floor at 0 %. Verified against a NEO 800M-X with GroBro running locally and no Growatt cloud session.
++ Added `KEEP_BATTERY_POSITION` option (default: off). When enabled, GroBro tracks NOAH battery serial numbers across position changes and logs a warning if the inverter stack re-enumerates and a battery moves to a different slot (#196)
+
+### Bug Fixes
++ Fixed NEXA and NOAH devices crashing the parser every hour when sending holding register dumps (message type 0x0103) (#198)
++ Fixed NEXA household load sensors showing wrong values when the load is negative (e.g. exporting to grid). The registers are now parsed as signed values (#195)
 
 ## v2.7.2
 
@@ -14,7 +28,6 @@
 + Fixed NOAH battery devices being merged into one in Home Assistant. All NOAH devices report the same non-unique MAC address (`AA:BB:CC:DD:EE:XX`), which caused Home Assistant's device registry to treat them as the same device. The MAC is now validated and masked MACs like this are rejected and no longer used for device matching (#178)
 + Fixed missing TZ definition in German translation (#183)
 + Fixed `MAX_BAT=auto` showing phantom empty batteries, battery count is now read from the device's own `bat_cnt` register instead of relying solely on serial-number register presence (#187)
-+ Restored icon fields on battery SOC sensors that were incorrectly removed
 
 ## v2.6.2
 

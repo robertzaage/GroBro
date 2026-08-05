@@ -68,3 +68,6 @@ configuration:
   TZ:
     name: Zeitzone
     sescription: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.
+  KEEP_BATTERY_POSITION:
+    name: KEEP_BATTERY_POSITION
+    description: Wenn aktiviert, überwacht GroBro die Seriennummern der NOAH-Batterien über Positionswechsel und protokolliert eine Warnung, wenn eine Batterie in einen anderen Steckplatz wechselt. Standard ist deaktiviert.
