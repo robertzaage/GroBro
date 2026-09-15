@@ -1457,15 +1457,15 @@
     "charging_discharging": {
       "growatt": {
         "position": {
-          "register_no": 11,
+          "register_no": 412,
           "offset": 0,
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
+            "delta": 0.0,
+            "multiplier": -1.0
           }
         }
       },
