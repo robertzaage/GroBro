@@ -110,9 +110,9 @@ class GrowattModbusMessage(BaseModel):
     Represents a block of modbus registers sent by the growatt device.
 
     Header Structure:
-        - H - 2 byte unknown
-        - H - 2 byte constant 7
-        - H - 2 byte message length (excluding register count, constant and message length)
+        - H - 2 byte transaction ID (echoed in responses)
+        - H - 2 byte Growatt protocol ID (observed: 7)
+        - H - 2 byte frame length from offset 8 (includes trailing CRC)
         - B - 1 byte modbus device address (seems to be constant 1 in mqtt)
         - B - 1 byte function
         - 30s - 30 byte zero-padded device id
@@ -120,7 +120,7 @@ class GrowattModbusMessage(BaseModel):
         - N register blocks
     """
 
-    unknown: int
+    transaction_id: int
     device_id: str
     metadata: Optional[GrowattMetadata] = None
     function: GrowattModbusFunction
@@ -146,7 +146,7 @@ class GrowattModbusMessage(BaseModel):
     @staticmethod
     def parse_grobro(buffer) -> Optional["GrowattModbusMessage"]:
         try:
-            (unknown, constant_7, msg_len, constant_1, function, device_id_raw) = (
+            (transaction_id, constant_7, msg_len, constant_1, function, device_id_raw) = (
                 struct.unpack(
                     HEADER_STRUCT,
                     buffer[0:38],
@@ -178,7 +178,7 @@ class GrowattModbusMessage(BaseModel):
                 offset += block.size()
 
             return GrowattModbusMessage(
-                unknown=unknown,
+                transaction_id=transaction_id,
                 metadata=metadata,
                 device_id=device_id,
                 function=function,
@@ -190,7 +190,7 @@ class GrowattModbusMessage(BaseModel):
     def build_grobro(self) -> bytes:
         result = struct.pack(
             HEADER_STRUCT,
-            self.unknown,
+            self.transaction_id,
             7,
             self.msg_len,
             1,

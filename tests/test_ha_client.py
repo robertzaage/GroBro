@@ -344,6 +344,7 @@ class TestClientHoldingInput:
         topic = ha_client._client.publish.call_args[0][0]
         assert "output_power_limit" in topic
         assert "get" in topic
+        assert ha_client._client.publish.call_args.kwargs["retain"] is True
 
     def test_publish_holding_register_error(self, caplog, ha_client):
         ha_client._client.publish.side_effect = Exception("publish error")

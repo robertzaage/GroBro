@@ -49,6 +49,12 @@ def _extract_device_id(topic: str) -> str:
     """
     return _DEVICE_ID_RE.sub("", topic.split("/")[-1])
 
+def _normalize_neo_output_power_limit(value: float | int) -> float | int:
+    # NEO encodes its 100% output-power limit as raw value 1 in read responses.
+    return 100 if value == 1 else value
+
+
+
 
 LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
@@ -376,9 +382,33 @@ class Client:
                         self.on_config(device_id, config)
                         return
 
+            # NEO preset-single responses carry the confirmed register value after
+            # a one-byte status field, unlike standard Modbus register blocks.
+            preset_response = GrowattModbusFunctionSingle.parse_response_grobro(unscrambled)
+            if preset_response and device_id.startswith("QMN"):
+                state = HomeAssistantHoldingRegisterInput(device_id=device_id)
+                for name, register in KNOWN_NEO_REGISTERS.holding_registers.items():
+                    if register.growatt.position.register_no != preset_response.register_no:
+                        continue
+                    value = register.growatt.data.parse(preset_response.value.to_bytes(2, "big"))
+                    if name == "output_power_limit":
+                        value = _normalize_neo_output_power_limit(value)
+                    if value is not None:
+                        state.payload.append(
+                            HomeAssistantHoldingRegisterValue(
+                                name=name,
+                                value=value,
+                                register=register.homeassistant,
+                            )
+                        )
+                    break
+                if state.payload:
+                    self.on_holding_register_input(state)
+                return
+
             # Generic modbus message
             modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
-            LOG.debug("Received modbus message: %s", modbus_message)
+            LOG.debug("Received Modbus response: %s", modbus_message)
 
             if modbus_message:
                 known_registers = None
@@ -419,6 +449,8 @@ class Client:
                         value = register.growatt.data.parse(data_raw)
                         if value is None:
                             continue
+                        if modbus_device_id.startswith("QMN") and name == "output_power_limit":
+                            value = _normalize_neo_output_power_limit(value)
                         if register.homeassistant.type=="switch":
                             value = "ON" if value==1 else "OFF"
                         state.payload.append(

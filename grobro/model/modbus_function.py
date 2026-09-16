@@ -12,9 +12,9 @@ class GrowattModbusFunctionMultiple(BaseModel):
     to read or write multiple registers.
 
     Structure:
-        - H - 2 byte unknown
-        - H - 2 byte constant 7
-        - H - 2 byte message length (excluding register count, constant and message length)
+        - H - 2 byte transaction ID (echoed in responses)
+        - H - 2 byte Growatt protocol ID (constant: 7)
+        - H - 2 byte frame length from offset 8 (includes trailing CRC)
         - B - 1 byte modbus device address (seems to be constant 1 in mqtt)
         - B - 1 byte function
         - 30s - 30 byte zero-padded device id
@@ -74,9 +74,9 @@ class GrowattModbusFunctionSingle(BaseModel):
     to read or write single registers.
 
     Structure:
-        - H - 2 byte unknown
-        - H - 2 byte constant 7
-        - H - 2 byte message length (excluding register count, constant and message length)
+        - H - 2 byte transaction ID (echoed in responses)
+        - H - 2 byte Growatt protocol ID (observed: 7)
+        - H - 2 byte frame length from offset 8 (includes trailing CRC)
         - B - 1 byte modbus device address (seems to be constant 1 in mqtt)
         - B - 1 byte function
         - 30s - 30 byte zero-padded device id
@@ -106,6 +106,36 @@ class GrowattModbusFunctionSingle(BaseModel):
 
         return GrowattModbusFunctionSingle(
             device_id=device_id,
+            function=function,
+            register_no=register,
+            value=value,
+        )
+
+    @staticmethod
+    def parse_response_grobro(buffer) -> Optional["GrowattModbusFunctionSingle"]:
+        if len(buffer) < 45:
+            return None
+
+        (
+            _unknown,
+            _constant_7,
+            message_length,
+            _device_address,
+            function,
+            device_id_raw,
+            register,
+            status,
+            value,
+        ) = struct.unpack(">HHHBB30sHBH", buffer[:43])
+        if (
+            message_length != len(buffer[8:])
+            or function != GrowattModbusFunction.PRESET_SINGLE_REGISTER
+            or status != 0
+        ):
+            return None
+
+        return GrowattModbusFunctionSingle(
+            device_id=device_id_raw.decode("ascii", errors="ignore").strip("\x00"),
             function=function,
             register_no=register,
             value=value,

@@ -21,6 +21,8 @@ Join us at [#grobro:matrix.org](https://matrix.to/#/#grobro:matrix.org)
 - Proxies messages to the Growatt Cloud to keep the ShinePhone app functional (optional)
 - Enables a local-only setup - keeping your device off the cloud
 - Supports Home Assistant MQTT auto-discovery
+- Publishes all holding-register state topics with MQTT retention so Home Assistant restores the latest confirmed control values after restarts
+- Handles the observed NEO output-power-limit encoding where raw response value `1` represents `100%`
 - Containerized and configurable via environment variables
 
 ---
