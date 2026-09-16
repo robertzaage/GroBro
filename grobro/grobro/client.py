@@ -299,11 +299,6 @@ class Client:
                     cfg["value"],
                 )
 
-                # Publish value back to HA (config/.../get)
-                topic = (
-                    f"{HA_BASE_TOPIC}/config/grobro/"
-                    f"{cfg['device_id']}/{cfg['register_no']}/get"
-                )
 
                 value = cfg["value"]
 
@@ -344,13 +339,13 @@ class Client:
                         e,
                     )
 
-                self._client.publish(topic, value, retain=True)
 
                 if self.on_config_read_response:
                     self.on_config_read_response(
                         cfg["device_id"],
                         cfg["register_no"],
-                )
+                        value,
+                    )
                 return
 
             # Config WRITE response (280)

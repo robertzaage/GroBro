@@ -22,7 +22,6 @@ def unscramble(decdata: bytes):
     for i, j in zip(range(0, ndecdata - 8), cycle(range(0, nmask))):
         unscrambled += bytes([decdata[i + 8] ^ int(hex_mask[j], 16)])
 
-    # hexdump(unscrambled)
     return unscrambled
 
 
@@ -115,7 +114,10 @@ def find_config_offset(data):
 
 
 def parse_config_message(data: bytes):
-    config_read_struct = struct.Struct(">4sHH16s14sH1xH2x")
+    # Config-read response layout:
+    # header, length, msg type, device id, 14B padding, config type,
+    # 1B padding, register number, value length, value, optional trailing TLVs, CRC.
+    config_read_struct = struct.Struct(">4sHH16s14sH1xHH")
 
     (
         header,
@@ -125,10 +127,22 @@ def parse_config_message(data: bytes):
         _padding,
         config_type,
         register_no,
+        value_len,
     ) = config_read_struct.unpack_from(data)
 
-    # remove trailing checksum
-    value = data[config_read_struct.size:-2].decode("ascii")
+    value_start = config_read_struct.size
+    if msg_type == 0x0118 and value_len == 0:
+        # Config-write packets omit the response value-length field; their
+        # value occupies the remaining payload before the two-byte CRC.
+        value_len = len(data) - value_start - 2
+
+    value_end = value_start + value_len
+    if value_end > len(data) - 2:
+        raise ValueError(
+            f"Config value length {value_len} exceeds packet payload ({len(data)} bytes)"
+        )
+
+    value = data[value_start:value_end].decode("ascii")
 
     return {
         "header": header,
@@ -145,7 +159,7 @@ def parse_config_ack(data: bytes):
     config_ack_struct = struct.Struct(">4sHH16s14sH")
 
     (
-     	header,
+        header,
         msg_len,
         msg_type,
         device_id,
@@ -154,7 +168,7 @@ def parse_config_ack(data: bytes):
     ) = config_ack_struct.unpack_from(data)
 
     return {
-	"header": header,
+        "header": header,
         "message_length": msg_len,
         "message_type": msg_type,
         "device_id": device_id.rstrip(b"\x00").decode("ascii"),
@@ -174,7 +188,6 @@ def parse_noah_0110(data: bytes) -> dict:
     """
     payload = data[24:]
     regs = {}
-    # register data at payload[14:] in the format: reg_lo(1B) + val_hi(1B) or reg(2B) + val(2B)
     body = payload[14:]
     pos = 0
     while pos + 4 <= len(body):
@@ -256,8 +269,7 @@ def parse_noah_fe25(data: bytes) -> dict:
     Payload: zeros except for CRC at end.
     """
     payload = data[24:]
-    # Check first 40 bytes for emptiness (last bytes may be non-payload data)
-    check_len = min(40, len(payload) - 4)  # exclude unknown trailing + CRC
+    check_len = min(40, len(payload) - 4)
     payload_body = payload[:check_len]
     return {
         "message_type": 0xFE25,

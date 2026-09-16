@@ -171,11 +171,15 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         client.on_config.assert_called_once()
 
-    def test_config_read_response_281(self, client):
+    def test_config_read_response_281_routes_value_to_ha_client(self, client):
         data = (Path(DATA_DIR) / "NeoConfigReadResponse_337.bin").read_bytes()
         msg = _msg("c/33/QMN000ABC1D2E3FG", data)
         client._client.on_message(None, None, msg)
-        client._client.publish.assert_called()  # publishes back to HA topic
+
+        client._client.publish.assert_not_called()
+        client.on_config_read_response.assert_called_once_with(
+            "QMN000ABC1D2E3FG", 4, 5
+        )
 
     def test_config_write_ack_280(self, client):
         data = (Path(DATA_DIR) / "NeoConfigWriteAck_DataInterval.bin").read_bytes()

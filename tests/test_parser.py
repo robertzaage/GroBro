@@ -27,7 +27,6 @@ def test_parse_noah_6f64():
     assert "2026-05-15T17:12:09.001" in result["timestamp"]
     assert json.loads(result["data"])["t_act"] == 150
 
-    # Should also work via dispatch
     dispatched = parser.parse_noah_message(bytes(data))
     assert dispatched is not None
     assert dispatched["message_type"] == 0x6F64
@@ -62,3 +61,22 @@ def test_parse_config_type_no_params():
     data = b"\xff\xff\x00\x00\x00\xff"
     config = parser.parse_config_type(data, 0)
     assert config.model_dump().get("raw") is not None
+
+
+def test_parse_neo_config_read_uses_declared_value_length():
+    # Real NEO response shape observed for register 76. The Wi-Fi RSSI value is
+    # '-055' and additional bytes follow before the CRC; they must not be
+    # included in the decoded value.
+    data = bytes.fromhex(
+        "00 01 00 07 00 30 01 19 "
+        "51 4d 4e 30 30 30 41 42 43 31 44 32 45 33 46 47 "
+        "00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+        "00 02 00 00 4c 00 04 2d 30 35 35 00 05 00 01 31 ca f3"
+    )
+
+    result = parser.parse_config_message(data)
+
+    assert result["message_type"] == 0x0119
+    assert result["device_id"] == "QMN000ABC1D2E3FG"
+    assert result["register_no"] == 76
+    assert result["value"] == "-055"

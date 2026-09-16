@@ -932,7 +932,10 @@ class Client:
         # continue with next queued register
         self.__kickoff_next_config_read(device_id)
 
-    def handle_config_read_response(self, device_id: str, register_no: int):
+    def handle_config_read_response(self, device_id: str, register_no: int, value: str | int):
+        topic = f"{HA_BASE_TOPIC}/config/grobro/{device_id}/{register_no}/get"
+        self._client.publish(topic, value, retain=True)
+
         with self._config_read_lock:
             inflight = self._config_read_inflight.get(device_id)
             if inflight != register_no:
