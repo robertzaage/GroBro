@@ -116,7 +116,7 @@ class GrowattModbusMessage(BaseModel):
         - B - 1 byte modbus device address (seems to be constant 1 in mqtt)
         - B - 1 byte function
         - 30s - 30 byte zero-padded device id
-        - optional GrowattModbusMetadata - only present when function == READ_INPUT_REGISTER
+        - optional GrowattModbusMetadata - present for functions READ_INPUT_REGISTER and READ_HOLDING_REGISTER
         - N register blocks
     """
 
@@ -163,12 +163,17 @@ class GrowattModbusMessage(BaseModel):
             offset = 38
 
             metadata = None
-            if function == GrowattModbusFunction.READ_INPUT_REGISTER:
+            if function in (
+                GrowattModbusFunction.READ_INPUT_REGISTER,
+                GrowattModbusFunction.READ_HOLDING_REGISTER,
+            ):
                 metadata = GrowattMetadata.parse_grobro(buffer[offset:])
                 offset += metadata.size()
 
             while len(buffer) > offset + 6:
                 block = GrowattModbusBlock.parse_grobro(buffer[offset:])
+                if block is None:
+                    return None
                 register_blocks.append(block)
                 offset += block.size()
 

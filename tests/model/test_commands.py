@@ -4,6 +4,7 @@ import struct
 
 from grobro.grobro import parser
 from grobro.model.modbus_message import (
+    GrowattModbusFunction,
     GrowattModbusMessage,
 )
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
@@ -229,10 +230,13 @@ def test_noah_preset_multiple_charge_limit():
 def test_noah_type0103_holding_registers():
     data = (DATA_DIR / "NoahType0103_HoldingRegs.bin").read_bytes()
     unscrambled = parser.unscramble(data)
-    result = parser.parse_noah_0103(unscrambled)
-    assert result["message_type"] == 0x0103
-    assert result["device_id"] == NOAH_TEST_DEVICE_ID
-    assert result["register_count"] > 0
+    result = GrowattModbusMessage.parse_grobro(unscrambled)
+    assert result is not None
+    assert result.device_id == NOAH_TEST_DEVICE_ID
+    assert result.function == GrowattModbusFunction.READ_HOLDING_REGISTER
+    assert result.metadata is not None
+    assert result.metadata.device_sn == NOAH_TEST_DEVICE_ID
+    assert len(result.register_blocks) > 0
 
 
 def test_noah_type0110_response():

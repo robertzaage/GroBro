@@ -167,25 +167,6 @@ def parse_config_ack(data: bytes):
 # The 2-byte type/subtype field starts at payload offset 14.
 
 
-def parse_noah_0103(data: bytes) -> dict:
-    """
-    NOAH type 0x0103 — Holding register dump.
-    Payload: 14 zero bytes + 16B device serial (offset 14) + register data.
-    """
-    payload = data[24:]
-    device_id = payload[14:30].rstrip(b"\x00").decode("ascii", errors="replace")
-    reg_data = payload[30:]
-    registers = []
-    for i in range(0, len(reg_data) - 1, 2):
-        registers.append(struct.unpack_from(">H", reg_data, i)[0])
-    return {
-        "message_type": 0x0103,
-        "device_id": device_id,
-        "registers": registers,
-        "register_count": len(registers),
-    }
-
-
 def parse_noah_0110(data: bytes) -> dict:
     """
     NOAH type 0x0110 — Preset-multiple register response/ack.
@@ -315,7 +296,6 @@ def parse_noah_6f64(data: bytes) -> dict:
 
 
 NOAH_DECODERS = {
-    0x0103: parse_noah_0103,
     0x0110: parse_noah_0110,
     0x0125: parse_noah_0125,
     0xFE18: parse_noah_fe18,
