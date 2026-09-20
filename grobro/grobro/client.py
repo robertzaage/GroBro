@@ -124,11 +124,11 @@ class Client:
         self._ptq_for_raq: dict[str, str] = {}
 
     def start(self):
-        LOG.debug("GroBro: Start")
+        LOG.info("GroBro: Start")
         self._client.loop_start()
 
     def stop(self):
-        LOG.debug("GroBro: Stop")
+        LOG.info("GroBro: Stop")
         self._client.loop_stop()
         self._client.disconnect()
         for key, client in self._forward_clients.items():
@@ -220,7 +220,7 @@ class Client:
         )
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
-      LOG.debug(f"Connected to GroBro MQTT server with result code {reason_code}")
+      LOG.info(f"Connected to GroBro MQTT server with result code {reason_code}")
       self._client.subscribe("c/#")      
 
     def __on_message(self, client, userdata, msg: MQTTMessage):
