@@ -46,16 +46,13 @@ configuration:
     description: Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR.
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: Dumps every received messages into $DUMP_DIR for later in-depth inspection.
+    description: Dumps every received messages into /config/dump for later in-depth inspection.
   MAX_SLOTS:
     name: MAX_SLOTS
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH only, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
     description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect automatically from serial numbers, or a number to override.
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.
@@ -71,3 +68,6 @@ configuration:
   KEEP_BATTERY_POSITION:
     name: KEEP_BATTERY_POSITION
     description: When enabled, GroBro tracks NOAH battery serial numbers across position changes and logs a warning if a battery moves to a different slot. Default is false.
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: When enabled, sensor state messages are published as MQTT retained messages, so Home Assistant immediately shows the last known values after a restart instead of "unknown". Default is false.

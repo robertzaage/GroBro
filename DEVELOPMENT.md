@@ -142,10 +142,16 @@ these tags. Messages tagged `"ha"` or `"growatt"` are skipped to avoid echo loop
 ### Config persistence
 
 Device configs are cached in memory (`_config_cache` dict) and also persisted to disk as
-`config_{device_id}.json` files in the working directory. On startup, if a device's config
+`config_{device_id}.json` files under `/config`. On startup, if a device's config
 is not in the cache, `__device_info_from_config` falls back to loading from file, then to
 creating a minimal config with just the serial number. Config files are written via
 `DeviceConfig.to_file()` and read via `DeviceConfig.from_file()`.
+
+The same `/config` directory also holds `state_cache_{device_id}.json` files, which cache
+the last known value of every input register per device. Missing keys in a fresh payload
+(e.g. a disconnected battery no longer reporting `bat*` registers) are backfilled from this
+cache before publishing, so the corresponding Home Assistant entities keep their last known
+value instead of dropping to "unknown".
 
 ### Three-broker topology
 
@@ -874,8 +880,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
-| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `<DUMP_DIR>/<topic_path>/<timestamp_ms>.bin` |
-| `DUMP_DIR` | `"/dump"` | Directory for dumped message files (in HA add-on: `"/share/GroBro/dump"`)
+| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `/config/dump/<topic_path>/<timestamp_ms>.bin` |
 
 ### 8.2 Message dump file naming
 
@@ -883,12 +888,12 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 with millisecond-precision timestamps:
 
 ```
-<DUMP_DIR>/<topic_parts>/<epoch_millis>.bin
+/config/dump/<topic_parts>/<epoch_millis>.bin
 ```
 
 For example, a message on topic `c/33/QMN000ABC1D2E3FG` is saved as:
 ```
-/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
+/config/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
 ```
 
 Because the payload is saved before unscrambling, you must call `unscramble()` on the
