@@ -955,3 +955,134 @@ class Client:
 
         # continue with next queued read
         self.__kickoff_next_config_read(device_id)
+
+
+# ------------------- Combined NOAH/NEXA firmware -------------------
+
+_COMBINED_FIRMWARE_PREFIXES = ("0PVP", "0HVR")
+
+
+def _firmware_part_names(payload: dict) -> list[str]:
+    """Return firmware part keys in numeric part order."""
+    names = [name for name in payload if name.startswith("fw_version_part_")]
+
+    def part_number(name: str) -> int:
+        try:
+            return int(name.rsplit("_", 1)[1])
+        except (TypeError, ValueError):
+            return 9999
+
+    return sorted(names, key=part_number)
+
+
+def _compact_datalogger_version(value: object) -> str | None:
+    """Convert a dotted numeric datalogger version to the ShinePhone suffix."""
+    if value is None:
+        return None
+
+    text = str(value).strip()
+    if not text:
+        return None
+
+    parts = text.split(".")
+    if not parts or any(not part.isdigit() for part in parts):
+        return None
+
+    return "".join(parts)
+
+
+def compose_combined_firmware(payload: dict, datalogger_version: object) -> str | None:
+    """Build a ShinePhone-style firmware version from received values."""
+    names = _firmware_part_names(payload)
+    if not names:
+        return None
+
+    base_parts: list[str] = []
+    for name in names:
+        value = payload.get(name)
+        if value is None or str(value).strip() == "":
+            return None
+        base_parts.append(str(value).strip())
+
+    base_version = ".".join(base_parts)
+    suffix = _compact_datalogger_version(datalogger_version)
+    return f"{base_version}.{suffix}" if suffix else base_version
+
+
+# Backwards-compatible name for callers/tests that used the first implementation.
+compose_noah_firmware = compose_combined_firmware
+
+
+_ORIGINAL_PUBLISH_INPUT_REGISTER = Client.publish_input_register
+_ORIGINAL_PUBLISH_DEVICE_DISCOVERY = Client._Client__publish_device_discovery
+
+
+def _publish_input_register_with_firmware(self, state: HomeAssistantInputRegister):
+    if state.device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
+        config = getattr(self, "_config_cache", {}).get(state.device_id)
+        datalogger_version = getattr(config, "sw_version", None) if config else None
+        firmware_version = compose_combined_firmware(state.payload, datalogger_version)
+
+        if firmware_version:
+            versions = getattr(self, "_combined_firmware_versions", None)
+            if versions is None:
+                versions = {}
+                self._combined_firmware_versions = versions
+
+            if versions.get(state.device_id) != firmware_version:
+                versions[state.device_id] = firmware_version
+                self._discovery_payload_cache.pop(state.device_id, None)
+
+            payload = dict(state.payload)
+            payload["fw_version"] = firmware_version
+            state = HomeAssistantInputRegister(
+                device_id=state.device_id,
+                payload=payload,
+            )
+
+    return _ORIGINAL_PUBLISH_INPUT_REGISTER(self, state)
+
+
+def _publish_device_discovery_with_firmware(
+    self,
+    device_id: str,
+    effective_max_bat: int | None = None,
+):
+    if not device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
+        return _ORIGINAL_PUBLISH_DEVICE_DISCOVERY(self, device_id, effective_max_bat)
+
+    original_publish = self._client.publish
+    discovery_topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+
+    def publish(topic, payload=None, *args, **kwargs):
+        if topic == discovery_topic and payload:
+            try:
+                data = json.loads(payload)
+                version = getattr(self, "_combined_firmware_versions", {}).get(device_id)
+
+                if version:
+                    device = data.get("dev")
+                    if isinstance(device, dict):
+                        device["sw_version"] = version
+
+                components = data.get("cmps")
+                if isinstance(components, dict):
+                    firmware = components.get(f"grobro_{device_id}_fw_version")
+                    if isinstance(firmware, dict):
+                        firmware["value_template"] = "{{ value_json['fw_version'] }}"
+
+                payload = json.dumps(data, sort_keys=True, separators=(",", ":"))
+            except (TypeError, ValueError):
+                pass
+
+        return original_publish(topic, payload, *args, **kwargs)
+
+    self._client.publish = publish
+    try:
+        return _ORIGINAL_PUBLISH_DEVICE_DISCOVERY(self, device_id, effective_max_bat)
+    finally:
+        self._client.publish = original_publish
+
+
+Client.publish_input_register = _publish_input_register_with_firmware
+Client._Client__publish_device_discovery = _publish_device_discovery_with_firmware
