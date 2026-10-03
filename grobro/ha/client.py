@@ -45,6 +45,12 @@ LOG = logging.getLogger(__name__)
 _MAX_BAT_CACHE: dict[str, int] = {}
 _LAST_BAT_SERIALS: dict[str, dict[int, str]] = {}
 
+# Sensor values are held at their last known reading when a key is
+# momentarily or permanently missing from a device's payload (e.g. a
+# disconnected battery, or a brief comms hiccup), so HA entities don't
+# drop to "unknown".
+CONFIG_DIR = "/config"
+
 # ------------------- Helpfunctions -------------------
 
 def _detect_bat_count(payload: dict) -> int:
@@ -234,15 +240,29 @@ class Client:
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
 
-        # Configs laden (Cache aus Dateien)
-        for fname in os.listdir("."):
+        self._discovery_payload_cache: dict[str, str] = {}
+        self._neo_pv_count: dict[str, int] = {}
+
+        # Last known sensor values per device, persisted to disk so they
+        # survive both GroBro and HA restarts.
+        self._value_cache: dict[str, dict] = {}
+
+        # Load from cached files
+        for fname in os.listdir(CONFIG_DIR):
             if fname.startswith("config_") and fname.endswith(".json"):
-                config = model.DeviceConfig.from_file(fname)
+                config = model.DeviceConfig.from_file(os.path.join(CONFIG_DIR, fname))
                 if config:
                     self._config_cache[config.device_id] = config
 
-        self._discovery_payload_cache: dict[str, str] = {}
-        self._neo_pv_count: dict[str, int] = {}
+        for fname in os.listdir(CONFIG_DIR):
+            if fname.startswith("state_cache_") and fname.endswith(".json"):
+                device_id = fname[len("state_cache_"):-len(".json")]
+                try:
+                    with open(os.path.join(CONFIG_DIR, fname), "r") as f:
+                        self._value_cache[device_id] = json.load(f)
+                    LOG.info("Loaded cached sensor values for %s from disk", device_id)
+                except Exception as e:
+                    LOG.warning("Failed to load state cache %s: %s", fname, e)
 
     # ------------------- Lifecycle -------------------
 
@@ -256,7 +276,7 @@ class Client:
     # ------------------- Config Handling -------------------
 
     def set_config(self, device_id: str, config: model.DeviceConfig):
-        config_path = f"config_{device_id}.json"
+        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
         existing_config = model.DeviceConfig.from_file(config_path)
         if existing_config is None or existing_config != config:
             LOG.info(f"Saving updated config for {device_id}")
@@ -358,6 +378,51 @@ class Client:
                             )
             _LAST_BAT_SERIALS[state.device_id] = current_serials
 
+        # Backfill missing sensor keys from the last known good values.
+        # A key can be entirely absent from a payload for two reasons:
+        # 1) the source (e.g. a disconnected battery) stopped reporting it, or
+        # 2) GroBro/HA just (re)started and hasn't seen fresh data yet.
+        # In both cases we still publish the last known value instead of
+        # letting the corresponding HA entity drop to "unknown".
+        #
+        # total_increasing/total counters (kWh energy meters, used by the HA
+        # Energy dashboard) are deliberately excluded: HA already handles
+        # gaps in those correctly on its own (no data point instead of a
+        # false delta), and caching them risks the opposite problem - a
+        # stale (too high) cached value getting reinstated after a
+        # legitimate reset (e.g. the daily "_today" counters at midnight),
+        # which combined with FILTER_DATA_GLITCHES could then suppress the
+        # correct lower value as a false "glitch".
+        def _is_cacheable(key: str) -> bool:
+            if not known_registers:
+                return True
+            reg = known_registers.input_registers.get(key)
+            if not reg:
+                return True
+            state_class = getattr(reg.homeassistant, "state_class", None)
+            return state_class not in ("total_increasing", "total")
+
+        device_value_cache = self._value_cache.setdefault(state.device_id, {})
+        cache_changed = False
+        for key, value in payload.items():
+            if value is None or not _is_cacheable(key):
+                continue
+            bat_num = _get_bat_number(key)
+            if bat_num is not None and bat_num > effective_max_bat:
+                continue
+            if device_value_cache.get(key) != value:
+                device_value_cache[key] = value
+                cache_changed = True
+        for key, cached_value in list(device_value_cache.items()):
+            if key in payload or not _is_cacheable(key):
+                continue
+            bat_num = _get_bat_number(key)
+            if bat_num is not None and bat_num > effective_max_bat:
+                continue
+            payload[key] = cached_value
+        if cache_changed:
+            self.__save_value_cache(state.device_id)
+
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
@@ -376,6 +441,18 @@ class Client:
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
+        # Immediately republish the last known values for every device we
+        # have a cache for, so entities don't wait for the next device poll
+        # (or stay "unknown") after GroBro or the broker connection restarts.
+        for device_id, cached_payload in self._value_cache.items():
+            if not cached_payload:
+                continue
+            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+            # retain=True here regardless of PUBLISH_SENSORS_RETAINED: this
+            # seed message exists purely so a later HA restart immediately
+            # gets a value-complete state instead of "unknown".
+            self._client.publish(topic, json.dumps(cached_payload, separators=(",", ":")), retain=True)
+            LOG.info("Republished cached values for %s after (re)connect", device_id)
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
@@ -552,6 +629,14 @@ class Client:
             return
 
     # ------------------- Internals -------------------
+
+    def __save_value_cache(self, device_id: str):
+        path = os.path.join(CONFIG_DIR, f"state_cache_{device_id}.json")
+        try:
+            with open(path, "w") as f:
+                json.dump(self._value_cache.get(device_id, {}), f)
+        except Exception as e:
+            LOG.warning("Failed to persist state cache for %s: %s", device_id, e)
 
     def __reset_device_timer(self, device_id: str):
         def set_device_unavailable(d_id: str):
@@ -840,7 +925,7 @@ class Client:
     def __device_info_from_config(self, device_id: str):
         # Find matching config
         config = self._config_cache.get(device_id)
-        config_path = f"config_{device_id}.json"
+        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
 
         # Fallback: try loading from file
         if not config:

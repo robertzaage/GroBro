@@ -93,6 +93,7 @@ docker run --detach \
   --env SOURCE_MQTT_TLS=true \
   --env TARGET_MQTT_HOST=<target-mqtt-host> \
   --env TARGET_MQTT_PORT=<target-mqtt-port> \
+  --volume ./grobro-config:/config \
   ghcr.io/robertzaage/grobro:latest
 ```
 
@@ -115,13 +116,16 @@ docker run --detach \
 | `GROWATT_CLOUD`      | ❌ No    | Set to `true` to redirect messages to and from the Growatt Cloud. This is turned off by default. Supports a comma-separated list of device serials (e.g. `123456789,987654321`) for selective forwarding. |
 | `GROWATT_CLOUD_CONFIG_FILTER`  | ❌ No | Set to `true` to prevent forwarding config messages. This protects the datalogger from remote setting changes initiated by the Growatt Cloud. |
 | `LOG_LEVEL`          | ❌ No    | Sets the logging level to either `ERROR`, `DEBUG`, or `INFO`. If not set `ERROR` is used. |
-| `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/dump` for later in-depth inspection. |
+| `DUMP_MESSAGES`      | ❌ No    | Dumps every received messages into `/config/dump` for later in-depth inspection. |
 | `DEVICE_TIMEOUT` | ❌ No | Set the timeout in seconds for device communication. Default is `0` (disabled). Note: This must be greater than 0 for any availability/online tracking to work. Recommended: `300`+ seconds. After this time without data, the device is considered "offline." |
 | `AVAILABILITY_SENSOR` | ❌ No | Requires `DEVICE_TIMEOUT > 0`. Set to `true` to expose availability as a dedicated `online` binary sensor. If `false` (default), the device and all its entities will be marked as "unavailable" (grayed out) in Home Assistant when the timeout is reached. |
 | `MAX_SLOTS`     | ❌ No    | Set max available Slots for Battery configuration (Noah = max 9) |
 | `MAX_BAT`       | ❌ No    | Battery pack count in Home Assistant. Default `"auto"` detects from serial number presence. Set to a number (e.g. `1`) to override. |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
 | `KEEP_BATTERY_POSITION` | ❌ No | Set to `true` to enable NOAH battery position change detection. When the inverter re-enumerates its battery stack and a battery moves to a different slot, a warning is logged. Default is `false`. |
+
+GroBro persists the device config cache and, if `DUMP_MESSAGES` is enabled, message dumps under `/config`. The Home Assistant add-on mounts this automatically; when running the plain Docker image, mount a volume to `/config` (e.g. `--volume ./grobro-config:/config`) so this data survives a container restart.
+
 
 # Example Setup with DuckDNS and HA-MQTT
 
