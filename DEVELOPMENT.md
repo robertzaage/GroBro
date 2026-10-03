@@ -142,10 +142,26 @@ these tags. Messages tagged `"ha"` or `"growatt"` are skipped to avoid echo loop
 ### Config persistence
 
 Device configs are cached in memory (`_config_cache` dict) and also persisted to disk as
-`config_{device_id}.json` files in the working directory. On startup, if a device's config
+`config_{device_id}.json` files under `/config`. On startup, if a device's config
 is not in the cache, `__device_info_from_config` falls back to loading from file, then to
 creating a minimal config with just the serial number. Config files are written via
 `DeviceConfig.to_file()` and read via `DeviceConfig.from_file()`.
+
+The same `/config` directory also holds `state_cache_{device_id}.json` files with the value
+to publish per input register while it is missing from a payload (absent or `None`, e.g. a
+disconnected battery no longer reporting `bat*` registers), so Home Assistant entities don't
+drop to "unknown":
+
+- A missing value keeps its last known reading for brief gaps.
+- After `OFFLINE_MISS_THRESHOLD` (3) consecutive payloads without it, or when the device hits
+  `DEVICE_TIMEOUT`, live readings (`device_class` power/apparent_power/reactive_power/current/
+  voltage/frequency, or unit W/kW/VA/var/A/mA/V/Hz) drop to `0`. State-like values (SoC,
+  temperature, status, serials) keep their last known value.
+- `total_increasing`/`total` energy counters are not cached; HA handles gaps in those itself.
+- A register can override the derived behavior with `"offline": "zero"` or `"hold"` in its
+  `homeassistant` block.
+- The file is written at most every `VALUE_CACHE_SAVE_INTERVAL` (300 s) per device and on
+  shutdown, atomically via a `.tmp` file. On startup, live readings are loaded as `0`.
 
 ### Three-broker topology
 
@@ -442,7 +458,8 @@ import time into `GroBroRegisters` Pydantic models.
         "type": "sensor",
         "device_class": "power",
         "unit_of_measurement": "W",
-        "state_class": "measurement"
+        "state_class": "measurement",
+        "offline": "zero"
       },
       "data_type": "FLOAT",
       "mult": 0.1,
@@ -453,6 +470,9 @@ import time into `GroBroRegisters` Pydantic models.
   "config_registers": { … }
 }
 ```
+
+`offline` is optional (`"zero"` or `"hold"`) and controls the value published while the
+register is missing from a payload; see [Config persistence](#config-persistence).
 
 Three sections mirror the three modbus register spaces:
 
@@ -874,8 +894,8 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
-| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `<DUMP_DIR>/<topic_path>/<timestamp_ms>.bin` |
-| `DUMP_DIR` | `"/dump"` | Directory for dumped message files (in HA add-on: `"/share/GroBro/dump"`)
+| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `/config/dump/<topic_path>/<timestamp_ms>.bin` |
+| `CONFIG_DIR` | `"/config"` | Directory for persisted device configs, sensor value cache and message dumps (created if missing) |
 
 ### 8.2 Message dump file naming
 
@@ -883,12 +903,12 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 with millisecond-precision timestamps:
 
 ```
-<DUMP_DIR>/<topic_parts>/<epoch_millis>.bin
+/config/dump/<topic_parts>/<epoch_millis>.bin
 ```
 
 For example, a message on topic `c/33/QMN000ABC1D2E3FG` is saved as:
 ```
-/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
+/config/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
 ```
 
 Because the payload is saved before unscrambling, you must call `unscramble()` on the
