@@ -21,7 +21,7 @@ class MQTTConfig(BaseModel):
         password = os.getenv(f"{prefix}_MQTT_PASS", defaults.password)
 
         LOG.info(f"Loading MQTT configuration from environment (prefix: {prefix})")
-        LOG.info(f"MQTT Host: {'***:' if password else ''}{username if username else 'anonymous'}@{host}:{port} (TLS: {use_tls})")
+        LOG.info(f"MQTT Host: {username if username else 'anonymous'}{':***' if password else ''}@{host}:{port} (TLS: {use_tls})")
 
         return MQTTConfig(
             host=host,

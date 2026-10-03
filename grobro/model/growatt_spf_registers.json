@@ -393,7 +393,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "Bus_Voltage": {

@@ -375,7 +375,7 @@ class Client:
     # ------------------- MQTT Callback -------------------
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
-        LOG.debug(f"Connected to HA MQTT server with result code {reason_code}")
+        LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")

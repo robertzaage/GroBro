@@ -1350,7 +1350,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "totalHouseholdLoad": {
@@ -1490,7 +1490,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "battery2Soc": {
@@ -1514,7 +1514,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "battery3Soc": {
@@ -1538,7 +1538,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "battery4Soc": {
@@ -1562,7 +1562,7 @@
         "state_class": "measurement",
         "device_class": "battery",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:battery"
       }
     },
     "register_71": {

@@ -48,22 +48,22 @@ schema:
   SOURCE_MQTT_PORT: int
   SOURCE_MQTT_TLS: bool
   SOURCE_MQTT_USER: str?
-  SOURCE_MQTT_PASS: str?
+  SOURCE_MQTT_PASS: password?
   TARGET_MQTT_HOST: str
   TARGET_MQTT_PORT: int
   TARGET_MQTT_TLS: bool
-  TARGET_MQTT_USER: "str?"
-  TARGET_MQTT_PASS: "str?"
-  HA_BASE_TOPIC: "str?"
-  REGISTER_FILTER: "str?"
+  TARGET_MQTT_USER: str?
+  TARGET_MQTT_PASS: password?
+  HA_BASE_TOPIC: str?
+  REGISTER_FILTER: str?
   GROWATT_CLOUD: bool
   GROWATT_CLOUD_CONFIG_FILTER: bool
   LOG_LEVEL: list(INFO|ERROR|DEBUG)?
   DUMP_MESSAGES: bool
-  DUMP_DIR: "str?"
-  DEVICE_TIMEOUT: "int?"
-  MAX_SLOTS: "int?"
-  MAX_BAT: "str?"
+  DUMP_DIR: str?
+  DEVICE_TIMEOUT: int?
+  MAX_SLOTS: int?
+  MAX_BAT: str?
   AVAILABILITY_SENSOR: bool
   FILTER_DATA_GLITCHES: bool
   TZ: str
