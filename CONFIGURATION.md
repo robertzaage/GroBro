@@ -12,7 +12,7 @@ These are usually located in `/etc/letsencrypt/live/<your-domain>/`
 
 Our setup needs the full trust chain including the root. Head over to the [Certificates Guide](CERTIFICATES.md) for details:
 ```bash
-curl -o root.pem https://letsencrypt.org/certs/isrgrootx2.pem
+curl -o root.pem https://letsencrypt.org/certs/isrg-root-x2.pem
 cat fullchain.pem root.pem > chain-full.pem
 ```
 
