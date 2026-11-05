@@ -226,11 +226,6 @@ class Client:
             self._client.tls_insecure_set(True)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
-        # Subscriptions
-        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
-            for action in ["set", "read"]:
-                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
-                self._client.subscribe(topic)
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
 
@@ -375,6 +370,11 @@ class Client:
     # ------------------- MQTT Callback -------------------
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
+        # Subscriptions
+        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
+            for action in ["set", "read"]:
+                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
+                self._client.subscribe(topic)
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
@@ -449,7 +449,7 @@ class Client:
                 )
 
                 return
-                
+
         # Number / Switch / Time / Select
         if cmd_type in {"number", "switch", "time", "select"} and action == "set":
             raw_value = msg.payload.decode().strip()
@@ -731,7 +731,7 @@ class Client:
                     "unique_id": uid,
                     "icon": "mdi:identifier",
                 }
-                
+
         # Combined firmware version (NOAH = 3 parts, NEXA = 4 parts)
         fw_version_parts = sorted(
             name
@@ -756,7 +756,7 @@ class Client:
                 "unique_id": firmware_unique_id,
                 "icon": "mdi:information",
             }
-                
+
         # Serial Number Entity
         serial_unique_id = f"grobro_{device_id}_serial"
         payload["cmps"][serial_unique_id] = {
@@ -766,7 +766,7 @@ class Client:
             "unique_id": serial_unique_id,
             "icon": "mdi:identifier",
         }
-        
+
         # Device Type Entity
         type_unique_id = f"grobro_{device_id}_type"
         payload["cmps"][type_unique_id] = {
