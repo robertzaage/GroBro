@@ -103,14 +103,40 @@ def _detect_bat_count(payload: dict) -> int:
     return count
 
 
-def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
+def _can_detect_bat_count(device_id: str) -> bool:
+    known_registers = get_known_registers(device_id)
+    if not known_registers:
+        return False
+    return any(
+        name == "bat_cnt" or (name.startswith("bat") and name.endswith("_ser_part_1"))
+        for name in known_registers.input_registers
+    )
+
+
+def _resolve_max_bat(device_id: str, payload: dict | None = None, cached_payload: dict | None = None) -> int:
     if isinstance(MAX_BAT, int):
         return MAX_BAT
     if payload is not None:
         c = _detect_bat_count(payload)
         _MAX_BAT_CACHE[device_id] = c
         return c
-    return _MAX_BAT_CACHE.get(device_id, 4)
+    if device_id in _MAX_BAT_CACHE:
+        return _MAX_BAT_CACHE[device_id]
+    if not _can_detect_bat_count(device_id):
+        return 4
+    # No payload seen since startup: use the battery count persisted in the
+    # value cache, otherwise assume a single battery. Entities of further
+    # batteries are added once a payload reports them, which (unlike
+    # removing entities again) leaves no orphans behind in Home Assistant.
+    bat_cnt = (cached_payload or {}).get("bat_cnt")
+    if isinstance(bat_cnt, int) and bat_cnt >= 1:
+        _MAX_BAT_CACHE[device_id] = bat_cnt
+        return bat_cnt
+    return 1
+
+
+def _bat_count_known(device_id: str) -> bool:
+    return isinstance(MAX_BAT, int) or device_id in _MAX_BAT_CACHE
 
 def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
     """Ermittle passende Register-Sammlung anhand device_id-Präfix."""
@@ -764,7 +790,11 @@ class Client:
             LOG.info("Unable to publish unknown device type: %s", device_id)
             return
         if effective_max_bat is None:
-            effective_max_bat = _resolve_max_bat(device_id)
+            effective_max_bat = _resolve_max_bat(device_id, cached_payload=self._value_cache.get(device_id))
+        # Entities of batteries above the known count are explicitly removed
+        # (component config with only the platform key), so HA doesn't keep
+        # them as orphans. Skipped while the count is only a guess.
+        remove_extra_bats = _bat_count_known(device_id)
 
         self.__migrate_entity_discovery(device_id, known_registers)
 
@@ -851,12 +881,14 @@ class Client:
             if not state.homeassistant.publish:
                 if not (self._neo_pv_count.get(device_id) == 4 and state_name in ("Vpv3", "Ipv3", "Ppv3", "Vpv4", "Ipv4", "Ppv4", "Epv3_today", "Epv3_total")):
                     continue
-            bat_num = _get_bat_number(state_name)
-            if bat_num is not None and bat_num > effective_max_bat:
-                continue
             if "_ser_part_" in state_name and state_name.startswith("bat"):
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
+            bat_num = _get_bat_number(state_name)
+            if bat_num is not None and bat_num > effective_max_bat:
+                if remove_extra_bats:
+                    payload["cmps"][unique_id] = {"platform": "sensor"}
+                continue
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
                 "name": state.homeassistant.name,
@@ -876,10 +908,12 @@ class Client:
         )
         if has_bat_ser_parts:
             for bat_num in range(2, 5):
-                if bat_num > effective_max_bat:
-                    continue
                 combined_name = f"bat{bat_num}_serial"
                 uid = f"grobro_{device_id}_{combined_name}"
+                if bat_num > effective_max_bat:
+                    if remove_extra_bats:
+                        payload["cmps"][uid] = {"platform": "sensor"}
+                    continue
                 payload["cmps"][uid] = {
                     "platform": "sensor",
                     "name": f"Bat{bat_num} Serial",

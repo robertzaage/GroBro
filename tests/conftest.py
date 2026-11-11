@@ -8,3 +8,11 @@ def _tmp_config_dir(tmp_path, monkeypatch):
     config_dir.mkdir()
     monkeypatch.setattr("grobro.ha.client.CONFIG_DIR", str(config_dir))
     return config_dir
+
+
+@pytest.fixture(autouse=True)
+def _reset_bat_count_cache():
+    from grobro.ha.client import _MAX_BAT_CACHE
+    _MAX_BAT_CACHE.clear()
+    yield
+    _MAX_BAT_CACHE.clear()

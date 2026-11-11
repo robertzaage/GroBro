@@ -791,7 +791,9 @@ class TestMaxBat:
         assert discovery_calls, "No discovery calls found"
         payload = json.loads(discovery_calls[-1][0][1])
         cmps = payload.get("cmps", {})
-        cmp_names = [v["name"] for v in cmps.values()]
+        cmp_names = [v["name"] for v in cmps.values() if "name" in v]
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"] == {"platform": "sensor"}
+        assert cmps["grobro_0PVP0000TEST0001_bat4_serial"] == {"platform": "sensor"}
         assert any("Bat1" in n for n in cmp_names)
         assert any("Battery 1" in n for n in cmp_names)
         assert not any("Bat2" in n for n in cmp_names)
@@ -799,6 +801,38 @@ class TestMaxBat:
         assert not any("Bat4" in n for n in cmp_names)
         assert not any("Battery 2" in n for n in cmp_names)
         assert any("Battery Count" in n for n in cmp_names)
+
+    def _discovery_cmps(self, client, device_id):
+        calls = [c for c in client._client.publish.call_args_list
+                 if c.args[0] == f"homeassistant/device/{device_id}/config" and c.args[1]]
+        return json.loads(calls[-1].args[1])["cmps"]
+
+    def test_unknown_count_assumes_single_battery_without_removal(self, ha_client):
+        ha_client.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert "grobro_0PVP0000TEST0001_bat1_temp" in cmps
+        assert not any("bat2" in uid or "bat_2" in uid for uid in cmps)
+
+    def test_unknown_count_uses_cached_bat_cnt(self, ha_client):
+        ha_client._value_cache["0PVP0000TEST0001"] = {"bat_cnt": 2}
+        ha_client.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+        assert cmps["grobro_0PVP0000TEST0001_bat3_temp"] == {"platform": "sensor"}
+
+    def test_detected_count_removes_extra_battery_entities(self, ha_client):
+        state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001")
+        state.payload.update(_load_payload("NoahReadInputRegisters_0-124.bin"))
+        ha_client.publish_input_register(state)
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        for uid in ("bat2_temp", "bat_3_soc_pct", "bat4_serial"):
+            assert cmps[f"grobro_0PVP0000TEST0001_{uid}"] == {"platform": "sensor"}
+        assert "grobro_0PVP0000TEST0001_bat2_ser_part_1" not in cmps
+
+    def test_undetectable_count_keeps_default_4(self, ha_client):
+        ha_client.set_config("0HVR0000TEST0001", DeviceConfig(serial_number="0HVR0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0HVR0000TEST0001")
+        assert cmps["grobro_0HVR0000TEST0001_battery4Soc"]["name"]
 
     def test_max_bat_default(self):
         from grobro.ha.client import MAX_BAT
@@ -1022,8 +1056,9 @@ class TestCombinedSerial:
     def test_discovery_excludes_ser_part_includes_combined(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                c = Client(MQTTConfig(host="localhost", port=1883))
-                c._Client__publish_device_discovery("0PVP0000TEST0001")
+                with patch("grobro.ha.client.MAX_BAT", 4):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[1]]
         assert discovery_calls
