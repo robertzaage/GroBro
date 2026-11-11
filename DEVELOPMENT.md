@@ -549,10 +549,23 @@ register files). Both `bat1_temp` and `bat_2_ser_part_1` fall into the same `eli
 name.startswith("bat"):` branch — the code does not distinguish them at the prefix level.
 
 `MAX_BAT` controls how many battery packs appear in HA. Default `"auto"` calls
-`_detect_bat_count(payload)` which checks `bat{2,3,4}_ser_part_1` values. When no
-serial parts have data (e.g. sanitized test data), falls back to `4`. Set to an
-integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
-in both `publish_input_register` and `__publish_device_discovery`.
+`_detect_bat_count(payload)`, which uses `bat_cnt` or else checks `bat{2,3,4}_ser_part_1`
+values. Set to an integer to override (e.g. `MAX_BAT=1`). Filtering uses
+`bat_number > resolved_max_bat` in both `publish_input_register` and
+`__publish_device_discovery`.
+
+In `"auto"` mode, `_resolve_max_bat()` keeps the highest count seen per device in
+`_MAX_BAT_CACHE`, persisted as `max_bat` in `state_cache_{device_id}.json`. The count
+only ever grows: a disconnected battery keeps its entities, and its values (which the
+NOAH still reports as `0` / empty registers beyond `bat_cnt`) are treated as missing, so
+they keep their last known value. Payloads without battery info (no `bat_cnt`, no serial
+parts) don't change the count. Before the first payload, a device whose count can be
+detected (NOAH) without a persisted count assumes a single battery; other devices
+(e.g. NEXA) fall back to `4`.
+
+Once the count is known (detected/persisted or `MAX_BAT`), discovery sends entities of
+batteries above it as `{"platform": "sensor"}`, which makes HA remove them. While the
+count is only a guess, they are left out instead.
 
 After filtering, the four `bat{N}_ser_part_{1-4}` values are concatenated into a
 single `bat{N}_serial` key in the state payload, and the individual part keys are
@@ -890,7 +903,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat{N}_ser_part_1` presence; set to a number to override. |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only ever grows; set to a number to override (removes entities of batteries above it). |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |

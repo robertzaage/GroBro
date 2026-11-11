@@ -52,7 +52,7 @@ configuration:
     description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (nur NOAH, max 9). Standard ist 1.
   MAX_BAT:
     name: MAX_BAT
-    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung anhand der Seriennummern, oder eine Zahl für manuelle Einstellung.
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Bei "auto" (Standard) wird die Anzahl vom Gerät erkannt und nur erhöht, sodass ein abgeklemmter Akku seine Entitäten und letzten Werte behält. Eine Zahl überschreibt die Erkennung; Entitäten von Batterien oberhalb davon werden entfernt.
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Legt den Timeout in Sekunden fest, wann das Gerät als Nicht Verfügbar angezeigt wird. Default ist 0 (deaktiviert). Empfehlung 300+ Sekunden.

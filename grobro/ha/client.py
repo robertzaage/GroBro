@@ -113,25 +113,30 @@ def _can_detect_bat_count(device_id: str) -> bool:
     )
 
 
-def _resolve_max_bat(device_id: str, payload: dict | None = None, cached_payload: dict | None = None) -> int:
+def _has_bat_info(payload: dict) -> bool:
+    bat_cnt = payload.get("bat_cnt")
+    if isinstance(bat_cnt, int) and bat_cnt >= 1:
+        return True
+    return any(str(payload.get(f"bat{n}_ser_part_1") or "").strip() for n in range(2, 5))
+
+
+def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
     if isinstance(MAX_BAT, int):
         return MAX_BAT
-    if payload is not None:
-        c = _detect_bat_count(payload)
+    if payload is not None and _has_bat_info(payload):
+        # The count only ever grows (and is persisted with the value cache):
+        # a battery that stops reporting, e.g. because it was disconnected,
+        # keeps its entities and last known values. Set MAX_BAT to drop it.
+        c = max(_detect_bat_count(payload), _MAX_BAT_CACHE.get(device_id, 0))
         _MAX_BAT_CACHE[device_id] = c
         return c
     if device_id in _MAX_BAT_CACHE:
         return _MAX_BAT_CACHE[device_id]
-    if not _can_detect_bat_count(device_id):
+    if payload is not None or not _can_detect_bat_count(device_id):
         return 4
-    # No payload seen since startup: use the battery count persisted in the
-    # value cache, otherwise assume a single battery. Entities of further
-    # batteries are added once a payload reports them, which (unlike
-    # removing entities again) leaves no orphans behind in Home Assistant.
-    bat_cnt = (cached_payload or {}).get("bat_cnt")
-    if isinstance(bat_cnt, int) and bat_cnt >= 1:
-        _MAX_BAT_CACHE[device_id] = bat_cnt
-        return bat_cnt
+    # No payload seen yet and no persisted count: assume a single battery.
+    # Entities of further batteries are added once a payload reports them,
+    # which (unlike removing entities again) leaves no orphans behind in HA.
     return 1
 
 
@@ -327,10 +332,13 @@ class Client:
                 device_id = fname[len("state_cache_"):-len(".json")]
                 try:
                     with open(os.path.join(CONFIG_DIR, fname), "r") as f:
-                        cached = json.load(f)
+                        data = json.load(f)
+                    cached = data["values"]
                 except Exception as e:
                     LOG.warning("Failed to load state cache %s: %s", fname, e)
                     continue
+                if isinstance(data.get("max_bat"), int):
+                    _MAX_BAT_CACHE[device_id] = data["max_bat"]
                 # The device may have gone offline while GroBro was down, so
                 # live readings start at 0 rather than at a stale value.
                 known_registers = get_known_registers(device_id)
@@ -371,7 +379,10 @@ class Client:
 
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
+        prev_max_bat = _MAX_BAT_CACHE.get(state.device_id)
         effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
+        if _MAX_BAT_CACHE.get(state.device_id) != prev_max_bat:
+            self._value_cache_dirty.add(state.device_id)
         self.__detect_neo_pv_count(state.device_id, state.payload)
         # discovery + availability
         self.__publish_device_discovery(state.device_id, effective_max_bat)
@@ -455,6 +466,16 @@ class Client:
                                 serial, prev_pos, pos, state.device_id,
                             )
             _LAST_BAT_SERIALS[state.device_id] = current_serials
+
+        # Batteries beyond the currently reported count (e.g. disconnected
+        # ones) still show up as 0 / empty registers: treat those as missing
+        # so their entities keep the last known value.
+        if _has_bat_info(state.payload):
+            reported_bat_cnt = _detect_bat_count(state.payload)
+            for key in list(payload):
+                bat_num = _get_bat_number(key)
+                if bat_num is not None and bat_num > reported_bat_cnt:
+                    payload[key] = None
 
         # Keep HA entities from dropping to "unknown" when a value is missing
         # from the payload (absent or None, e.g. a disconnected battery, or
@@ -711,7 +732,7 @@ class Client:
         self._value_cache_saved_at[device_id] = time.monotonic()
         try:
             with open(tmp_path, "w") as f:
-                json.dump(self._value_cache.get(device_id, {}), f)
+                json.dump({"values": self._value_cache.get(device_id, {}), "max_bat": _MAX_BAT_CACHE.get(device_id)}, f)
             os.replace(tmp_path, path)
             self._value_cache_dirty.discard(device_id)
         except Exception as e:
@@ -790,7 +811,7 @@ class Client:
             LOG.info("Unable to publish unknown device type: %s", device_id)
             return
         if effective_max_bat is None:
-            effective_max_bat = _resolve_max_bat(device_id, cached_payload=self._value_cache.get(device_id))
+            effective_max_bat = _resolve_max_bat(device_id)
         # Entities of batteries above the known count are explicitly removed
         # (component config with only the platform key), so HA doesn't keep
         # them as orphans. Skipped while the count is only a guess.

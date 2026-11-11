@@ -52,7 +52,7 @@ configuration:
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH only, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
-    description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect automatically from serial numbers, or a number to override.
+    description: How many battery packs to display in Home Assistant. With "auto" (default) the count is detected from the device and only ever grows, so a disconnected battery keeps its entities and last known values. Set a number to override; entities of batteries above it are removed.
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.
