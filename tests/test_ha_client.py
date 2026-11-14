@@ -1273,6 +1273,21 @@ class TestValueCache:
         assert _offline_behavior(known, "bat2_serial") == "hold"
         assert _offline_behavior(None, "out_power") == "hold"
 
+    @pytest.mark.parametrize("device_id", ["0PVP0000TEST0001", "0HVR0000TEST0001", "QMN000ABC1D2E3FG", "HAQ0TEST01", "ZGQ0TEST01", "VWQ0TEST01"])
+    def test_battery_state_held_and_live_percentages_zeroed(self, device_id):
+        """SoC and battery/cell voltages are battery state and must not drop to 0
+        while the device is silent (e.g. after stopping at the discharge limit);
+        load/output percentages and fan speeds are live readings."""
+        known = get_known_registers(device_id)
+        for name, reg in known.input_registers.items():
+            ha = reg.homeassistant
+            label = f"{name} {ha.name}".lower()
+            behavior = _offline_behavior(known, name)
+            if ha.device_class == "battery" or (ha.device_class == "voltage" and any(w in label for w in ("bat", "bms", "cell"))):
+                assert behavior == "hold", name
+            if any(w in label for w in ("load", "fan speed", "output power")) and ha.unit_of_measurement == "%":
+                assert behavior == "zero", name
+
     def test_offline_behavior_register_override(self):
         known = get_known_registers(self.DEVICE)
         reg = known.input_registers["out_power"]

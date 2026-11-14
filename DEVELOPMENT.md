@@ -159,7 +159,9 @@ drop to "unknown":
   temperature, status, serials) keep their last known value.
 - `total_increasing`/`total` energy counters are not cached; HA handles gaps in those itself.
 - A register can override the derived behavior with `"offline": "zero"` or `"hold"` in its
-  `homeassistant` block.
+  `homeassistant` block. Battery and cell voltages (and the BMS CV setpoint) use `"hold"`,
+  since a battery keeps its voltage like its SoC when the device stops reporting (e.g. at
+  the discharge limit); load/output percentages and fan speeds use `"zero"`.
 - The file is written at most every `VALUE_CACHE_SAVE_INTERVAL` (300 s) per device and on
   shutdown, atomically via a `.tmp` file. On startup, live readings are loaded as `0`.
 

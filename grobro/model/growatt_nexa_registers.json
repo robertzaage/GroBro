@@ -1917,7 +1917,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "minCellVoltage": {
@@ -1941,7 +1942,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "batteryCycles": {

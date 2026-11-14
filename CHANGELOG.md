@@ -1,7 +1,7 @@
 ## Unreleased
 
 ### New Features
-+ Sensor values survive GroBro and Home Assistant restarts instead of showing "unknown". Values missing from a device's payload (e.g. a disconnected battery) keep their last known reading; after 3 payloads without them, or on `DEVICE_TIMEOUT`, live readings (power, current, voltage, frequency) drop to 0 while SoC, temperature and status keep their last value. Energy counters are not affected (#233)
++ Sensor values survive GroBro and Home Assistant restarts instead of showing "unknown". Values missing from a device's payload (e.g. a disconnected battery) keep their last known reading; after 3 payloads without them, or on `DEVICE_TIMEOUT`, live readings (power, current, voltage, frequency, load) drop to 0 while SoC, battery voltages, temperature and status keep their last value. Energy counters are not affected (#233)
 + `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI (#233)
 
 ### Bug Fixes
