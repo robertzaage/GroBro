@@ -1,3 +1,16 @@
+## Unreleased
+
+### New Features
++ Sensor values survive GroBro and Home Assistant restarts instead of showing "unknown". Values missing from a device's payload (e.g. a disconnected battery) keep their last known reading; after 3 payloads without them, or on `DEVICE_TIMEOUT`, live readings (power, current, voltage, frequency, load) drop to 0 while SoC, battery voltages, temperature and status keep their last value. Energy counters are not affected (#233)
++ `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI (#233)
+
+### Bug Fixes
++ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). With `MAX_BAT=auto`, the highest detected battery count is now persisted and only ever grows; until it is known, a single battery is assumed. Entities of batteries above this count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. A disconnected battery keeps its entities and last known values instead of showing 0
+
+### Breaking Changes
++ Device configs, the sensor value cache and message dumps are now stored under `/config` (add-on: its own `addon_config` folder instead of `/share`). Old dumps in `/share/GroBro/dump` are not moved. Plain Docker users should mount a volume at `/config` (e.g. `--volume ./grobro-config:/config`) for this data to survive a restart (#233)
++ The `DUMP_DIR` option has been removed; dumps are written to `/config/dump` (#233)
+
 ## v2.7.5
 
 ### Bug Fixes

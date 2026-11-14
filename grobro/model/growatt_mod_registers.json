@@ -720,7 +720,8 @@
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:gauge"
+        "icon": "mdi:gauge",
+        "offline": "zero"
       }
     },
     "DCI_R": {

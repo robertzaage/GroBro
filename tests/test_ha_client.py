@@ -18,6 +18,8 @@ from grobro.ha.client import (
     _resolve_max_bat,
     _MAX_BAT_CACHE,
     _LAST_BAT_SERIALS,
+    _offline_behavior,
+    OFFLINE_MISS_THRESHOLD,
 )
 from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
@@ -183,14 +185,6 @@ class TestBatNumber:
 
     def test_non_bat_name(self):
         assert _get_bat_number("Ppv") is None
-
-
-@pytest.fixture(autouse=True)
-def _cleanup_config_files():
-    yield
-    for name in os.listdir("."):
-        if name.startswith("config_") and name.endswith(".json"):
-            os.unlink(name)
 
 
 @pytest.fixture
@@ -797,7 +791,9 @@ class TestMaxBat:
         assert discovery_calls, "No discovery calls found"
         payload = json.loads(discovery_calls[-1][0][1])
         cmps = payload.get("cmps", {})
-        cmp_names = [v["name"] for v in cmps.values()]
+        cmp_names = [v["name"] for v in cmps.values() if "name" in v]
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"] == {"platform": "sensor"}
+        assert cmps["grobro_0PVP0000TEST0001_bat4_serial"] == {"platform": "sensor"}
         assert any("Bat1" in n for n in cmp_names)
         assert any("Battery 1" in n for n in cmp_names)
         assert not any("Bat2" in n for n in cmp_names)
@@ -805,6 +801,68 @@ class TestMaxBat:
         assert not any("Bat4" in n for n in cmp_names)
         assert not any("Battery 2" in n for n in cmp_names)
         assert any("Battery Count" in n for n in cmp_names)
+
+    def _discovery_cmps(self, client, device_id):
+        calls = [c for c in client._client.publish.call_args_list
+                 if c.args[0] == f"homeassistant/device/{device_id}/config" and c.args[1]]
+        return json.loads(calls[-1].args[1])["cmps"]
+
+    def test_unknown_count_assumes_single_battery_without_removal(self, ha_client):
+        ha_client.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert "grobro_0PVP0000TEST0001_bat1_temp" in cmps
+        assert not any("bat2" in uid or "bat_2" in uid for uid in cmps)
+
+    def _publish_noah(self, client, **overrides):
+        state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001")
+        state.payload.update(_load_payload("NoahReadInputRegisters_0-124.bin"))
+        state.payload.update(overrides)
+        client.publish_input_register(state)
+
+    def test_persisted_max_bat_used_after_restart(self, ha_client, mock_mqtt):
+        self._publish_noah(ha_client, bat_cnt=2)
+        ha_client.stop()
+        _MAX_BAT_CACHE.clear()
+        restarted = Client(MQTTConfig(host="localhost", port=1883))
+        restarted.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(restarted, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+        assert cmps["grobro_0PVP0000TEST0001_bat3_temp"] == {"platform": "sensor"}
+
+    def test_disconnected_battery_keeps_entities_and_values(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=2, bat_2_soc_pct=55, bat2_temp=21.0)
+        self._publish_noah(ha_client, bat_cnt=1)  # bat_2_soc_pct=0, bat2_temp=-273.1
+        state = None
+        for entry in reversed(ha_client._client.publish.call_args_list):
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                state = json.loads(entry.args[1])
+                break
+        assert state["bat_2_soc_pct"] == 55
+        assert state["bat2_temp"] == 21.0
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 2
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+
+    def test_payload_without_bat_info_keeps_known_count(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=1)
+        ha_client.publish_input_register(
+            HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload={"out_power": 5})
+        )
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 1
+
+    def test_detected_count_removes_extra_battery_entities(self, ha_client):
+        state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001")
+        state.payload.update(_load_payload("NoahReadInputRegisters_0-124.bin"))
+        ha_client.publish_input_register(state)
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        for uid in ("bat2_temp", "bat_3_soc_pct", "bat4_serial"):
+            assert cmps[f"grobro_0PVP0000TEST0001_{uid}"] == {"platform": "sensor"}
+        assert "grobro_0PVP0000TEST0001_bat2_ser_part_1" not in cmps
+
+    def test_undetectable_count_keeps_default_4(self, ha_client):
+        ha_client.set_config("0HVR0000TEST0001", DeviceConfig(serial_number="0HVR0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0HVR0000TEST0001")
+        assert cmps["grobro_0HVR0000TEST0001_battery4Soc"]["name"]
 
     def test_max_bat_default(self):
         from grobro.ha.client import MAX_BAT
@@ -1028,8 +1086,9 @@ class TestCombinedSerial:
     def test_discovery_excludes_ser_part_includes_combined(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                c = Client(MQTTConfig(host="localhost", port=1883))
-                c._Client__publish_device_discovery("0PVP0000TEST0001")
+                with patch("grobro.ha.client.MAX_BAT", 4):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[1]]
         assert discovery_calls
@@ -1108,3 +1167,138 @@ class TestBatteryPositionWatch:
 
         assert "moved" not in caplog.text
         assert "re-enumeration" not in caplog.text
+
+
+class TestValueCache:
+    DEVICE = "0PVP0000TEST0001"
+    TOPIC = f"homeassistant/grobro/{DEVICE}/state"
+
+    def _last_state(self, client):
+        for entry in reversed(client._client.publish.call_args_list):
+            if entry.args[0] == self.TOPIC:
+                return json.loads(entry.args[1]), entry.kwargs.get("retain")
+        return None, None
+
+    def _publish(self, client, payload):
+        # Filled after construction like grobro.Client does, which lets None
+        # values (registers outside the received blocks) through.
+        state = HomeAssistantInputRegister(device_id=self.DEVICE)
+        state.payload.update(payload)
+        client.publish_input_register(state)
+
+    def test_missing_key_backfilled_from_cache(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        self._publish(ha_client, {"out_power": 130})
+        state, _ = self._last_state(ha_client)
+        assert state["out_power"] == 130
+        assert state["tot_bat_soc_pct"] == 80
+
+    def test_energy_counters_not_backfilled(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "pv_eng_today": 5.5})
+        self._publish(ha_client, {"out_power": 130})
+        state, _ = self._last_state(ha_client)
+        assert "pv_eng_today" not in state
+
+    def test_cache_persisted_and_reloaded(self, ha_client, mock_mqtt, _tmp_config_dir):
+        self._publish(ha_client, {"tot_bat_soc_pct": 80})
+        cache_file = _tmp_config_dir / f"state_cache_{self.DEVICE}.json"
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 80
+
+        restarted = Client(MQTTConfig(host="localhost", port=1883))
+        assert restarted._value_cache[self.DEVICE]["tot_bat_soc_pct"] == 80
+
+    def test_on_connect_republishes_cache_honoring_retain_flag(self, ha_client):
+        self._publish(ha_client, {"tot_bat_soc_pct": 80})
+        ha_client._client.publish.reset_mock()
+        for retained in (False, True):
+            with patch("grobro.ha.client.PUBLISH_SENSORS_RETAINED", retained):
+                ha_client._Client__on_connect(None, None, None, 0, None)
+            state, retain = self._last_state(ha_client)
+            assert state == {"tot_bat_soc_pct": 80}
+            assert retain is retained
+
+    def test_live_value_held_briefly_then_zeroed(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        for _ in range(OFFLINE_MISS_THRESHOLD - 1):
+            self._publish(ha_client, {})
+            state, _ = self._last_state(ha_client)
+            assert state["out_power"] == 120
+        for _ in range(3):
+            self._publish(ha_client, {})
+            state, _ = self._last_state(ha_client)
+            assert state["out_power"] == 0
+            assert state["tot_bat_soc_pct"] == 80
+
+    def test_none_value_treated_as_missing(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        for _ in range(OFFLINE_MISS_THRESHOLD):
+            self._publish(ha_client, {"out_power": None, "tot_bat_soc_pct": None})
+        state, _ = self._last_state(ha_client)
+        assert state["out_power"] == 0
+        assert state["tot_bat_soc_pct"] == 80
+
+    def test_value_recovers_after_offline(self, ha_client):
+        self._publish(ha_client, {"out_power": 120})
+        for _ in range(OFFLINE_MISS_THRESHOLD):
+            self._publish(ha_client, {})
+        self._publish(ha_client, {"out_power": 90})
+        state, _ = self._last_state(ha_client)
+        assert state["out_power"] == 90
+
+    def test_reload_zeroes_live_values(self, ha_client, mock_mqtt):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        restarted = Client(MQTTConfig(host="localhost", port=1883))
+        assert restarted._value_cache[self.DEVICE] == {"out_power": 0, "tot_bat_soc_pct": 80}
+
+    def test_device_timeout_publishes_zeroed_live_values(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        ha_client._Client__publish_offline_values(self.DEVICE)
+        state, _ = self._last_state(ha_client)
+        assert state == {"out_power": 0, "tot_bat_soc_pct": 80}
+
+    def test_cache_writes_throttled_and_flushed_on_stop(self, ha_client, _tmp_config_dir):
+        cache_file = _tmp_config_dir / f"state_cache_{self.DEVICE}.json"
+        self._publish(ha_client, {"tot_bat_soc_pct": 80})
+        self._publish(ha_client, {"tot_bat_soc_pct": 81})
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 80
+        ha_client.stop()
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 81
+        assert not list(_tmp_config_dir.glob("*.tmp"))
+
+    def test_offline_behavior_classification(self):
+        known = get_known_registers(self.DEVICE)
+        assert _offline_behavior(known, "out_power") == "zero"
+        assert _offline_behavior(known, "tot_bat_soc_pct") == "hold"
+        assert _offline_behavior(known, "pv_eng_today") is None
+        assert _offline_behavior(known, "bat2_serial") == "hold"
+        assert _offline_behavior(None, "out_power") == "hold"
+
+    @pytest.mark.parametrize("device_id", ["0PVP0000TEST0001", "0HVR0000TEST0001", "QMN000ABC1D2E3FG", "HAQ0TEST01", "ZGQ0TEST01", "VWQ0TEST01"])
+    def test_battery_state_held_and_live_percentages_zeroed(self, device_id):
+        """SoC and battery/cell voltages are battery state and must not drop to 0
+        while the device is silent (e.g. after stopping at the discharge limit);
+        load/output percentages and fan speeds are live readings."""
+        known = get_known_registers(device_id)
+        for name, reg in known.input_registers.items():
+            ha = reg.homeassistant
+            label = f"{name} {ha.name}".lower()
+            behavior = _offline_behavior(known, name)
+            if ha.device_class == "battery" or (ha.device_class == "voltage" and any(w in label for w in ("bat", "bms", "cell"))):
+                assert behavior == "hold", name
+            if any(w in label for w in ("load", "fan speed", "output power")) and ha.unit_of_measurement == "%":
+                assert behavior == "zero", name
+
+    def test_offline_behavior_register_override(self):
+        known = get_known_registers(self.DEVICE)
+        reg = known.input_registers["out_power"]
+        with patch.object(reg.homeassistant, "offline", "hold"):
+            assert _offline_behavior(known, "out_power") == "hold"
+
+    def test_missing_config_dir_does_not_crash(self, mock_mqtt, monkeypatch, tmp_path):
+        blocker = tmp_path / "not_a_dir"
+        blocker.write_text("")
+        monkeypatch.setattr("grobro.ha.client.CONFIG_DIR", str(blocker / "config"))
+        c = Client(MQTTConfig(host="localhost", port=1883))
+        c.set_config(self.DEVICE, DeviceConfig(serial_number=self.DEVICE))
+        c.publish_input_register(HomeAssistantInputRegister(device_id=self.DEVICE, payload={"out_power": 1}))
+        assert self.DEVICE in c._config_cache

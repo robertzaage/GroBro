@@ -1403,7 +1403,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "mincvbat1": {
@@ -1427,7 +1428,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "pv_tot_power": {
