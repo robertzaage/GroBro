@@ -1,3 +1,11 @@
+## Unreleased
+
+### New Features
++ NOAH devices now expose PV1 temperature, PV2 temperature, system temperature (input registers 94, 97, 98, reported in 0.1 K like the battery temperatures) and battery state of health (input register 102)
+
+### Bug Fixes
++ Fixed Home Assistant controls (number, select, switch, time, button) silently stopping to work after the MQTT broker was restarted or the connection dropped. The command topic subscriptions are now re-established on every (re)connect instead of only once at startup
+
 ## v2.7.5
 
 ### Bug Fixes

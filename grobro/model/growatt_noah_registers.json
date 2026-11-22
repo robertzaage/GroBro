@@ -2038,6 +2038,97 @@
         "publish": false,
         "icon": "mdi:information"
       }
+    },
+    "pv1_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 94,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "pv2_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 97,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "system_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 98,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "System Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "bat_soh": {
+      "growatt": {
+        "position": {
+          "register_no": 102,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery SoH",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:battery-heart-variant"
+      }
     }
   }
 }
