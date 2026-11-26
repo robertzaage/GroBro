@@ -66,6 +66,8 @@ To satisfy Growatt clients, you must provide a **fullchain.pem** that includes:
 - If you’re unsure about which intermediate/root to use, check the [Let’s Encrypt certificate list](https://letsencrypt.org/certificates/).
 - If the device is using a different root, make sure to follow the corresponding chain.
 
+For automated renewal on a Linux host, see [Certbot renewal and Mosquitto deployment](CERTBOT_RENEWAL.md).
+
 ## Supported Root Certificates
 
 These root certificates are embedded in the firmware and are considered trusted by the device.
