@@ -96,6 +96,8 @@ docker run --detach \
   ghcr.io/robertzaage/grobro:latest
 ```
 
+For a Linux deployment with an existing Home Assistant broker, see the [authenticated Docker Compose example](examples/authenticated-compose/README.md).
+
 ### Environment Variable Reference
 
 | Variable             | Required | Description                                                                 |
