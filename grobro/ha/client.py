@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import ssl
 import json
 import logging
 from threading import Timer
@@ -221,9 +220,7 @@ class Client:
 
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
-        if mqtt_config.use_tls:
-            self._client.tls_set(cert_reqs=ssl.CERT_NONE)
-            self._client.tls_insecure_set(True)
+        mqtt_config.configure_tls(self._client)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         # Subscriptions
