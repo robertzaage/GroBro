@@ -6,6 +6,8 @@ import ssl
 import paho.mqtt.client as mqtt
 from pydantic import BaseModel
 
+from grobro import settings
+
 LOG = logging.getLogger(__name__)
 
 class MQTTConfig(BaseModel):
@@ -53,7 +55,7 @@ class MQTTConfig(BaseModel):
             # Relative paths point into the persisted config dir, which is
             # the only folder mapped into the add-on (its addon_config).
             if tls_ca_file and not os.path.isabs(tls_ca_file):
-                tls_ca_file = os.path.join(os.getenv("CONFIG_DIR", "/config"), tls_ca_file)
+                tls_ca_file = os.path.join(settings.CONFIG_DIR, tls_ca_file)
 
         LOG.info(f"Loading MQTT configuration from environment (prefix: {prefix})")
         LOG.info(f"MQTT Host: {username if username else 'anonymous'}{':***' if password else ''}@{host}:{port} (TLS: {use_tls})")

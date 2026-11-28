@@ -157,7 +157,7 @@ FAMILIES = [
 
 @pytest.mark.parametrize("name, device_id, inverter_serial", FAMILIES, ids=[f[0] for f in FAMILIES])
 def test_family_snapshot(name, device_id, inverter_serial):
-    with patch("grobro.ha.client.MAX_SLOTS", 9):
+    with patch("grobro.settings.MAX_SLOTS", 9):
         hc, gc, ha_mqtt, _ = _setup()
         if inverter_serial:
             regs.detect_device_by_inverter_serial(device_id, inverter_serial)

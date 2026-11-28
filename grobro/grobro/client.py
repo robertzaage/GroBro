@@ -15,7 +15,7 @@ from typing import Callable
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage
 
-from grobro import model
+from grobro import model, settings
 from grobro.grobro import parser
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
@@ -60,26 +60,6 @@ def _normalize_neo_output_power_limit(value: float | int) -> float | int:
 
 
 LOG = logging.getLogger(__name__)
-HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
-
-# Updated growatt cloud forwarding config
-def _parse_growatt_cloud(raw: str) -> tuple[str, bool, set[str]]:
-    """Parse GROWATT_CLOUD: "true" forwards all devices, a comma-separated list only these serials."""
-    value = (raw or "").strip()
-    if value.lower() == "true":
-        return "true", True, set()
-    if value.lower() in ("", "false"):
-        return "false", False, set()
-    serials = {serial.strip() for serial in value.split(",") if serial.strip()}
-    return value, bool(serials), serials
-
-
-GROWATT_CLOUD, GROWATT_CLOUD_ENABLED, GROWATT_CLOUD_FILTER = _parse_growatt_cloud(os.getenv("GROWATT_CLOUD", "false"))
-GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false").strip().lower()
-
-DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
-PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
-DUMP_DIR = os.path.join(os.getenv("CONFIG_DIR", "/config"), "dump")
 
 # Property to flag messages forwarded from growatt cloud
 MQTT_PROP_FORWARD_GROWATT = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
@@ -107,7 +87,7 @@ class Client:
         LOG.info(
             f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
         )
-        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id_suffix = settings.MQTT_CLIENT_SUFFIX
         client_id = f"grobro-grobro{('-' + client_id_suffix) if client_id_suffix else ''}"
         self._type_code_requested: set[str] = set()
 
@@ -235,14 +215,14 @@ class Client:
 
         file = get_property(msg, "file")
         LOG.debug("Received message (%s): %s: %s", file, msg.topic, msg.payload)
-        if DUMP_MESSAGES:
+        if settings.DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
             device_id = _extract_device_id(msg.topic)
-            if GROWATT_CLOUD_ENABLED:
-                if GROWATT_CLOUD == "true" or device_id in GROWATT_CLOUD_FILTER:
+            if settings.GROWATT_CLOUD_ENABLED:
+                if settings.GROWATT_CLOUD == "true" or device_id in settings.GROWATT_CLOUD_FILTER:
                     try:
-                        if GROWATT_CLOUD_CONFIG_FILTER == "true":
+                        if settings.GROWATT_CLOUD_CONFIG_FILTER:
                             try:
                                 unscrambled = parser.unscramble(msg.payload)
                                 msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
@@ -351,8 +331,8 @@ class Client:
             if msg_type == 0x6F64:
                 smart_meter = parser.parse_noah_6f64(unscrambled)
                 LOG.debug("Smart Meter data for %s: %s", smart_meter["device_id"], smart_meter["data"])
-                topic = f"{HA_BASE_TOPIC}/sensor/grobro/{smart_meter['device_id']}/smart_meter/state"
-                self._client.publish(topic, smart_meter["data"], retain=PUBLISH_SENSORS_RETAINED)
+                topic = f"{settings.HA_BASE_TOPIC}/sensor/grobro/{smart_meter['device_id']}/smart_meter/state"
+                self._client.publish(topic, smart_meter["data"], retain=settings.PUBLISH_SENSORS_RETAINED)
                 return
 
             # NOAH/NEXA-specific message types (FE19 config, etc.)
@@ -502,7 +482,7 @@ class Client:
 
     def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
         LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
-        if DUMP_MESSAGES:
+        if settings.DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
         try:
             device_id = _extract_device_id(msg.topic)
@@ -510,9 +490,9 @@ class Client:
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug("Received Growatt forward: %s %s", msg.topic, unscrambled.hex(" "))
 
-            if not GROWATT_CLOUD_ENABLED:
+            if not settings.GROWATT_CLOUD_ENABLED:
                 return
-            if GROWATT_CLOUD != "true" and device_id not in GROWATT_CLOUD_FILTER:
+            if settings.GROWATT_CLOUD != "true" and device_id not in settings.GROWATT_CLOUD_FILTER:
                 LOG.debug(
                     "Dropping Growatt message for device %s not in GROWATT_CLOUD filter",
                     device_id,
@@ -559,16 +539,16 @@ class Client:
 
 
 # Ensure that the dump directory exists
-if DUMP_MESSAGES and not os.path.exists(DUMP_DIR):
-    os.makedirs(DUMP_DIR, exist_ok=True)
-    LOG.info(f"Dump directory created: {DUMP_DIR}")
+if settings.DUMP_MESSAGES and not os.path.exists(settings.DUMP_DIR):
+    os.makedirs(settings.DUMP_DIR, exist_ok=True)
+    LOG.info(f"Dump directory created: {settings.DUMP_DIR}")
 
 
 def dump_message_binary(topic, payload):
     try:
         # Build path following topic structure
         topic_parts = topic.strip("/").split("/")
-        dir_path = os.path.join(DUMP_DIR, *topic_parts)
+        dir_path = os.path.join(settings.DUMP_DIR, *topic_parts)
         os.makedirs(dir_path, exist_ok=True)
 
         # Write each message to a new file with timestamp

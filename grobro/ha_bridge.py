@@ -5,15 +5,14 @@ Reads Growatt MQTT packets, decodes them, maps registers
 and republishes values for Home Assistant auto-discovery.
 """
 
-import os
 import signal
 import logging
 import time
 
-from grobro import model, ha, grobro
+from grobro import model, ha, grobro, settings
 
 # Setup Logger
-LOG_LEVEL = os.getenv("LOG_LEVEL", "ERROR").upper()
+LOG_LEVEL = settings.LOG_LEVEL
 try:
     logging.basicConfig(
         level=LOG_LEVEL,

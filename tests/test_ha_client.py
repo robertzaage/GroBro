@@ -692,13 +692,13 @@ class TestClientAvailability:
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert all("online" not in t for t in topics)
 
-    @patch("grobro.ha.client.AVAILABILITY_SENSOR", True)
+    @patch("grobro.settings.AVAILABILITY_SENSOR", True)
     def test_publish_availability_offline_with_sensor(self, ha_client):
         ha_client._Client__publish_availability("QMN000ABC1D2E3FG", False)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert any("online" in t for t in topics)
 
-    @patch("grobro.ha.client.AVAILABILITY_SENSOR", True)
+    @patch("grobro.settings.AVAILABILITY_SENSOR", True)
     def test_publish_availability_online_with_sensor(self, ha_client):
         ha_client._Client__publish_availability("QMN000ABC1D2E3FG", True)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
@@ -707,7 +707,7 @@ class TestClientAvailability:
 
 
 class TestClientDeviceTimer:
-    @patch("grobro.ha.client.DEVICE_TIMEOUT", 10)
+    @patch("grobro.settings.DEVICE_TIMEOUT", 10)
     def test_device_timer(self, ha_client):
         ha_client._Client__reset_device_timer("QMN000ABC1D2E3FG")
         assert "QMN000ABC1D2E3FG" in ha_client._device_timers
@@ -716,7 +716,7 @@ class TestClientDeviceTimer:
 
     def test_set_device_offline(self, ha_client):
         ha_client._Client__publish_availability = MagicMock()
-        with patch("grobro.ha.client.DEVICE_TIMEOUT", 10):
+        with patch("grobro.settings.DEVICE_TIMEOUT", 10):
             ha_client._Client__reset_device_timer("QMN000ABC1D2E3FG")
             timer = ha_client._device_timers["QMN000ABC1D2E3FG"]
             timer.function(timer.args[0])
@@ -835,7 +835,7 @@ class TestMaxBat:
     def test_publish_input_register_filters_bat_above_max(self, ha_client):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
         real_payload = _load_payload("NoahReadInputRegisters_0-124.bin")
-        with patch("grobro.ha.client.MAX_BAT", 1):
+        with patch("grobro.settings.MAX_BAT", 1):
             state = HomeAssistantInputRegister(
                 device_id="0PVP0000TEST0001",
                 payload=real_payload,
@@ -857,7 +857,7 @@ class TestMaxBat:
     def test_discovery_filters_bat_above_max(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                with patch("grobro.ha.client.MAX_BAT", 1):
+                with patch("grobro.settings.MAX_BAT", 1):
                     c = Client(MQTTConfig(host="localhost", port=1883))
                     c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
@@ -910,7 +910,7 @@ class TestMaxBat:
         return None
 
     def test_disconnected_battery_keeps_entities_and_values(self, ha_client, monkeypatch):
-        monkeypatch.setattr("grobro.ha.client.KEEP_LAST_VALUES", True)
+        monkeypatch.setattr("grobro.settings.KEEP_LAST_VALUES", True)
         self._publish_noah(ha_client, bat_cnt=2, bat_2_soc_pct=55, bat2_temp=21.0)
         self._publish_noah(ha_client, bat_cnt=1)  # bat_2_soc_pct=0, bat2_temp=-273.1
         state = self._last_noah_state(ha_client)
@@ -958,7 +958,7 @@ class TestMaxBat:
         assert cmps["grobro_0HVR0000TEST0001_battery4Soc"]["name"]
 
     def test_max_bat_default(self):
-        from grobro.ha.client import MAX_BAT
+        from grobro.settings import MAX_BAT
         assert MAX_BAT == "auto"
 
     def test_detect_bat_count_all_empty(self):
@@ -994,26 +994,26 @@ class TestMaxBat:
         assert _detect_bat_count(payload) == 4
 
     def test_resolve_max_bat_int(self):
-        with patch("grobro.ha.client.MAX_BAT", 2):
+        with patch("grobro.settings.MAX_BAT", 2):
             assert _resolve_max_bat("device1") == 2
             assert _resolve_max_bat("device1", {"bat2_ser_part_1": "X"}) == 2
 
     def test_resolve_max_bat_auto_caches(self):
         _MAX_BAT_CACHE.clear()
-        with patch("grobro.ha.client.MAX_BAT", "auto"):
+        with patch("grobro.settings.MAX_BAT", "auto"):
             payload = {"bat2_ser_part_1": "X", "bat3_ser_part_1": "Y"}
             assert _resolve_max_bat("device1", payload) == 3
             assert _MAX_BAT_CACHE.get("device1") == 3
 
     def test_resolve_max_bat_auto_fallback_no_payload(self):
         _MAX_BAT_CACHE.clear()
-        with patch("grobro.ha.client.MAX_BAT", "auto"):
+        with patch("grobro.settings.MAX_BAT", "auto"):
             assert _resolve_max_bat("unknown") == 4
 
     def test_auto_mode_keeps_all_when_serials_empty(self, ha_client):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
         payload = {"bat1_temp": 24, "bat2_temp": 25, "bat3_temp": 26, "bat4_temp": 27}
-        with patch("grobro.ha.client.MAX_BAT", "auto"):
+        with patch("grobro.settings.MAX_BAT", "auto"):
             state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload=dict(payload))
             ha_client.publish_input_register(state)
         published = None
@@ -1033,7 +1033,7 @@ class TestMaxBat:
             "bat1_temp": 24, "bat2_temp": 25, "bat3_temp": 26,
             "bat2_ser_part_1": "SN002",
         }
-        with patch("grobro.ha.client.MAX_BAT", "auto"):
+        with patch("grobro.settings.MAX_BAT", "auto"):
             state = HomeAssistantInputRegister(device_id="0PVP0000TEST0002", payload=dict(payload))
             ha_client.publish_input_register(state)
         published = None
@@ -1068,7 +1068,7 @@ class TestEdgeCases:
     def test_device_timer_enabled(self):
         with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                with patch("grobro.ha.client.DEVICE_TIMEOUT", 5):
+                with patch("grobro.settings.DEVICE_TIMEOUT", 5):
                     c = Client(MQTTConfig(host="localhost", port=1883))
                     c._Client__publish_device_discovery = MagicMock()
                     c._Client__publish_availability = MagicMock()
@@ -1115,7 +1115,7 @@ class TestEdgeCases:
 
     def test_slot_name_parse_error(self, ha_client):
         msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")
-        with patch("grobro.ha.client.MAX_SLOTS", 1):
+        with patch("grobro.settings.MAX_SLOTS", 1):
             ha_client._client.on_message(None, None, msg)
         ha_client.on_command.assert_called()
 
@@ -1138,8 +1138,8 @@ class TestEdgeCases:
     def test_discovery_online_entity_with_device_timeout(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                with patch("grobro.ha.client.DEVICE_TIMEOUT", 10):
-                    with patch("grobro.ha.client.AVAILABILITY_SENSOR", True):
+                with patch("grobro.settings.DEVICE_TIMEOUT", 10):
+                    with patch("grobro.settings.AVAILABILITY_SENSOR", True):
                         c = Client(MQTTConfig(host="localhost", port=1883))
                         c._Client__publish_device_discovery("QMN000ABC1D2E3FG")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
@@ -1189,7 +1189,7 @@ class TestCombinedSerial:
             "bat2_ser_part_2": "ABCD",
             "bat3_ser_part_1": "SN003",
         }
-        with patch("grobro.ha.client.MAX_BAT", 1):
+        with patch("grobro.settings.MAX_BAT", 1):
             state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload=dict(payload))
             ha_client.publish_input_register(state)
         published = None
@@ -1204,7 +1204,7 @@ class TestCombinedSerial:
     def test_discovery_excludes_ser_part_includes_combined(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                with patch("grobro.ha.client.MAX_BAT", 4):
+                with patch("grobro.settings.MAX_BAT", 4):
                     c = Client(MQTTConfig(host="localhost", port=1883))
                     c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
@@ -1228,7 +1228,7 @@ class TestBatteryPositionWatch:
 
     def test_position_change_detected(self, ha_client, caplog):
         caplog.set_level(logging.WARNING)
-        with patch("grobro.ha.client.KEEP_BATTERY_POSITION", True):
+        with patch("grobro.settings.KEEP_BATTERY_POSITION", True):
             # First call: SN002 at Bat2, SN003 at Bat3
             state1 = HomeAssistantInputRegister(
                 device_id="0PVP0000TEST0001",
@@ -1251,7 +1251,7 @@ class TestBatteryPositionWatch:
 
     def test_no_warning_stable_positions(self, ha_client, caplog):
         caplog.set_level(logging.WARNING)
-        with patch("grobro.ha.client.KEEP_BATTERY_POSITION", True):
+        with patch("grobro.settings.KEEP_BATTERY_POSITION", True):
             state1 = HomeAssistantInputRegister(
                 device_id="0PVP0000TEST0001",
                 payload={"bat2_ser_part_1": "SN002", "bat3_ser_part_1": "SN003"},
@@ -1406,10 +1406,10 @@ class TestAutoTimeSync:
 
     def test_time_sync_is_scheduled_only_when_enabled(self, mock_mqtt):
         with patch("grobro.ha.client.os.listdir", return_value=[]), patch("grobro.ha.client.Timer") as timer:
-            with patch("grobro.ha.client.AUTO_TIME_SYNC", False):
+            with patch("grobro.settings.AUTO_TIME_SYNC", False):
                 Client(MQTTConfig(host="localhost", port=1883))
             timer.assert_not_called()
-            with patch("grobro.ha.client.AUTO_TIME_SYNC", True):
+            with patch("grobro.settings.AUTO_TIME_SYNC", True):
                 Client(MQTTConfig(host="localhost", port=1883))
             delay = timer.call_args.args[0]
             assert 0 < delay <= 12 * 3600
@@ -1420,7 +1420,7 @@ class TestValueCache:
 
     @pytest.fixture(autouse=True)
     def _keep_last_values(self, monkeypatch):
-        monkeypatch.setattr("grobro.ha.client.KEEP_LAST_VALUES", True)
+        monkeypatch.setattr("grobro.settings.KEEP_LAST_VALUES", True)
 
     def _last_state(self, client):
         for entry in reversed(client._client.publish.call_args_list):
@@ -1460,7 +1460,7 @@ class TestValueCache:
         self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
         ha_client._client.publish.reset_mock()
         for retained in (False, True):
-            with patch("grobro.ha.client.PUBLISH_SENSORS_RETAINED", retained):
+            with patch("grobro.settings.PUBLISH_SENSORS_RETAINED", retained):
                 ha_client._Client__on_connect(None, None, None, 0, None)
             state, retain = self._last_state(ha_client)
             # Live readings are outdated after a reconnect and left out
@@ -1569,7 +1569,7 @@ class TestValueCache:
     def test_missing_config_dir_does_not_crash(self, mock_mqtt, monkeypatch, tmp_path):
         blocker = tmp_path / "not_a_dir"
         blocker.write_text("")
-        monkeypatch.setattr("grobro.ha.client.CONFIG_DIR", str(blocker / "config"))
+        monkeypatch.setattr("grobro.settings.CONFIG_DIR", str(blocker / "config"))
         c = Client(MQTTConfig(host="localhost", port=1883))
         c.set_config(self.DEVICE, DeviceConfig(serial_number=self.DEVICE))
         c.publish_input_register(HomeAssistantInputRegister(device_id=self.DEVICE, payload={"out_power": 1}))
@@ -1592,7 +1592,7 @@ class TestKeepLastValuesDisabled:
         return None
 
     def test_default_is_disabled(self):
-        from grobro.ha.client import KEEP_LAST_VALUES
+        from grobro.settings import KEEP_LAST_VALUES
         assert KEEP_LAST_VALUES is False
 
     def test_missing_values_not_filled_in(self, ha_client):

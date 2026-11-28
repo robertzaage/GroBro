@@ -12,6 +12,7 @@ from threading import Lock
 import paho.mqtt.client as mqtt
 
 import grobro.model as model
+from grobro import settings
 from grobro.model.growatt_codes import fault_text, warning_texts
 from grobro.model.growatt_registers import (
     HomeAssistantInputRegister,
@@ -28,35 +29,10 @@ from grobro.model.modbus_function import (
     GrowattModbusFunctionSingle,
 )
 
-HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
-# Availability of GroBro itself, set to offline by the broker if GroBro disconnects
-BRIDGE_AVAILABILITY_TOPIC = f"{HA_BASE_TOPIC}/grobro/bridge/availability"
-# Home Assistant announces restarts on this topic (birth message)
-HA_STATUS_TOPIC = f"{HA_BASE_TOPIC}/status"
-DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
-AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
-PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
-MAX_SLOTS = int(os.getenv("MAX_SLOTS", "1"))
-MAX_BAT_RAW = os.getenv("MAX_BAT", "auto")
-try:
-    MAX_BAT: int | str = int(MAX_BAT_RAW)
-except ValueError:
-    MAX_BAT = MAX_BAT_RAW
-FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
-KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
-AUTO_TIME_SYNC = os.getenv("AUTO_TIME_SYNC", "False").lower() == "true"
-TIME_SYNC_HOURS = (0, 12)
-# Opt-in: fill in values missing from a payload from the last known ones and
-# restore them after a restart, see _offline_behavior.
-KEEP_LAST_VALUES = os.getenv("KEEP_LAST_VALUES", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
 _LAST_BAT_SERIALS: dict[str, dict[int, str]] = {}
-
-# Persistent storage for device configs and the sensor value cache.
-# The HA add-on maps this via addon_config; plain Docker needs a volume.
-CONFIG_DIR = os.getenv("CONFIG_DIR", "/config")
 
 # Offline handling of sensor values (KEEP_LAST_VALUES): a value missing from a
 # payload keeps its last known reading for brief gaps. Once it has been missing
@@ -81,7 +57,7 @@ def _offline_behavior(known_registers, key: str) -> Optional[str]:
     dashboard) are not cached at all: HA already handles gaps in those
     correctly, and a cached value could get reinstated after a legitimate
     reset (e.g. daily "_today" counters at midnight), which combined with
-    FILTER_DATA_GLITCHES could suppress the correct lower value as a glitch.
+    settings.FILTER_DATA_GLITCHES could suppress the correct lower value as a glitch.
     """
     reg = known_registers.input_registers.get(key) if known_registers else None
     if not reg:
@@ -131,8 +107,8 @@ def _has_bat_info(payload: dict) -> bool:
 
 
 def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
-    if isinstance(MAX_BAT, int):
-        return MAX_BAT
+    if isinstance(settings.MAX_BAT, int):
+        return settings.MAX_BAT
     if payload is not None and _has_bat_info(payload):
         # The count only ever grows (and is persisted with the value cache):
         # a battery that stops reporting, e.g. because it was disconnected,
@@ -151,7 +127,7 @@ def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
 
 
 def _bat_count_known(device_id: str) -> bool:
-    return isinstance(MAX_BAT, int) or device_id in _MAX_BAT_CACHE
+    return isinstance(settings.MAX_BAT, int) or device_id in _MAX_BAT_CACHE
 
 def map_enum_value(reg, value):
     """Wandelt ENUM-INT_MAP-Werte in Klartext um (falls vorhanden)."""
@@ -302,7 +278,7 @@ class Client:
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
 
-        client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
+        client_id_suffix = settings.MQTT_CLIENT_SUFFIX
         client_id = f"grobro-ha{('-' + client_id_suffix) if client_id_suffix else ''}"
 
         self._client = mqtt.Client(
@@ -313,10 +289,10 @@ class Client:
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
         mqtt_config.configure_tls(self._client)
-        self._client.will_set(BRIDGE_AVAILABILITY_TOPIC, "offline", retain=True)
+        self._client.will_set(settings.BRIDGE_AVAILABILITY_TOPIC, "offline", retain=True)
         self._last_states: dict[str, str] = {}
         self._time_sync_timer: Optional[Timer] = None
-        if AUTO_TIME_SYNC:
+        if settings.AUTO_TIME_SYNC:
             self.__schedule_time_sync()
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
@@ -338,15 +314,15 @@ class Client:
         self._value_cache_saved_at: dict[str, float] = {}
 
         try:
-            os.makedirs(CONFIG_DIR, exist_ok=True)
+            os.makedirs(settings.CONFIG_DIR, exist_ok=True)
         except OSError as e:
-            LOG.warning("Cannot create config dir %s, persistence disabled: %s", CONFIG_DIR, e)
+            LOG.warning("Cannot create config dir %s, persistence disabled: %s", settings.CONFIG_DIR, e)
 
         # Load from cached files
-        cached_files = os.listdir(CONFIG_DIR) if os.path.isdir(CONFIG_DIR) else []
+        cached_files = os.listdir(settings.CONFIG_DIR) if os.path.isdir(settings.CONFIG_DIR) else []
         for fname in cached_files:
             if fname.startswith("config_") and fname.endswith(".json"):
-                config = model.DeviceConfig.from_file(os.path.join(CONFIG_DIR, fname))
+                config = model.DeviceConfig.from_file(os.path.join(settings.CONFIG_DIR, fname))
                 if config:
                     self._config_cache[config.device_id] = config
 
@@ -354,7 +330,7 @@ class Client:
             if fname.startswith("state_cache_") and fname.endswith(".json"):
                 device_id = fname[len("state_cache_"):-len(".json")]
                 try:
-                    with open(os.path.join(CONFIG_DIR, fname), "r") as f:
+                    with open(os.path.join(settings.CONFIG_DIR, fname), "r") as f:
                         data = json.load(f)
                     cached = data["values"]
                 except Exception as e:
@@ -362,7 +338,7 @@ class Client:
                     continue
                 if isinstance(data.get("max_bat"), int):
                     _MAX_BAT_CACHE[device_id] = data["max_bat"]
-                if not KEEP_LAST_VALUES:
+                if not settings.KEEP_LAST_VALUES:
                     continue
                 # Live readings are not restored: they were only valid at the
                 # time they were saved, and restoring them (or 0) would show
@@ -388,7 +364,7 @@ class Client:
     # ------------------- Config Handling -------------------
 
     def set_config(self, device_id: str, config: model.DeviceConfig):
-        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
+        config_path = os.path.join(settings.CONFIG_DIR, f"config_{device_id}.json")
         existing_config = model.DeviceConfig.from_file(config_path)
         if existing_config is None or existing_config != config:
             LOG.info(f"Saving updated config for {device_id}")
@@ -413,7 +389,7 @@ class Client:
         # discovery + availability
         self.__publish_device_discovery(state.device_id, effective_max_bat)
         self.__publish_availability(state.device_id, True)
-        if DEVICE_TIMEOUT > 0:
+        if settings.DEVICE_TIMEOUT > 0:
             self.__reset_device_timer(state.device_id)
 
         # ENUM Mapping
@@ -451,7 +427,7 @@ class Client:
             payload["Status_Summary"] = status_summary
 
         # Prevent glitches on total_increasing sensors (energy counters)
-        if FILTER_DATA_GLITCHES and known_registers:
+        if settings.FILTER_DATA_GLITCHES and known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
                 if not reg:
@@ -481,7 +457,7 @@ class Client:
                 payload.pop(f"bat{bat_num}_serial", None)
 
         # Detect battery position changes when enabled
-        if KEEP_BATTERY_POSITION:
+        if settings.KEEP_BATTERY_POSITION:
             current_serials: dict[int, str] = {}
             for bat_num in range(2, 5):
                 key = f"bat{bat_num}_serial"
@@ -498,15 +474,15 @@ class Client:
                             )
             _LAST_BAT_SERIALS[state.device_id] = current_serials
 
-        if KEEP_LAST_VALUES:
+        if settings.KEEP_LAST_VALUES:
             self.__fill_in_last_values(state.device_id, known_registers, state.payload, payload, absent_keys, effective_max_bat)
         self.__maybe_save_value_cache(state.device_id)
 
         # State publish
-        topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
+        topic = f"{settings.HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         state_str = json.dumps(payload, separators=(",", ":"))
         self._last_states[topic] = state_str
-        self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+        self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
 
     def __fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
         """Keep HA entities from dropping to "unknown" when a value is missing
@@ -561,7 +537,7 @@ class Client:
         try:
             LOG.debug("HA: publish: %s", ha_input)
             for value in ha_input.payload:
-                topic = f"{HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
+                topic = f"{settings.HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
                 self._holding_values[(ha_input.device_id, value.name)] = str(value.value)
                 self._client.publish(topic, value.value, retain=True)
         except Exception as e:
@@ -571,8 +547,8 @@ class Client:
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
-        self._client.publish(BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
-        self._client.subscribe(HA_STATUS_TOPIC)
+        self._client.publish(settings.BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
+        self._client.subscribe(settings.HA_STATUS_TOPIC)
         self.__subscribe_commands()
         # Immediately republish the last known state-like values for every
         # device we have a cache for, so entities don't wait for the next
@@ -586,26 +562,26 @@ class Client:
             }
             if not cached_payload:
                 continue
-            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+            topic = f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state"
             self._client.publish(
                 topic,
                 json.dumps(cached_payload, separators=(",", ":")),
-                retain=PUBLISH_SENSORS_RETAINED,
+                retain=settings.PUBLISH_SENSORS_RETAINED,
             )
             LOG.info("Republished cached values for %s after (re)connect", device_id)
 
     def __subscribe_commands(self):
         for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
             for action in ["set", "read"]:
-                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
+                topic = f"{settings.HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
-        if msg.topic == HA_STATUS_TOPIC:
+        if msg.topic == settings.HA_STATUS_TOPIC:
             if msg.payload.decode(errors="ignore").strip() == "online":
                 self.__republish_after_ha_restart()
             return
-        parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
+        parts = msg.topic.removeprefix(f"{settings.HA_BASE_TOPIC}/").split("/")
         if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "select", "config"}:
             return
         cmd_type, _, device_id, cmd_name, action = parts
@@ -624,7 +600,7 @@ class Client:
                 for name, register in known_registers.holding_registers.items():
                     if name.startswith("slot"):
                         try:
-                            if int(name[4]) > MAX_SLOTS:
+                            if int(name[4]) > settings.MAX_SLOTS:
                                 continue
                         except ValueError:
                             continue
@@ -756,7 +732,7 @@ class Client:
         from datetime import datetime, timedelta
 
         now = datetime.now()
-        candidates = [now.replace(hour=h, minute=0, second=0, microsecond=0) for h in TIME_SYNC_HOURS]
+        candidates = [now.replace(hour=h, minute=0, second=0, microsecond=0) for h in settings.TIME_SYNC_HOURS]
         candidates += [c + timedelta(days=1) for c in candidates]
         next_sync = min(c for c in candidates if c > now)
         self._time_sync_timer = Timer((next_sync - now).total_seconds(), self.sync_time_of_all_devices, args=(True,))
@@ -786,7 +762,7 @@ class Client:
             self._discovery_payload_cache.pop(device_id, None)
             self.__publish_device_discovery(device_id)
         for topic, state_str in list(self._last_states.items()):
-            self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+            self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
 
     def __pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
         """Combine a new field value with the last known values of the other fields in the same register."""
@@ -837,7 +813,7 @@ class Client:
             self.__save_value_cache(device_id)
 
     def __save_value_cache(self, device_id: str):
-        path = os.path.join(CONFIG_DIR, f"state_cache_{device_id}.json")
+        path = os.path.join(settings.CONFIG_DIR, f"state_cache_{device_id}.json")
         tmp_path = f"{path}.tmp"
         self._value_cache_saved_at[device_id] = time.monotonic()
         try:
@@ -858,11 +834,11 @@ class Client:
             if value != 0 and _offline_behavior(known_registers, key) == "zero":
                 device_value_cache[key] = 0
                 self._value_cache_dirty.add(device_id)
-        topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+        topic = f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state"
         state_str = json.dumps(device_value_cache, separators=(",", ":"))
         # Also used when Home Assistant restarts, see __republish_after_ha_restart
         self._last_states[topic] = state_str
-        self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+        self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
         self.__maybe_save_value_cache(device_id)
 
     def __reset_device_timer(self, device_id: str):
@@ -874,24 +850,24 @@ class Client:
         if device_id in self._device_timers:
             self._device_timers[device_id].cancel()
 
-        timer = Timer(DEVICE_TIMEOUT, set_device_unavailable, args=[device_id])
+        timer = Timer(settings.DEVICE_TIMEOUT, set_device_unavailable, args=[device_id])
         timer.daemon = True
         self._device_timers[device_id] = timer
         timer.start()
 
     def __publish_availability(self, device_id: str, online: bool):
         LOG.debug("Set device %s availability: %s", device_id, online)
-        if (not online and not AVAILABILITY_SENSOR) or online:
+        if (not online and not settings.AVAILABILITY_SENSOR) or online:
             self._client.publish(
-                f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
+                f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/availability",
                 "online" if online else "offline",
                 retain=True,
             )
-        if (AVAILABILITY_SENSOR):
+        if (settings.AVAILABILITY_SENSOR):
             self._client.publish(
-                f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
+                f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/online",
                 "ON" if online else "OFF",
-                retain=PUBLISH_SENSORS_RETAINED,
+                retain=settings.PUBLISH_SENSORS_RETAINED,
             )
 
     def __detect_neo_pv_count(self, device_id: str, payload: dict) -> None:
@@ -929,14 +905,14 @@ class Client:
 
         self.__migrate_entity_discovery(device_id, known_registers)
 
-        topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+        topic = f"{settings.HA_BASE_TOPIC}/device/{device_id}/config"
 
         # prepare discovery payload
         payload: dict = {
             "dev": self.__device_info_from_config(device_id),
             "avty": [
-                {"t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability"},
-                {"t": BRIDGE_AVAILABILITY_TOPIC},
+                {"t": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/availability"},
+                {"t": settings.BRIDGE_AVAILABILITY_TOPIC},
             ],
             "avty_mode": "all",
             "o": {"name": "grobro", "url": "https://github.com/robertzaage/GroBro"},
@@ -952,7 +928,7 @@ class Client:
             # slot filtering applies only to modbus
             if not entry["is_config"] and entry["name"].startswith("slot"):
                 try:
-                    if int(entry["name"][4]) > MAX_SLOTS:
+                    if int(entry["name"][4]) > settings.MAX_SLOTS:
                         continue
                 except ValueError:
                     continue
@@ -973,11 +949,11 @@ class Client:
                 "name": ha.name,
                 "unique_id": unique_id,
                 "command_topic": (
-                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{settings.HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
                     f"{device_id}/{entry['cmd_id']}/set"
                 ),
                 "state_topic": (
-                    f"{HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
+                    f"{settings.HA_BASE_TOPIC}/{entry['topic_root']}/grobro/"
                     f"{device_id}/{entry['state_id']}/get"
                 ),
                 **ha_data,
@@ -987,7 +963,7 @@ class Client:
         payload["cmps"][restart_uid] = {
             "platform": "button",
             "name": "Restart Datalogger",
-            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
+            "command_topic": f"{settings.HA_BASE_TOPIC}/config/grobro/{device_id}/32/set",
             "payload_press": "1",
             "icon": "mdi:restart",
             "unique_id": restart_uid
@@ -999,13 +975,13 @@ class Client:
             "platform": "button",
             "name": "Sync Time",
             "icon": "mdi:clock-outline",
-            "command_topic": f"{HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
+            "command_topic": f"{settings.HA_BASE_TOPIC}/config/grobro/{device_id}/31/set",
             "unique_id": time_sync_uid
         }
 
         # Read-All Button
         payload["cmps"][f"grobro_{device_id}_cmd_read_all"] = {
-            "command_topic": f"{HA_BASE_TOPIC}/button/grobro/{device_id}/read_all/read",
+            "command_topic": f"{settings.HA_BASE_TOPIC}/button/grobro/{device_id}/read_all/read",
             "platform": "button",
             "unique_id": f"grobro_{device_id}_cmd_read_all",
             "name": "Read All Values",
@@ -1027,7 +1003,7 @@ class Client:
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
                 "name": state.homeassistant.name,
-                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state",
                 "value_template": f"{{{{ value_json['{state_name}'] }}}}",
                 "unique_id": unique_id,
                 "device_class": state.homeassistant.device_class,
@@ -1044,7 +1020,7 @@ class Client:
             payload["cmps"][summary_uid] = {
                 "platform": "sensor",
                 "name": "Status",
-                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state",
                 "value_template": "{{ value_json['Status_Summary'] | default('unknown') }}",
                 "unique_id": summary_uid,
                 "icon": "mdi:information-outline",
@@ -1067,7 +1043,7 @@ class Client:
                     "platform": "sensor",
                     "name": f"Bat{bat_num} Serial",
                     "entity_category": "diagnostic",
-                    "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                    "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state",
                     "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
                     "unique_id": uid,
                     "icon": "mdi:identifier",
@@ -1093,7 +1069,7 @@ class Client:
                 "platform": "sensor",
                 "name": "Firmware Version",
                 "entity_category": "diagnostic",
-                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state",
                 "value_template": value_template,
                 "unique_id": firmware_unique_id,
                 "icon": "mdi:information",
@@ -1105,7 +1081,7 @@ class Client:
             "platform": "sensor",
             "name": "Device SN",
             "entity_category": "diagnostic",
-            "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/serial",
+            "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/serial",
             "unique_id": serial_unique_id,
             "icon": "mdi:identifier",
         }
@@ -1116,19 +1092,19 @@ class Client:
             "platform": "sensor",
             "name": "Device Type",
             "entity_category": "diagnostic",
-            "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/type",
+            "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/type",
             "unique_id": type_unique_id,
             "icon": "mdi:chip",
         }
 
         # Online Entity
-        if DEVICE_TIMEOUT > 0 and AVAILABILITY_SENSOR:
+        if settings.DEVICE_TIMEOUT > 0 and settings.AVAILABILITY_SENSOR:
             online_unique_id = f"grobro_{device_id}_online"
             payload["cmps"][online_unique_id] = {
                 "platform": "binary_sensor",
                 "name": "Online",
                 "entity_category": "diagnostic",
-                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
+                "state_topic": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/online",
                 "device_class": "connectivity",
                 "unique_id": online_unique_id,
             }
@@ -1141,8 +1117,8 @@ class Client:
             if device_id not in self._discovery_cache:
                 self._discovery_cache.append(device_id)
             # trotzdem States aktualisieren
-            self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
-            self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
+            self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
+            self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
             return
 
         LOG.info("Publishing updated discovery for %s", device_id)
@@ -1155,32 +1131,32 @@ class Client:
         if device_id not in self._discovery_cache:
             self._discovery_cache.append(device_id)
 
-        self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
-        self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
+        self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
+        self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
 
     def __migrate_entity_discovery(self, device_id: str, known_registers: GroBroRegisters):
         old_entities = [("set_wirk", "number")]
         for e_name, e_type in old_entities:
             self._client.publish(
-                f"{HA_BASE_TOPIC}/{e_type}/grobro/{device_id}_{e_name}/config",
+                f"{settings.HA_BASE_TOPIC}/{e_type}/grobro/{device_id}_{e_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
         for cmd_name, cmd in known_registers.holding_registers.items():
             cmd_type = cmd.homeassistant.type
             self._client.publish(
-                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
+                f"{settings.HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
             self._client.publish(
-                f"{HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}_read/config",
+                f"{settings.HA_BASE_TOPIC}/{cmd_type}/grobro/{device_id}_{cmd_name}_read/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
         for state_name in known_registers.input_registers:
             self._client.publish(
-                f"{HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state_name}/config",
+                f"{settings.HA_BASE_TOPIC}/sensor/grobro/{device_id}_{state_name}/config",
                 json.dumps({"migrate_discovery": True}),
                 retain=True,
             )
@@ -1188,7 +1164,7 @@ class Client:
     def __device_info_from_config(self, device_id: str):
         # Find matching config
         config = self._config_cache.get(device_id)
-        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
+        config_path = os.path.join(settings.CONFIG_DIR, f"config_{device_id}.json")
 
         # Fallback: try loading from file
         if not config:
@@ -1289,7 +1265,7 @@ class Client:
         self.__kickoff_next_config_read(device_id)
 
     def handle_config_read_response(self, device_id: str, register_no: int, value: str | int):
-        topic = f"{HA_BASE_TOPIC}/config/grobro/{device_id}/{register_no}/get"
+        topic = f"{settings.HA_BASE_TOPIC}/config/grobro/{device_id}/{register_no}/get"
         self._client.publish(topic, value, retain=True)
 
         with self._config_read_lock:
@@ -1408,7 +1384,7 @@ def _publish_device_discovery_with_firmware(
         return _ORIGINAL_PUBLISH_DEVICE_DISCOVERY(self, device_id, effective_max_bat)
 
     original_publish = self._client.publish
-    discovery_topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+    discovery_topic = f"{settings.HA_BASE_TOPIC}/device/{device_id}/config"
 
     def publish(topic, payload=None, *args, **kwargs):
         if topic == discovery_topic and payload:

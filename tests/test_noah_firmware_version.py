@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import grobro.ha.client as firmware_client
+from grobro.settings import HA_BASE_TOPIC
 from grobro.ha.client import (
     Client,
-    HA_BASE_TOPIC,
     _compact_datalogger_version,
     _firmware_part_names,
     compose_combined_firmware,
