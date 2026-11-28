@@ -728,6 +728,63 @@
         "name": "Load First 3 Enabled",
         "type": "switch"
       }
+    },
+    "export_limit_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 122,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Disabled",
+              "1": "Meter 1",
+              "2": "Meter 2",
+              "3": "CT Clamp"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limit Mode",
+        "type": "select",
+        "options": {
+          "0": "Disabled",
+          "1": "Meter 1",
+          "2": "Meter 2",
+          "3": "CT Clamp"
+        }
+      }
+    },
+    "export_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 123,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "SIGNED_FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limit",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": -100,
+        "max": 100,
+        "step": 0.1
+      }
     }
   },
   "input_registers": {

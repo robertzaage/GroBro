@@ -35,6 +35,14 @@ class GrowattRegisterDataType(BaseModel):
     float_options: Optional[GrowattRegisterFloatOptions] = None
     enum_options: Optional[GrowattRegisterEnumOptions] = None
     mult: Optional[float] = None
+    # Optional bit field inside the register, e.g. the enable flag of a packed time slot
+    bit_shift: int = 0
+    bit_width: Optional[int] = None
+
+    def extract_bits(self, value: int) -> int:
+        if self.bit_width is None:
+            return value
+        return (value >> self.bit_shift) & ((1 << self.bit_width) - 1)
 
     def parse(self, data_raw: bytes):
         if not data_raw:
@@ -54,16 +62,15 @@ class GrowattRegisterDataType(BaseModel):
                 value += self.float_options.delta
             return round(value, 3)
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
-            value = struct.unpack(unpack_type, data_raw)[0]
+            value = self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
             hour = (value >> 8) & 0xFF
             minute = value & 0xFF
             return f"{hour:02d}:{minute:02d}"
         elif self.data_type in [GrowattRegisterDataTypes.INT, GrowattRegisterDataTypes.SIGNED_INT]:
-            value = struct.unpack(unpack_type, data_raw)[0]
-            return value
+            return self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
         elif self.data_type == GrowattRegisterDataTypes.ENUM:
             opts = self.enum_options
-            value = struct.unpack(unpack_type, data_raw)[0]
+            value = self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
 
             if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
                 return None  # TODO: implement
@@ -87,9 +94,9 @@ class HomeAssistantHoldingRegister(BaseModel):
     name: str
     publish: bool
     type: str
-    min: Optional[int] = None
-    max: Optional[int] = None
-    step: Optional[int] = None
+    min: Optional[Union[int, float]] = None
+    max: Optional[Union[int, float]] = None
+    step: Optional[Union[int, float]] = None
     state_class: Optional[str] = None
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None

@@ -124,6 +124,33 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
     )
 
 
+def _to_register_value(reg, cmd_type: str, raw_value: str) -> int:
+    """Convert a Home Assistant value into the raw 16 bit register value of a holding register."""
+    if cmd_type == "switch":
+        return 1 if raw_value.upper() == "ON" else 0
+    if cmd_type == "time":
+        hour, minute = map(int, raw_value.split(":")[:2])
+        return (hour * 256) + minute
+    if cmd_type == "select":
+        options = getattr(reg.homeassistant, "options", None)
+        if options:
+            reverse_options = {value: int(key) for key, value in options.items()}
+            if raw_value not in reverse_options:
+                raise ValueError(f"unknown option {raw_value}")
+            return reverse_options[raw_value]
+        return int(raw_value)
+
+    data = reg.growatt.data
+    value = float(raw_value)
+    if data.float_options and data.data_type in ("FLOAT", "SIGNED_FLOAT"):
+        value = (value - data.float_options.delta) / data.float_options.multiplier
+    elif data.mult:
+        value = value / data.mult
+    raw = int(round(value))
+    # Negative values are written as two's complement
+    return raw & 0xFFFF if raw < 0 else raw
+
+
 def _get_bat_number(name: str) -> Optional[int]:
     if name.startswith("battery"):
         rest = name[7:]
@@ -223,6 +250,8 @@ class Client:
                     self._config_cache[config.device_id] = config
 
         self._discovery_payload_cache: dict[str, str] = {}
+        # Last published holding register values, needed to update packed registers
+        self._holding_values: dict[tuple[str, str], str] = {}
         self._neo_pv_count: dict[str, int] = {}
 
     # ------------------- Lifecycle -------------------
@@ -347,6 +376,7 @@ class Client:
             LOG.debug("HA: publish: %s", ha_input)
             for value in ha_input.payload:
                 topic = f"{HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
+                self._holding_values[(ha_input.device_id, value.name)] = str(value.value)
                 self._client.publish(topic, value.value, retain=True)
         except Exception as e:
             LOG.error(f"HA: publish msg: {e}")
@@ -449,41 +479,17 @@ class Client:
                 )
                 return
 
-            if cmd_type == "switch":
-                parsed_value = 1 if raw_value.upper() == "ON" else 0
+            try:
+                parsed_value = _to_register_value(reg, cmd_type, raw_value)
+            except ValueError as e:
+                LOG.error("Invalid value %s for %s: %s", raw_value, cmd_name, e)
+                return
 
-            elif cmd_type == "time":
-                hour, minute = map(int, raw_value.split(":")[:2])
-                parsed_value = (hour * 256) + minute
-
-            elif cmd_type == "select":
-                options = getattr(
-                    reg.homeassistant,
-                    "options",
-                    None,
-                )
-
-                if options:
-                    reverse_options = {
-                        value: int(key)
-                        for key, value in options.items()
-                    }
-
-                    if raw_value not in reverse_options:
-                        LOG.error(
-                            "Unknown select value %s for %s",
-                            raw_value,
-                            cmd_name,
-                        )
-                        return
-
-                    parsed_value = reverse_options[raw_value]
-
-                else:
-                    parsed_value = int(raw_value)
-
-            else:
-                parsed_value = int(raw_value)
+            # Packed registers hold several fields, keep the other fields unchanged
+            if reg.growatt.data.bit_width is not None:
+                parsed_value = self.__pack_register_value(device_id, known_registers, cmd_name, parsed_value)
+                if parsed_value is None:
+                    return
 
             pos = reg.growatt.position
 
@@ -536,6 +542,32 @@ class Client:
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)
             return
+
+    def __pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
+        """Combine a new field value with the last known values of the other fields in the same register."""
+        reg = known_registers.holding_registers[cmd_name]
+        register_no = reg.growatt.position.register_no
+        raw = 0
+        for name, other in known_registers.holding_registers.items():
+            data = other.growatt.data
+            if other.growatt.position.register_no != register_no or data.bit_width is None:
+                continue
+            if name == cmd_name:
+                value = field_value
+            else:
+                current = self._holding_values.get((device_id, name))
+                if current is None:
+                    LOG.warning(
+                        "Unknown value of %s for %s, reading register %s first. Please try again.",
+                        name, device_id, register_no,
+                    )
+                    self.on_command(
+                        make_modbus_command(device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, register_no)
+                    )
+                    return None
+                value = _to_register_value(other, other.homeassistant.type, current)
+            raw |= (value & ((1 << data.bit_width) - 1)) << data.bit_shift
+        return raw
 
     # ------------------- Internals -------------------
 
