@@ -187,9 +187,69 @@ with resources.files(__package__).joinpath("growatt_spf_registers.json").open("r
 with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("rb") as f:
     KNOWN_XH2_REGISTERS = GroBroRegisters.model_validate(json.load(f))
 # MOD 3-phase inverter family (ShineWiFi-X dongle).
-# Similar register block layout (3000-3499) to NEO but with key differences:
-# - Phase powers are u16*0.1 instead of u32*0.1
-# - Pac total at reg 3020 (u16) instead of 3019 (u32)
-# - Pac1 at 3025, Pac2 at 3029, Pac3 at 3033
+# Uses the standard 3000-3249 input register layout shared with MIN/TL-XH, all
+# three phases published and battery values read from the first BDC (3169+).
 with resources.files(__package__).joinpath("growatt_mod_registers.json").open("rb") as f:
     KNOWN_MOD_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+
+
+# Device routing by the serial in the MQTT topic (datalogger or integrated inverter serial)
+DEVICE_PREFIXES: list[tuple[str, str, GroBroRegisters]] = [
+    ("QMN", "NEO", KNOWN_NEO_REGISTERS),
+    ("0PVP", "NOAH", KNOWN_NOAH_REGISTERS),
+    ("0HVR", "NEXA", KNOWN_NEXA_REGISTERS),
+    ("HAQ", "SPF", KNOWN_SPF_REGISTERS),
+    # ShineWeLink-X2 datalogger, its LoRa inverters (PTQ) are registered as NEO devices
+    ("RAQ", "ShineWeLink", KNOWN_NEO_REGISTERS),
+    ("PTQ", "NEO", KNOWN_NEO_REGISTERS),
+    ("ZGQ", "MIN-XH2", KNOWN_XH2_REGISTERS),
+    ("VWQ", "MOD", KNOWN_MOD_REGISTERS),
+]
+
+# Inverter serial prefixes (reported in the metadata of every input register message)
+# of the families sharing the standard 3000-3249 input register layout. Used for
+# dataloggers whose own serial prefix is unknown. Single-phase models use the XH2 map,
+# three-phase models the MOD map.
+INVERTER_PREFIXES: dict[str, tuple[str, GroBroRegisters]] = {
+    **{p: ("MIN TL-XH", KNOWN_XH2_REGISTERS) for p in ("ABJ", "SKL", "XVM", "SMN", "JGQ", "HJU", "VFJ")},
+    **{p: ("MIN TL-X", KNOWN_XH2_REGISTERS) for p in ("QYL", "XTD", "BDK", "DCF", "WVN")},
+    **{p: ("MIC TL-X", KNOWN_XH2_REGISTERS) for p in ("FPH", "FWJ")},
+    **{p: ("MOD TL3-XH", KNOWN_MOD_REGISTERS) for p in ("XHL", "MFK", "PYL", "JCM", "MEK", "DFK", "FMP", "FPP", "FQP", "CZM")},
+    **{p: ("MOD TL3-HU", KNOWN_MOD_REGISTERS) for p in ("DPS", "DMS", "DKS", "DO1", "TTS", "TSS", "EGR")},
+    **{p: ("MID TL3-XH", KNOWN_MOD_REGISTERS) for p in ("KLN", "KMN", "KNN", "RKM", "DLP")},
+    **{p: ("MID TL3-XL", KNOWN_MOD_REGISTERS) for p in ("GXF",)},
+    **{p: ("MAX TL3", KNOWN_MOD_REGISTERS) for p in ("NAH",)},
+    **{p: ("WIT", KNOWN_MOD_REGISTERS) for p in ("0PE", "0PC", "0PH", "0HU")},
+}
+
+# Devices identified by their inverter serial, keyed by the serial in the MQTT topic
+DETECTED_DEVICES: dict[str, tuple[str, GroBroRegisters]] = {}
+
+
+def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
+    """Return the register map for a device, based on its serial prefix."""
+    for prefix, _, registers in DEVICE_PREFIXES:
+        if device_id.startswith(prefix):
+            return registers
+    detected = DETECTED_DEVICES.get(device_id)
+    return detected[1] if detected else None
+
+
+def get_device_type_name(device_id: str) -> str:
+    """Return the device type name for a device, based on its serial prefix."""
+    for prefix, name, _ in DEVICE_PREFIXES:
+        if device_id.startswith(prefix):
+            return name
+    detected = DETECTED_DEVICES.get(device_id)
+    return detected[0] if detected else "UNKNOWN"
+
+
+def detect_device_by_inverter_serial(device_id: str, inverter_serial: Optional[str]) -> Optional[GroBroRegisters]:
+    """Identify a device with an unknown topic prefix by the serial of its inverter."""
+    if get_known_registers(device_id) is not None or not inverter_serial:
+        return None
+    match = INVERTER_PREFIXES.get(inverter_serial[:3])
+    if match is None:
+        return None
+    DETECTED_DEVICES[device_id] = match
+    return match[1]

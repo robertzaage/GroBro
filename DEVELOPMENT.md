@@ -522,10 +522,17 @@ The serial number prefix in the MQTT topic determines which register set to use:
 
 `get_device_type_name('RAQ')` returns `"ShineWeLink"`. The `PTQ` prefix is now also recognized in `ha/client.py` — `get_known_registers()` returns `KNOWN_NEO_REGISTERS` and `get_device_type_name()` returns `"NEO"`. PTQ serials are automatically extracted from ShineWeLink (RAQ) 0x0129 config messages and registered as separate inverter devices with modbus data routed to them.
 
-The routing is currently duplicated in two places — both must be updated when adding a new prefix:
+The routing lives in one place, `DEVICE_PREFIXES` in `grobro/model/growatt_registers.py`,
+used through `get_known_registers()` and `get_device_type_name()` by both clients.
 
-- `grobro/grobro/client.py` — `known_registers` switch in `__on_message` (used for modbus register routing AND config message type casting)
-- `grobro/ha/client.py` — `get_known_registers()` and `get_device_type_name()` helpers (used for HA discovery)
+**Detection by inverter serial**: every input register message carries the serial of the
+inverter in its metadata. If the topic prefix is unknown (e.g. a datalogger GroBro doesn't
+know yet), `detect_device_by_inverter_serial()` matches the first three characters of the
+inverter serial against `INVERTER_PREFIXES` and remembers the result in `DETECTED_DEVICES`.
+This covers MIN/MIC TL-X and MIN TL-XH (XH2 map) as well as MOD/MID TL3-XH, MOD TL3-HU,
+MAX TL3 and WIT (MOD map). A known topic prefix always takes precedence. Detection happens
+on the first input register message, so holding and config messages of such a device are
+only routed after that.
 
 ### 3.4 `_get_bat_number` and `MAX_BAT`
 
@@ -578,22 +585,10 @@ removed. Discovery skips `_ser_part_` entities and instead publishes a single
 2. **Register** the JSON file in `grobro/model/growatt_registers.py`:
    - `import` the JSON
    - Add `KNOWN_<NAME>_REGISTERS = GroBroRegisters.model_validate(json.load(f))`
-3. **Add prefix routing** in `grobro/grobro/client.py` (`__on_message` approach):
-   ```python
-   elif device_id.startswith("<PREFIX>"):
-       known_registers = KNOWN_<NAME>_REGISTERS
-   ```
-4. **Add HA helpers** in `grobro/ha/client.py`:
-   ```python
-   def get_known_registers(device_id: str) -> GroBroRegisters | None:
-       if device_id.startswith("<PREFIX>"):
-           return KNOWN_<NAME>_REGISTERS
-       …
-   def get_device_type_name(device_id: str) -> str:
-       if device_id.startswith("<PREFIX>"):
-           return "<Name>"
-       …
-   ```
+3. **Add prefix routing**: add an entry to `DEVICE_PREFIXES` in `grobro/model/growatt_registers.py`.
+   If the family is identified by its inverter serial instead, add its prefixes to `INVERTER_PREFIXES`.
+4. **Check special cases** in `grobro/grobro/client.py` and `grobro/ha/client.py` that match on a
+   prefix directly (e.g. NEO PV count detection, NOAH/NEXA message types).
 5. **Create test fixtures** from real device logs (see [§6 Testing](#6-testing)).
 6. **Add fixture-driven tests** in the appropriate test file.
 7. **Run full test suite** and verify coverage.

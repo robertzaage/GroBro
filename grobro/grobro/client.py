@@ -28,11 +28,9 @@ from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.model.growatt_registers import (
     KNOWN_NEO_REGISTERS,
-    KNOWN_NOAH_REGISTERS,
-    KNOWN_NEXA_REGISTERS,
-    KNOWN_SPF_REGISTERS,
-    KNOWN_XH2_REGISTERS,
-    KNOWN_MOD_REGISTERS,
+    detect_device_by_inverter_serial,
+    get_device_type_name,
+    get_known_registers,
 )
 
 
@@ -308,27 +306,7 @@ class Client:
 
                 # Cast value for HA number entities (INT config registers)
                 try:
-                    known_registers = None
-                    if cfg["device_id"].startswith("QMN"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    elif cfg["device_id"].startswith("0PVP"):
-                        known_registers = KNOWN_NOAH_REGISTERS
-                    elif cfg["device_id"].startswith("0HVR"):
-                        known_registers = KNOWN_NEXA_REGISTERS
-                    elif cfg["device_id"].startswith("HAQ"):
-                        known_registers = KNOWN_SPF_REGISTERS
-                    # TODO: ShineWeLink Datalogger
-                    elif cfg["device_id"].startswith("RAQ"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    # NEO 1000M-X LoRa (encapsulated)
-                    elif cfg["device_id"].startswith("PTQ"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
-                    elif cfg["device_id"].startswith("ZGQ"):
-                        known_registers = KNOWN_XH2_REGISTERS
-                    # MOD-series 3-phase inverters
-                    elif cfg["device_id"].startswith("VWQ"):
-                        known_registers = KNOWN_MOD_REGISTERS
+                    known_registers = get_known_registers(cfg["device_id"])
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -409,27 +387,21 @@ class Client:
             LOG.debug("Received Modbus response: %s", modbus_message)
 
             if modbus_message:
-                known_registers = None
                 ptq_device_id = self._ptq_for_raq.get(device_id)
                 modbus_device_id = ptq_device_id or device_id
-                if modbus_device_id.startswith("QMN"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                elif modbus_device_id.startswith("0PVP"):
-                    known_registers = KNOWN_NOAH_REGISTERS
-                elif modbus_device_id.startswith("0HVR"):
-                    known_registers = KNOWN_NEXA_REGISTERS
-                elif modbus_device_id.startswith("HAQ"):
-                    known_registers = KNOWN_SPF_REGISTERS
-                elif modbus_device_id.startswith("RAQ"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                elif modbus_device_id.startswith("PTQ"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
-                elif modbus_device_id.startswith("ZGQ"):
-                    known_registers = KNOWN_XH2_REGISTERS
-                # MOD-series 3-phase inverters
-                elif modbus_device_id.startswith("VWQ"):
-                    known_registers = KNOWN_MOD_REGISTERS
+                known_registers = get_known_registers(modbus_device_id)
+                if not known_registers and modbus_message.metadata:
+                    # Unknown datalogger, identify the device by the serial of its inverter
+                    known_registers = detect_device_by_inverter_serial(
+                        modbus_device_id, modbus_message.metadata.device_sn
+                    )
+                    if known_registers:
+                        LOG.info(
+                            "Detected %s inverter %s behind datalogger %s",
+                            get_device_type_name(modbus_device_id),
+                            modbus_message.metadata.device_sn,
+                            modbus_device_id,
+                        )
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
                     return
