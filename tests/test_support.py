@@ -188,3 +188,12 @@ def test_noah_bundle_contains_no_serials(tmp_path):
         assert serial not in text
         assert serial.encode().hex() not in text
     assert not any("ser_part" in key for device in bundle["devices"].values() for key in device["state"])
+
+
+def test_bridge_ignores_other_platforms():
+    stats = BridgeStats()
+    hc, _ = _clients(stats)
+    with patch.object(hc, "_handle_bridge_command") as handler:
+        hc._client.on_message(None, None, _msg("homeassistant/number/grobro/grobro_bridge/support_bundle/set", b"1"))
+        hc._client.on_message(None, None, _msg("homeassistant/button/grobro/grobro_bridge/support_bundle/read", b"1"))
+    handler.assert_not_called()

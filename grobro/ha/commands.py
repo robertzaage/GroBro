@@ -105,7 +105,8 @@ class CommandsMixin:
         LOG.debug("Received %s %s command %s for device %s", cmd_type, action, cmd_name, device_id)
 
         if device_id == bridge_id():
-            self._handle_bridge_command(cmd_name)
+            if cmd_type == "button" and action == "set":
+                self._handle_bridge_command(cmd_name)
             return
 
         known_registers = get_known_registers(device_id)
