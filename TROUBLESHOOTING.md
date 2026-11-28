@@ -33,6 +33,12 @@ Check each broker separately. A source connection can succeed while the target r
 
 If `mosquitto_passwd` reports `Read-only file system` inside a running broker, inspect its mounts (`docker inspect --format '{{range .Mounts}}{{println .Source .Destination .RW}}{{end}}' mosquitto`). Keep the runtime config mount read-only. Back up the host-side password file and use an administrative tool or a temporary container with a writable mount to edit that file interactively. Never use `mosquitto_passwd -c` on a populated file. Restore appropriate ownership/permissions and reload the broker if supported. Check existing clients still authenticate. Do not print password hashes or Compose-expanded secrets into shared logs.
 
+## Device connects but Mosquitto drops it
+
+Some dataloggers (e.g. the ShineWiFi-X of MOD inverters) use an MQTT client that isn't fully spec conform. Mosquitto is strict about this and rejects the client registration, so the TLS handshake succeeds but no messages arrive. GroBro logs then show no data from this device, while the Mosquitto log shows the client disconnecting right after connecting.
+
+In this case use [EMQX](https://github.com/emqx/emqx) as source broker on the TLS port, it is more forgiving and accepts these clients. Use its TLS listener, the plain listener rejects the connection with `invalid_proto_name`.
+
 ## Discovery and telemetry
 
 Once both bridge logins work, verify a real device connects to the source broker, publishes messages, and GroBro decodes them. Then check MQTT discovery and sensor values in Home Assistant. The `DEVICE_TIMEOUT` option enables offline tracking when greater than zero; tune it to the reporting interval. Do not interpret unavailable power as measured zero unless the device actually reports it.
