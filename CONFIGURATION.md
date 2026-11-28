@@ -170,6 +170,10 @@ options. Verification and CA settings are independent and are not inherited
 from the source broker. A CA file replaces the default trust store for that
 connection.
 
+In the add-on, `/config` is the add-on's own config folder. You find it as
+`addon_configs/<id>_grobro` via the Samba or File editor add-on. Put the CA file
+there and set a relative path, e.g. `ca.pem`.
+
 Verification is disabled by default for compatibility. When enabled, an invalid
 certificate, hostname mismatch or unreadable CA file fails the connection/setup;
 there is no automatic insecure fallback. Verification with TLS disabled, or a CA

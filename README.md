@@ -36,6 +36,9 @@ Devices behind other dataloggers are identified by the serial of their inverter.
 - Control your devices from Home Assistant, e.g. output power, charge and discharge limits, time slots, export limit and the inverter power switch. Battery controls for TL-XH, MOD and SPH inverters are experimental
 - Controls keep their last confirmed value after a Home Assistant restart
 - Optionally keeps the last known values of disconnected batteries and restores them after a GroBro restart
+- Combined `Status` sensor with the derating reason and fault code, e.g. `Normal – Grid voltage high`
+- Devices come back right after a Home Assistant restart and are marked unavailable when GroBro goes offline
+- Optional automatic clock sync of your devices
 - Publishes smart meter readings (e.g. EcoTracker, Shelly) reported by NOAH and NEXA to MQTT
 - Optional TLS certificate verification for the MQTT connections
 - Runs as Home Assistant add-on or as standalone container, configurable via environment variables
