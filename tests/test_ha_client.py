@@ -935,6 +935,30 @@ class TestEdgeCases:
                 c._Client__on_connect(None, None, None, 0, None)
                 assert "Connected to HA MQTT server" in caplog.text
 
+    def test_on_connect_subscribes_command_topics(self):
+        with patch("grobro.ha.client.mqtt.Client") as mqtt_client:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                mock = mqtt_client.return_value
+                mock.subscribe.reset_mock()
+                c._Client__on_connect(mock, None, None, 0, None)
+                topics = {call.args[0] for call in mock.subscribe.call_args_list}
+                assert "homeassistant/number/grobro/+/+/set" in topics
+                assert "homeassistant/button/grobro/+/+/read" in topics
+                assert len(topics) == 12
+
+    def test_on_reconnect_resubscribes_command_topics(self):
+        # A broker restart drops subscriptions (clean session); they must be
+        # restored on every (re)connect, otherwise HA controls stop working.
+        with patch("grobro.ha.client.mqtt.Client") as mqtt_client:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                mock = mqtt_client.return_value
+                mock.subscribe.reset_mock()
+                c._Client__on_connect(mock, None, None, 0, None)
+                c._Client__on_connect(mock, None, None, 0, None)
+                assert mock.subscribe.call_count == 24
+
     def test_slot_name_parse_error(self, ha_client):
         msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")
         with patch("grobro.ha.client.MAX_SLOTS", 1):

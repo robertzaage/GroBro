@@ -223,11 +223,8 @@ class Client:
         mqtt_config.configure_tls(self._client)
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
-        # Subscriptions
-        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
-            for action in ["set", "read"]:
-                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
-                self._client.subscribe(topic)
+        # Subscriptions are (re)established in __on_connect so they survive
+        # broker restarts and reconnects (clean session drops them).
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
 
@@ -371,6 +368,13 @@ class Client:
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
+        self.__subscribe_commands()
+
+    def __subscribe_commands(self):
+        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
+            for action in ["set", "read"]:
+                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
+                self._client.subscribe(topic)
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")

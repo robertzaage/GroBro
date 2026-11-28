@@ -282,6 +282,17 @@ class TestClientOnMessage:
         client._client.on_message(None, None, msg)
         client.on_input_register.assert_called_once()
 
+    def test_modbus_input_noah_extra_sensors(self, client):
+        data = (Path(DATA_DIR) / "NoahReadInputRegisters_0-124.bin").read_bytes()
+        msg = _msg("c/33/0PVP0000TEST0001", data)
+        client._client.on_message(None, None, msg)
+        payload = client.on_input_register.call_args.args[0].payload
+        # Temperatures are reported in 0.1 K like the battery temperatures
+        assert payload["pv1_temp"] == pytest.approx(32.0, abs=0.01)
+        assert payload["pv2_temp"] == pytest.approx(32.2, abs=0.01)
+        assert payload["system_temp"] == pytest.approx(32.7, abs=0.01)
+        assert payload["bat_soh"] == 100
+
     @patch("grobro.grobro.client.GROWATT_CLOUD", "true")
     @patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", True)
     def test_growatt_cloud_forwarding(self, client):
