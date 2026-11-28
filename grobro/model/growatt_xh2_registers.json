@@ -2781,7 +2781,8 @@
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:percent",
+        "offline": "zero"
       }
     },
     "OPFullwatt": {
@@ -3574,7 +3575,8 @@
         "publish": false,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:percent",
+        "offline": "zero"
       }
     },
     "PF": {
@@ -3739,7 +3741,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "Ibat": {
@@ -4179,7 +4182,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "BMS_BatteryCurr": {
@@ -4343,7 +4347,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "hold"
       }
     },
     "BMS_BMSInfo": {

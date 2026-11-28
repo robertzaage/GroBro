@@ -1435,6 +1435,22 @@ class TestValueCache:
         assert _offline_behavior(known, "bat2_serial") == "hold"
         assert _offline_behavior(None, "out_power") == "hold"
 
+    @pytest.mark.parametrize("family", ["NOAH", "NEXA", "NEO", "SPF", "XH2", "MOD", "SPH"])
+    def test_battery_state_held_and_live_percentages_zeroed(self, family):
+        """SoC and battery/cell voltages are battery state and must not drop to 0
+        while the device is silent (e.g. after stopping at the discharge limit);
+        load/output percentages and fan speeds are live readings."""
+        from grobro.model import growatt_registers
+        known = getattr(growatt_registers, f"KNOWN_{family}_REGISTERS")
+        for name, reg in known.input_registers.items():
+            ha = reg.homeassistant
+            label = f"{name} {ha.name}".lower()
+            behavior = _offline_behavior(known, name)
+            if ha.device_class == "battery" or (ha.device_class == "voltage" and any(w in label for w in ("bat", "bms", "cell"))):
+                assert behavior == "hold", name
+            if any(w in label for w in ("load", "fan speed", "output power")) and ha.unit_of_measurement == "%":
+                assert behavior == "zero", name
+
     def test_offline_behavior_register_override(self):
         known = get_known_registers(self.DEVICE)
         reg = known.input_registers["out_power"]

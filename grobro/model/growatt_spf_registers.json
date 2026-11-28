@@ -396,7 +396,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:sine-wave"
+        "icon": "mdi:sine-wave",
+        "offline": "hold"
       }
     },
     "Battery_SOC": {
@@ -631,7 +632,8 @@
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:percent",
+        "offline": "zero"
       }
     },
     "BuckConverter1_Temp": {
@@ -1248,7 +1250,8 @@
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:percent",
+        "offline": "zero"
       }
     },
     "MPPT_Fan_Speed": {
@@ -1271,7 +1274,8 @@
         "publish": true,
         "state_class": "measurement",
         "unit_of_measurement": "%",
-        "icon": "mdi:percent"
+        "icon": "mdi:percent",
+        "offline": "zero"
       }
     },
     "Fault_code": {
