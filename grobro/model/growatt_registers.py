@@ -192,6 +192,11 @@ with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("r
 with resources.files(__package__).joinpath("growatt_mod_registers.json").open("rb") as f:
     KNOWN_MOD_REGISTERS = GroBroRegisters.model_validate(json.load(f))
 
+# SPH/SPA storage inverter family: PV and grid values in input registers 0-124,
+# storage values in 1000-1124, priority and time slots in holding registers 1044-1118.
+with resources.files(__package__).joinpath("growatt_sph_registers.json").open("rb") as f:
+    KNOWN_SPH_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+
 
 # Device routing by the serial in the MQTT topic (datalogger or integrated inverter serial)
 DEVICE_PREFIXES: list[tuple[str, str, GroBroRegisters]] = [
@@ -207,9 +212,9 @@ DEVICE_PREFIXES: list[tuple[str, str, GroBroRegisters]] = [
 ]
 
 # Inverter serial prefixes (reported in the metadata of every input register message)
-# of the families sharing the standard 3000-3249 input register layout. Used for
-# dataloggers whose own serial prefix is unknown. Single-phase models use the XH2 map,
-# three-phase models the MOD map.
+# of the supported inverter families. Used for dataloggers whose own serial prefix is
+# unknown. Single-phase models of the 3000 register layout use the XH2 map, three-phase
+# models the MOD map and the SPH/SPA storage inverters their own map.
 INVERTER_PREFIXES: dict[str, tuple[str, GroBroRegisters]] = {
     **{p: ("MIN TL-XH", KNOWN_XH2_REGISTERS) for p in ("ABJ", "SKL", "XVM", "SMN", "JGQ", "HJU", "VFJ")},
     **{p: ("MIN TL-X", KNOWN_XH2_REGISTERS) for p in ("QYL", "XTD", "BDK", "DCF", "WVN")},
@@ -220,6 +225,8 @@ INVERTER_PREFIXES: dict[str, tuple[str, GroBroRegisters]] = {
     **{p: ("MID TL3-XL", KNOWN_MOD_REGISTERS) for p in ("GXF",)},
     **{p: ("MAX TL3", KNOWN_MOD_REGISTERS) for p in ("NAH",)},
     **{p: ("WIT", KNOWN_MOD_REGISTERS) for p in ("0PE", "0PC", "0PH", "0HU")},
+    **{p: ("SPH", KNOWN_SPH_REGISTERS) for p in ("YRP", "DIE", "PYH", "NLC", "NRC")},
+    **{p: ("SPA", KNOWN_SPH_REGISTERS) for p in ("WPD",)},
 }
 
 # Devices identified by their inverter serial, keyed by the serial in the MQTT topic

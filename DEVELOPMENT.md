@@ -530,7 +530,8 @@ inverter in its metadata. If the topic prefix is unknown (e.g. a datalogger GroB
 know yet), `detect_device_by_inverter_serial()` matches the first three characters of the
 inverter serial against `INVERTER_PREFIXES` and remembers the result in `DETECTED_DEVICES`.
 This covers MIN/MIC TL-X and MIN TL-XH (XH2 map) as well as MOD/MID TL3-XH, MOD TL3-HU,
-MAX TL3 and WIT (MOD map). A known topic prefix always takes precedence. Detection happens
+MAX TL3 and WIT (MOD map) as well as SPH/SPA storage inverters (`growatt_sph_registers.json`,
+input registers 0-124 and 1000-1124). A known topic prefix always takes precedence. Detection happens
 on the first input register message, so holding and config messages of such a device are
 only routed after that.
 

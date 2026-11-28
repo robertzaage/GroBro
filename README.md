@@ -27,6 +27,8 @@ Join us at [#grobro:matrix.org](https://matrix.to/#/#grobro:matrix.org)
 | MOD series | Inverter (initial support) | `VWQ` |
 | ShineWeLink-X2 | Datalogger for LoRa inverters like the NEO 1000M-X | `RAQ` / `PTQ` |
 
+Devices behind other dataloggers are identified by the serial of their inverter. This experimental support covers MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3, WIT and the SPH/SPA storage inverters. Please open an issue with a message dump if your device shows wrong values.
+
 ## Features
 - Local-only setup, your devices don't need the Growatt Cloud
 - Optional forwarding to the Growatt Cloud, so the ShinePhone app keeps working

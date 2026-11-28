@@ -106,6 +106,129 @@
         "max": 100,
         "step": 1
       }
+    },
+    "discharge_rate": {
+      "growatt": {
+        "position": {
+          "register_no": 3036,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Discharge Rate",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "discharge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3037,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Discharge Stop SOC",
+        "type": "number",
+        "min": 10,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "charge_rate": {
+      "growatt": {
+        "position": {
+          "register_no": 3047,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Rate",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "charge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3048,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Stop SOC",
+        "type": "number",
+        "min": 11,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "ac_charge": {
+      "growatt": {
+        "position": {
+          "register_no": 3049,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "AC Charge",
+        "type": "switch",
+        "icon": "mdi:transmission-tower-import"
+      }
+    },
+    "on_grid_discharge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3067,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "On-grid Discharge Stop SOC",
+        "type": "number",
+        "min": 10,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
     }
   },
   "input_registers": {
