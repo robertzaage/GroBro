@@ -899,6 +899,30 @@ class TestMaxBat:
         assert "grobro_0PVP0000TEST0001_bat1_temp" in cmps
         assert not any("bat2" in uid or "bat_2" in uid for uid in cmps)
 
+    def test_persisted_max_bat_used_after_restart(self, ha_client, mock_mqtt):
+        self._publish_noah(ha_client, bat_cnt=2)
+        ha_client.stop()
+        _MAX_BAT_CACHE.clear()
+        restarted = Client(MQTTConfig(host="localhost", port=1883))
+        restarted.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(restarted, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+        assert cmps["grobro_0PVP0000TEST0001_bat3_temp"] == {"platform": "sensor"}
+
+    def test_disconnected_battery_keeps_entities_and_values(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=2, bat_2_soc_pct=55, bat2_temp=21.0)
+        self._publish_noah(ha_client, bat_cnt=1)  # bat_2_soc_pct=0, bat2_temp=-273.1
+        state = None
+        for entry in reversed(ha_client._client.publish.call_args_list):
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                state = json.loads(entry.args[1])
+                break
+        assert state["bat_2_soc_pct"] == 55
+        assert state["bat2_temp"] == 21.0
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 2
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+
     def test_detected_count_removes_extra_battery_entities(self, ha_client):
         self._publish_noah(ha_client)
         cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
@@ -1338,7 +1362,7 @@ class TestValueCache:
     def test_cache_persisted_and_reloaded(self, ha_client, mock_mqtt, _tmp_config_dir):
         self._publish(ha_client, {"tot_bat_soc_pct": 80})
         cache_file = _tmp_config_dir / f"state_cache_{self.DEVICE}.json"
-        assert json.loads(cache_file.read_text())["tot_bat_soc_pct"] == 80
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 80
 
         restarted = Client(MQTTConfig(host="localhost", port=1883))
         assert restarted._value_cache[self.DEVICE]["tot_bat_soc_pct"] == 80
@@ -1398,9 +1422,9 @@ class TestValueCache:
         cache_file = _tmp_config_dir / f"state_cache_{self.DEVICE}.json"
         self._publish(ha_client, {"tot_bat_soc_pct": 80})
         self._publish(ha_client, {"tot_bat_soc_pct": 81})
-        assert json.loads(cache_file.read_text())["tot_bat_soc_pct"] == 80
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 80
         ha_client.stop()
-        assert json.loads(cache_file.read_text())["tot_bat_soc_pct"] == 81
+        assert json.loads(cache_file.read_text())["values"]["tot_bat_soc_pct"] == 81
         assert not list(_tmp_config_dir.glob("*.tmp"))
 
     def test_offline_behavior_classification(self):

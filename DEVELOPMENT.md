@@ -597,19 +597,18 @@ the `bat{2,3,4}_ser_part_1` values are checked, and when no serial parts have da
 integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
 in both `publish_input_register` and `__publish_device_discovery`.
 
-In auto mode, the detected count is kept per device in `_MAX_BAT_CACHE` and only
-ever grows while GroBro runs, so a battery that stops reporting keeps its
-entities. Before the first payload after a restart, devices whose count can be
-detected (`bat_cnt` / `bat*_ser_part_1` registers, i.e. NOAH) assume a single
-battery instead of 4; entities of further batteries are added once a payload
-reports them. Devices without detection (e.g. NEXA) keep the default of 4.
+In `"auto"` mode, `_resolve_max_bat()` keeps the highest count seen per device in
+`_MAX_BAT_CACHE`, persisted as `max_bat` in `state_cache_{device_id}.json`. The count
+only ever grows: a disconnected battery keeps its entities, and its values (which the
+NOAH still reports as `0` / empty registers beyond `bat_cnt`) are treated as missing, so
+they keep their last known value. Payloads without battery info (no `bat_cnt`, no serial
+parts) don't change the count. Before the first payload, a device whose count can be
+detected (NOAH) without a persisted count assumes a single battery; other devices
+(e.g. NEXA) fall back to `4`.
 
-Once the count is known (detected or `MAX_BAT`), discovery sends the entities
-of batteries above it as `{"platform": "sensor"}`, the documented way to remove
-a single component from a device discovery payload. Simply leaving a component
-out does not remove it in HA and leaves an orphaned entity. While the count is
-only a guess, they are left out instead, so existing entities aren't removed and
-re-added on every restart.
+Once the count is known (detected/persisted or `MAX_BAT`), discovery sends entities of
+batteries above it as `{"platform": "sensor"}`, which makes HA remove them. While the
+count is only a guess, they are left out instead.
 
 After filtering, the four `bat{N}_ser_part_{1-4}` values are concatenated into a
 single `bat{N}_serial` key in the state payload, and the individual part keys are
@@ -965,7 +964,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only grows while running; set to a number to override and remove the entities of batteries above it. |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only ever grows; set to a number to override (removes entities of batteries above it). |
 | `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |
 | `AUTO_TIME_SYNC` | `False` | Write the current time (config register 31) to all known devices at 00:00 and 12:00 |
 | `TZ` | (system) | Time zone used by the `Sync Time` button and `AUTO_TIME_SYNC` |
