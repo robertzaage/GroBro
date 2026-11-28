@@ -1,3 +1,20 @@
+## v2.8.2
+
+### New Features
++ Added optional certificate and hostname verification for the source and target MQTT connections (`SOURCE_MQTT_TLS_VERIFY`, `SOURCE_MQTT_CA_FILE`, `TARGET_MQTT_TLS_VERIFY`, `TARGET_MQTT_CA_FILE`). It is disabled by default, so existing setups keep working unchanged (#247)
++ NOAH devices now expose PV1 temperature, PV2 temperature, system temperature and battery state of health (#242)
++ NEXA devices now expose the temperatures of battery packs 2-4 (#240)
++ Added a Power+ switch for NEXA. It raises the output power limit of the device from 800W to 1000W, and slot power can now be set up to 1000W as well (#229)
++ NEXA devices now expose the battery heater state (#153)
++ Added an MQTT and network troubleshooting guide (#246)
+
+### Bug Fixes
++ Fixed the NOAH heater state always showing "Off". It is now read from register 14, which reports one bit per battery pack whose heater is running (#153)
++ Fixed Home Assistant controls silently stopping to work after the MQTT broker was restarted or the connection dropped. The command topic subscriptions are now re-established on every reconnect (#242)
++ Fixed NEXA PV1-PV4 and system temperatures always showing around 28 °C. They are now scaled like the battery temperatures (#240)
++ Absent temperature sensors (e.g. an unused PV input or a missing battery pack) now show as unknown instead of -273.1 °C
++ Fixed the ISRG Root X2 download link in the configuration guide (#235)
+
 ## v2.8.1
 
 ### Breaking Changes
