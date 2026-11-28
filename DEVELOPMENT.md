@@ -28,6 +28,8 @@ graph TD
         NOAH["NOAH Battery<br/>(0PVP serial)"]
         NEXA["NEXA Battery<br/>(0HVR serial)"]
         SPF["SPF Inverter<br/>(HAQ serial)"]
+        XH2["TL-XH2 Inverter<br/>(ZGQ serial)"]
+        MOD["MOD Inverter<br/>(VWQ serial)"]
         SWX["ShineWeLink<br/>(RAQ serial)"]
         NEO_L["NEO 1000M-X<br/>(PTQ serial, via LoRa)"]
     end
@@ -53,6 +55,8 @@ graph TD
     NOAH --> SRC_BROKER
     NEXA --> SRC_BROKER
     SPF --> SRC_BROKER
+    XH2 --> SRC_BROKER
+    MOD --> SRC_BROKER
     SWX --> NEO_L --> SRC_BROKER
     SRC_BROKER --> GC
     GC --> HC
@@ -429,30 +433,40 @@ import time into `GroBroRegisters` Pydantic models.
 ```json
 {
   "input_registers": {
-    "<sensor_name>": {
+    "Ppv": {
       "growatt": {
-        "position": {
-          "register_no": 0,
-          "offset": 0,
-          "size": 2
-        },
-        "count": 1
+        "position": { "register_no": 3001, "offset": 0, "size": 4 },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": { "multiplier": 0.1, "delta": 0.0 }
+        }
       },
       "homeassistant": {
-        "type": "sensor",
+        "name": "PV total power",
+        "publish": true,
+        "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
-        "state_class": "measurement"
-      },
-      "data_type": "FLOAT",
-      "mult": 0.1,
-      "name": "PV Power"
+        "icon": "mdi:flash"
+      }
     }
   },
-  "holding_registers": { … },
-  "config_registers": { … }
+  "holding_registers": {
+    "slot1_power": {
+      "growatt": { "position": { "register_no": 257, "offset": 0, "size": 2 }, "data": { "data_type": "INT" } },
+      "homeassistant": { "name": "Slot 1 Power", "publish": true, "type": "number", "min": 0, "max": 800, "step": 1 }
+    }
+  },
+  "config_registers": {
+    "data_interval": {
+      "growatt": { "register_no": 4, "data": { "data_type": "INT" } },
+      "homeassistant": { "name": "Update Interval", "publish": true, "type": "number", "entity_category": "config" }
+    }
+  }
 }
 ```
+
+The value is calculated as `raw × multiplier + delta`. `size` is in bytes, so a 32 bit value spanning two registers uses `"size": 4`. `entity_category` is optional: use `diagnostic` for read-only information like serials or firmware and `config` for writable settings, measurements and controls leave it out. Holding and config registers need a `type` (`number`, `switch`, `select`, `time`, `text`, `sensor`).
 
 Three sections mirror the three modbus register spaces:
 
@@ -470,7 +484,7 @@ Three sections mirror the three modbus register spaces:
 | `SIGNED_FLOAT` | `signed short × mult` | `"mult": 0.01` | raw -150 → -1.5 A |
 | `INT` | `unsigned short` | — | raw 1280 → 1280 W |
 | `SIGNED_INT` | `signed short` | — | raw -67 → -67 dBm |
-| `STRING` | 2 chars (hi/lo byte) | — | raw `0x4E 0x41` → `"NA"` |
+| `STRING` | ASCII, `size` bytes, trailing `\0` stripped | — | raw `0x4E 0x41` → `"NA"` |
 | `TIME_HHMM` | hi byte = hours, lo byte = minutes | — | raw `0x17 0x2D` → `"23:45"` |
 | `ENUM` | mapped via `INT_MAP` or `BITFIELD` | — | `{ "0": "Normal", "1": "Fault" }` |
 
@@ -486,14 +500,14 @@ Three sections mirror the three modbus register spaces:
 `result = raw × 0.1 − 273.1` → raw `2971` → `24.0` °C.
 
 A raw value of `0` produces `-273.1` which is treated as "sensor offline" and replaced
-with `null` before publishing to HA. This guard applies to any register using `delta`.
+with `null` before publishing to HA. This guard applies to every register with `device_class: temperature`.
 
 **Energy accumulator registers** (NEO `eTotal`, `eToday`, etc.) use `FLOAT` with `mult: 0.1`
 to report in kWh. The inverter resets daily counters at midnight.
 
 ### 3.3 Device prefix routing
 
-The first 4 characters of the serial number in the MQTT topic determine which register set to use:
+The serial number prefix in the MQTT topic determines which register set to use:
 
 | Prefix | Device family | Register file |
 |--------|---------------|---------------|
@@ -501,6 +515,8 @@ The first 4 characters of the serial number in the MQTT topic determine which re
 | `0PVP` | NOAH series | `growatt_noah_registers.json` |
 | `0HVR` | NEXA series | `growatt_nexa_registers.json` |
 | `HAQ` | SPF series | `growatt_spf_registers.json` |
+| `ZGQ` | TL-XH2 series | `growatt_xh2_registers.json` |
+| `VWQ` | MOD series | `growatt_mod_registers.json` |
 | `RAQ` | ShineWeLink | `growatt_neo_registers.json` (passthrough for LoRa NEO) |
 | `PTQ` | NEO 1000M-X (LoRa) | `growatt_neo_registers.json` — extracted from ShineWeLink 0x0129 config as a separate HA device |
 
@@ -529,8 +545,9 @@ register files). Both `bat1_temp` and `bat_2_ser_part_1` fall into the same `eli
 name.startswith("bat"):` branch — the code does not distinguish them at the prefix level.
 
 `MAX_BAT` controls how many battery packs appear in HA. Default `"auto"` calls
-`_detect_bat_count(payload)` which checks `bat{2,3,4}_ser_part_1` values. When no
-serial parts have data (e.g. sanitized test data), falls back to `4`. Set to an
+`_detect_bat_count(payload)`, which uses the device's `bat_cnt` register. Without it,
+the `bat{2,3,4}_ser_part_1` values are checked, and when no serial parts have data
+(e.g. sanitized test data), it falls back to `4`. Set to an
 integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
 in both `publish_input_register` and `__publish_device_discovery`.
 
@@ -560,7 +577,7 @@ removed. Discovery skips `_ser_part_` entities and instead publishes a single
 1. **Create** `grobro/model/growatt_<name>_registers.json` with the full register map.
 2. **Register** the JSON file in `grobro/model/growatt_registers.py`:
    - `import` the JSON
-   - Add `KNOWN_<NAME>_REGISTERS = GroBroRegisters(**data)`
+   - Add `KNOWN_<NAME>_REGISTERS = GroBroRegisters.model_validate(json.load(f))`
 3. **Add prefix routing** in `grobro/grobro/client.py` (`__on_message` approach):
    ```python
    elif device_id.startswith("<PREFIX>"):
@@ -634,13 +651,22 @@ homeassistant/device/<device_id>/config
   "avty_t": "homeassistant/grobro/QMN000ABC1D2E3FG/availability",
   "o": { "name": "grobro", "url": "https://github.com/robertzaage/GroBro" },
   "cmps": {
-    "grobro_QMN000ABC1D2E3FG_sensor_Ppv": {
+    "grobro_QMN000ABC1D2E3FG_Ppv": {
       "platform": "sensor",
       "name": "PV Power",
-      "unique_id": "grobro_QMN000ABC1D2E3FG_sensor_Ppv",
+      "unique_id": "grobro_QMN000ABC1D2E3FG_Ppv",
+      "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+      "value_template": "{{ value_json['Ppv'] }}",
       "device_class": "power",
       "unit_of_measurement": "W",
       "state_class": "measurement"
+    },
+    "grobro_QMN000ABC1D2E3FG_serial": {
+      "platform": "sensor",
+      "name": "Device SN",
+      "entity_category": "diagnostic",
+      "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/serial",
+      "unique_id": "grobro_QMN000ABC1D2E3FG_serial"
     },
     "grobro_QMN000ABC1D2E3FG_cmd_read_all": {
       "platform": "button",
@@ -659,25 +685,27 @@ homeassistant/device/<device_id>/config
 | Button | `read_all` | Read all holding registers + config registers |
 | Button | `restart_datalogger` | Restart the datalogger (register 32, value 1) |
 | Button | `sync_time` | Synchronise datalogger clock (register 31) |
-| Number | *config registers* | Each config register (data interval, MQTT host, etc.) |
-| Number | *holding registers* | Writable holding registers (slots, charge limits, etc.) |
+| Number / Text / Sensor | *config registers* | Datalogger settings (update interval, MQTT host and port, Wi-Fi signal, etc.) |
+| Number / Select / Time | *holding registers* | Writable holding registers (slots, charge limits, output power, etc.) |
 | Switch | *boolean registers* | On/off toggles mapped to 1/0 values |
+| Sensor | `serial`, `type`, `fw_version` | Device SN, device type and combined firmware version (diagnostic) |
+| Binary sensor | `online` | Only with `DEVICE_TIMEOUT > 0` and `AVAILABILITY_SENSOR=true` (diagnostic) |
 
 ### 5.4 Command register iteration
 
 `iter_command_registers(known_registers)` yields a dict for every writable holding register
-that has a corresponding HA platform (number, switch). This drives the dynamic generation
-of command topics in HA discovery. Each yielded entry contains `key`, `name`, `type`,
-`register_no`, `offset`, `size`, and HA-specific fields (`min`, `max`, `step`, etc.).
+and config register that is published to HA. This drives the dynamic generation of
+command topics in HA discovery. Each yielded entry contains `name`, `ha` (the Home Assistant
+model), `topic_root`, `cmd_id`, `state_id` and `is_config`.
 
-### 5.6 Energy glitch filter state tracking
+### 5.5 Energy glitch filter state tracking
 
 When `FILTER_DATA_GLITCHES` is enabled, `publish_input_register` stores the last published
 value for every `total_increasing` sensor in `_last_energy_values[device_id, key]`. If a
 new value is lower than the stored value, it's replaced with the stored value (suppressing
 the glitch). The dict is in-memory only and resets on restart.
 
-### 5.7 Entity migration
+### 5.6 Entity migration
 
 The `__migrate_entity_discovery` method publishes `{"migrate_discovery": True}` for legacy
 entity-based discovery topics, causing Home Assistant to delete the old entities after a
@@ -691,14 +719,19 @@ version upgrade. This is called once per device on each discovery publication.
 
 ```
 tests/
-├── test_grobro_client.py    # Client unit tests
-├── test_ha_client.py        # HA client unit tests
-├── test_ha_bridge.py        # Bridge wiring tests
-├── test_parser.py           # Parser unit tests (NOAH, config TLV)
-├── test_builder.py          # Scramble/CRC roundtrip
+├── test_grobro_client.py           # Client unit tests
+├── test_ha_client.py               # HA client unit tests (publishing, discovery, commands)
+├── test_ha_bridge.py               # Bridge wiring tests
+├── test_integration.py             # End-to-end tests from binary fixture to HA payload
+├── test_parser.py                  # Parser unit tests (NOAH, config TLV)
+├── test_builder.py                 # Scramble/CRC roundtrip
+├── test_mqtt_tls_verification.py   # Optional TLS verification
+├── test_noah_firmware_version.py   # Combined NOAH/NEXA firmware version
+├── test_nexa_registers.py          # NEXA register definitions and scaling
+├── test_spf_registers.py           # SPF register definitions
 └── model/
-    ├── test_commands.py     # Binary fixture roundtrip + parsing
-    └── test_models.py       # Pydantic model tests
+    ├── test_commands.py            # Binary fixture roundtrip + parsing
+    └── test_models.py              # Pydantic model tests
 ```
 
 ### 6.2 Binary fixtures
@@ -721,7 +754,7 @@ a corresponding test. The `test_all_binary_files_exist` fixture enforces this.
 An existing file can be used as a reference for the correct format. The test
 `test_no_original_serial` verifies that no real serials leaked into the repository.
 
-**Important**: The `LOG.debug("Received: …")` output at `client.py:241` is **already
+**Important**: The `LOG.debug("Received: …")` output in `grobro/grobro/client.py` is **already
 unscrambled**. Do not call `unscramble()` again on hex copied from the log. The `.bin`
 files store the scrambled payload as it arrives from MQTT.
 
@@ -773,18 +806,7 @@ def test_unscramble(self, name):
 
 Neither marker is currently applied to any test — all tests are fast and self-contained.
 
-### 6.6 Empty / abandoned sub-packages
-
-The following package directories exist but contain `__pycache__` only (no Python source):
-
-- `grobro/core/`
-- `grobro/devices/`
-- `grobro/models/`
-- `grobro/mqtt/`
-
-These are vestigial and can be removed.
-
-### 6.7 Test isolation notes
+### 6.6 Test isolation notes
 
 Config read state (`_config_read_queues`, `_config_read_inflight`, `_config_read_timers`)
 is shared class-state on `ha.Client`. Tests that exercise config read logic must clear
@@ -821,10 +843,16 @@ Docker tags:
 | `grocli` | `grobro/tools/grocli.py` | Send commands (charge limit, output limit, slots, power set) to devices via MQTT |
 | `reg_msg_decoder` | `grobro/tools/reg_msg_decoder.py` | Decode captured binary dumps — descrambles, identifies message type, parses payload |
 
-### 7.3 Versioning
+### 7.3 Versioning and releases
 
-GroBro follows **semantic versioning** (`MAJOR.MINOR.PATCH`). The current version is
-maintained only in the git tag and the release. There is no version file in the repository.
+GroBro follows **semantic versioning** (`MAJOR.MINOR.PATCH`). The version lives in
+`config.yaml` (`version:`), which Home Assistant uses to offer add-on updates.
+
+A release consists of:
+
+1. Bump `version:` in `config.yaml`
+2. Add a `## vX.Y.Z` section to `CHANGELOG.md` (`### Breaking Changes`, `### New Features`, `### Bug Fixes`)
+3. Publish a GitHub release tagged `vX.Y.Z` with the changelog section as release notes, which builds and pushes the `:latest` and `:<version>` images
 
 ---
 
@@ -845,11 +873,15 @@ is the Growatt Cloud relay broker.
 | `SOURCE_MQTT_TLS` | `False` | Enable TLS for source broker |
 | `SOURCE_MQTT_USER` | `None` | Username for source broker |
 | `SOURCE_MQTT_PASS` | `None` | Password for source broker |
+| `SOURCE_MQTT_TLS_VERIFY` | `False` | Verify certificate and hostname of the source broker (requires TLS) |
+| `SOURCE_MQTT_CA_FILE` | `None` | PEM CA bundle for source verification |
 | `TARGET_MQTT_HOST` | = `SOURCE_MQTT_HOST` | Target (Home Assistant) MQTT broker hostname |
 | `TARGET_MQTT_PORT` | = `SOURCE_MQTT_PORT` | Target MQTT broker port |
 | `TARGET_MQTT_TLS` | = `SOURCE_MQTT_TLS` | Enable TLS for target broker |
 | `TARGET_MQTT_USER` | = `SOURCE_MQTT_USER` | Username for target broker |
 | `TARGET_MQTT_PASS` | = `SOURCE_MQTT_PASS` | Password for target broker |
+| `TARGET_MQTT_TLS_VERIFY` | `False` | Verify certificate and hostname of the target broker (not inherited) |
+| `TARGET_MQTT_CA_FILE` | `None` | PEM CA bundle for target verification (not inherited) |
 | `FORWARD_MQTT_HOST` | `"mqtt.growatt.com"` | Forward (Growatt Cloud) broker hostname |
 | `FORWARD_MQTT_PORT` | `7006` | Forward broker port |
 | `FORWARD_MQTT_TLS` | `False` | Enable TLS for forward broker |
@@ -870,12 +902,14 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat{N}_ser_part_1` presence; set to a number to override. |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` uses the `bat_cnt` register (falls back to `bat{N}_ser_part_1` presence); set to a number to override. |
+| `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |
+| `TZ` | (system) | Time zone used by the `Sync Time` button |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
 | `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `<DUMP_DIR>/<topic_path>/<timestamp_ms>.bin` |
-| `DUMP_DIR` | `"/dump"` | Directory for dumped message files (in HA add-on: `"/share/GroBro/dump"`)
+| `DUMP_DIR` | `"/dump"` | Directory for dumped message files (in HA add-on: `"/share/GroBro/dump"`) |
 
 ### 8.2 Message dump file naming
 
@@ -901,10 +935,10 @@ development, running a local Mosquitto as `TARGET` and using a remote TLS broker
 `SOURCE` is a common setup:
 
 ```bash
-SOURCE_HOST=my-growatt-broker.example.com \
-SOURCE_PORT=7006 \
-SOURCE_USE_TLS=true \
-TARGET_HOST=localhost \
-TARGET_PORT=1883 \
+SOURCE_MQTT_HOST=my-growatt-broker.example.com \
+SOURCE_MQTT_PORT=7006 \
+SOURCE_MQTT_TLS=true \
+TARGET_MQTT_HOST=localhost \
+TARGET_MQTT_PORT=1883 \
 python -m grobro.ha_bridge
 ```
