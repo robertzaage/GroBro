@@ -12,11 +12,15 @@ from threading import Lock
 import paho.mqtt.client as mqtt
 
 import grobro.model as model
+from grobro.model.growatt_codes import fault_text, warning_texts
 from grobro.model.growatt_registers import (
     HomeAssistantInputRegister,
     HomeAssistantHoldingRegisterInput,
     GroBroRegisters,
     get_device_type_name,
+    DETECTED_DEVICES,
+    INVERTER_SERIALS,
+    GENERIC_DATALOGGER_PREFIXES,
     get_known_registers,
 )
 from grobro.model.modbus_message import GrowattModbusFunction
@@ -203,12 +207,13 @@ def _to_register_value(reg, cmd_type: str, raw_value: str) -> int:
 
 def _has_status_summary(known_registers) -> bool:
     regs = known_registers.input_registers
-    return "Inverter_Status" in regs and ("Derating_Mode" in regs or "Fault_code" in regs)
+    has_status = "Inverter_Status" in regs or "System_Status" in regs
+    return has_status and ("Derating_Mode" in regs or "Fault_code" in regs)
 
 
-def _status_summary(payload: dict) -> Optional[str]:
-    """Combine status, derating reason and fault code into one readable text."""
-    status = payload.get("Inverter_Status")
+def _status_summary(payload: dict, known_registers=None) -> Optional[str]:
+    """Combine status, derating reason, fault code and warnings into one readable text."""
+    status = payload.get("Inverter_Status", payload.get("System_Status"))
     if not isinstance(status, str) or status == "unknown":
         return None
     parts = [status.removesuffix("Status") or status]
@@ -217,7 +222,10 @@ def _status_summary(payload: dict) -> Optional[str]:
         parts.append(derating)
     fault = payload.get("Fault_code")
     if isinstance(fault, (int, float)) and fault > 0:
-        parts.append(f"Code {int(fault)}")
+        parts.append(fault_text(known_registers, int(fault)))
+    warnings = warning_texts(known_registers, payload)
+    if warnings:
+        parts.append(", ".join(warnings))
     return " – ".join(parts)
 
 
@@ -438,7 +446,7 @@ class Client:
                 if reg:
                     payload[key] = map_enum_value(reg, value)
 
-        status_summary = _status_summary(payload)
+        status_summary = _status_summary(payload, known_registers)
         if status_summary:
             payload["Status_Summary"] = status_summary
 
@@ -1205,10 +1213,17 @@ class Client:
             "61": "NOAH-series",
         }.get(getattr(config, "device_type", None))
 
-        if known_model_id:
+        if device_id in DETECTED_DEVICES:
+            # Identified by inverter serial or device type code, e.g. "MOD TL3-XH"
+            device_info["model"] = type_name
+        elif known_model_id:
             device_info["model"] = known_model_id
         else:
             device_info["model"] = f"{type_name}-series"
+        # Devices behind a datalogger show the serial of their inverter
+        behind_datalogger = device_id in DETECTED_DEVICES or device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+        if behind_datalogger and device_id in INVERTER_SERIALS:
+            device_info["serial_number"] = INVERTER_SERIALS[device_id]
 
         if getattr(config, "model_id", None):
             device_info["model"] += f" ({config.model_id})"

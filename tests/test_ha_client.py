@@ -1321,6 +1321,84 @@ class TestStatusSummary:
         assert f"grobro_{device_id}_Status_Summary" in discovery["cmps"]
 
 
+class TestFaultAndWarningTexts:
+    def test_sph_fault_text(self):
+        from grobro.ha.client import _status_summary
+        from grobro.model.growatt_registers import KNOWN_SPH_REGISTERS
+        payload = {"Inverter_Status": "Fault", "Fault_code": 26}
+        assert _status_summary(payload, KNOWN_SPH_REGISTERS) == "Fault – PV isolation low (26)"
+        payload = {"Inverter_Status": "Fault", "Fault_code": 5}
+        assert _status_summary(payload, KNOWN_SPH_REGISTERS) == "Fault – Error 104 (5)"
+
+    def test_spf_fault_and_warning_texts(self):
+        from grobro.ha.client import _status_summary
+        from grobro.model.growatt_registers import KNOWN_SPF_REGISTERS
+        payload = {"System_Status": "Fault", "Fault_code": 7}
+        assert _status_summary(payload, KNOWN_SPF_REGISTERS) == "Fault – Overload (7)"
+        # Warning bits 41 (bit 0, bit 13) and 42 (bit 4)
+        payload = {"System_Status": "Standby", "Fault_code": 0, "Warning_code": 0x2001, "Fault_value": 0x0010}
+        assert _status_summary(payload, KNOWN_SPF_REGISTERS) == "Standby – Fan lock, Battery disconnected, Host lost"
+
+    def test_unknown_codes_and_families_show_the_raw_code(self):
+        from grobro.ha.client import _status_summary
+        from grobro.model.growatt_registers import KNOWN_SPF_REGISTERS, KNOWN_XH2_REGISTERS
+        assert _status_summary({"System_Status": "Fault", "Fault_code": 99}, KNOWN_SPF_REGISTERS) == "Fault – Code 99"
+        assert _status_summary({"Inverter_Status": "Fault", "Fault_code": 26}, KNOWN_XH2_REGISTERS) == "Fault – Code 26"
+
+    def test_spf_gets_a_status_sensor(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        device_id = "HAQ0000TEST0001"
+        ha_client.publish_input_register(HomeAssistantInputRegister(
+            device_id=device_id, payload={"System_Status": 3, "Fault_code": 4},
+        ))
+        published = {call.args[0]: call.args[1] for call in ha_client._client.publish.call_args_list}
+        state = json.loads(published[f"homeassistant/grobro/{device_id}/state"])
+        discovery = json.loads(published[f"homeassistant/device/{device_id}/config"])
+        assert state["Status_Summary"] == "Fault – Battery voltage low (4)"
+        assert f"grobro_{device_id}_Status_Summary" in discovery["cmps"]
+
+
+class TestDeviceModelAndInverterSerial:
+    def _device(self, ha_client, device_id):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        ha_client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload={"Ppv": 100}))
+        published = {call.args[0]: call.args[1] for call in ha_client._client.publish.call_args_list}
+        return json.loads(published[f"homeassistant/device/{device_id}/config"])["dev"]
+
+    def test_detected_inverter_shows_exact_family_and_inverter_serial(self, ha_client):
+        from grobro.model.growatt_registers import (
+            DETECTED_DEVICES, INVERTER_SERIALS, detect_device_by_inverter_serial, remember_inverter_serial,
+        )
+        device_id = "VWQ0000TEST0001"
+        try:
+            detect_device_by_inverter_serial(device_id, "XHL1234567")
+            remember_inverter_serial(device_id, "XHL1234567\x00\x00")
+            dev = self._device(ha_client, device_id)
+            assert dev["model"] == "MOD TL3-XH"
+            assert dev["serial_number"] == "XHL1234567"
+        finally:
+            DETECTED_DEVICES.pop(device_id, None)
+            INVERTER_SERIALS.pop(device_id, None)
+
+    def test_own_devices_keep_their_serial(self, ha_client):
+        from grobro.model.growatt_registers import INVERTER_SERIALS, remember_inverter_serial
+        device_id = "QMN000ABC1D2E3FG"
+        try:
+            remember_inverter_serial(device_id, "OTHER12345")
+            dev = self._device(ha_client, device_id)
+            assert dev["serial_number"] == device_id
+            assert dev["model"].startswith("NEO-series")
+        finally:
+            INVERTER_SERIALS.pop(device_id, None)
+
+    def test_remember_inverter_serial_ignores_garbage(self):
+        from grobro.model.growatt_registers import INVERTER_SERIALS, remember_inverter_serial
+        remember_inverter_serial("VWQ0000TEST0002", "")
+        remember_inverter_serial("VWQ0000TEST0002", "VWQ0000TEST0002")
+        remember_inverter_serial("VWQ0000TEST0002", "\x01\x02junk")
+        assert "VWQ0000TEST0002" not in INVERTER_SERIALS
+
+
 class TestAutoTimeSync:
     def test_sync_time_of_all_devices(self, ha_client):
         ha_client._discovery_cache.clear()

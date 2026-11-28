@@ -582,6 +582,11 @@ requests register 43 once. Detection happens
 on the first input register message, so holding and config messages of such a device are
 only routed after that.
 
+**Inverter serial**: the inverter serial from the metadata of every Modbus message is stored in
+`INVERTER_SERIALS`. Devices behind a datalogger (detected or generic) show it as serial number in
+their Home Assistant device info, and detected devices show their exact family (e.g. `MOD TL3-XH`)
+as model.
+
 ### 3.4 `_get_bat_number` and `MAX_BAT`
 
 Battery registers use a naming convention that the system parses to determine the battery index:
@@ -782,6 +787,15 @@ so all entities become unavailable when GroBro stops or loses its connection.
 GroBro subscribes to Home Assistant's birth topic `<base>/status`. On `online` it republishes the
 discovery of all known devices (without clearing it) and the last state of every device, so
 entities don't stay unknown until the next device message.
+
+### 5.8 Combined status sensor
+
+Devices with `Inverter_Status` or `System_Status` and `Derating_Mode` or `Fault_code` get a
+synthetic `Status_Summary` entity, e.g. `Normal – Grid voltage high` or
+`Fault – PV isolation low (26)`. Fault and warning texts live in `grobro/model/growatt_codes.py`
+per register map. Only add tables from the official Growatt protocol documents there; codes
+without a known text are shown as `Code <n>`. NEO, TL-XH and MOD fault main codes (3105) have no
+documented table yet.
 
 ---
 
