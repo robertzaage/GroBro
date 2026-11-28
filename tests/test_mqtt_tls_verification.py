@@ -105,3 +105,17 @@ def test_clients_apply_verified_tls_before_connect(kind):
     calls = [call[0] for call in client.method_calls]
     assert calls.index('tls_set_context') < calls.index('connect')
     client.tls_insecure_set.assert_called_once_with(False)
+
+
+def test_relative_ca_file_resolves_against_config_dir(monkeypatch):
+    monkeypatch.setenv('SOURCE_MQTT_CA_FILE', 'certs/ca.pem')
+    monkeypatch.setenv('CONFIG_DIR', '/data/grobro')
+    source = MQTTConfig.from_env('SOURCE', config())
+    assert source.tls_ca_file == '/data/grobro/certs/ca.pem'
+
+
+def test_relative_ca_file_defaults_to_config(monkeypatch):
+    monkeypatch.setenv('TARGET_MQTT_CA_FILE', 'ca.pem')
+    monkeypatch.delenv('CONFIG_DIR', raising=False)
+    target = MQTTConfig.from_env('TARGET', config())
+    assert target.tls_ca_file == '/config/ca.pem'

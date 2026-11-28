@@ -10,6 +10,7 @@
 ### Breaking Changes
 + Device configs, the sensor value cache and message dumps are now stored under `/config` (add-on: its own `addon_config` folder instead of `/share`). Old dumps in `/share/GroBro/dump` are not moved. Plain Docker users should mount a volume at `/config` (e.g. `--volume ./grobro-config:/config`) for this data to survive a restart (#233)
 + The `DUMP_DIR` option has been removed; dumps are written to `/config/dump` (#233)
++ The add-on no longer maps `/share`. A relative `SOURCE_MQTT_CA_FILE` / `TARGET_MQTT_CA_FILE` path is now resolved against `/config`, so a CA file can be placed next to the other persisted data (#233)
 
 ## v2.8.3
 

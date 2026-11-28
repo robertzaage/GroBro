@@ -974,7 +974,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
 | `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `/config/dump/<topic_path>/<timestamp_ms>.bin` |
-| `CONFIG_DIR` | `"/config"` | Directory for persisted device configs, sensor value cache and message dumps (created if missing) |
+| `CONFIG_DIR` | `"/config"` | Directory for persisted device configs, sensor value cache and message dumps (created if missing). Relative `SOURCE_MQTT_CA_FILE` / `TARGET_MQTT_CA_FILE` paths are resolved against it |
 
 ### 8.2 Message dump file naming
 

@@ -118,7 +118,7 @@ The container is configured via environment variables. The Home Assistant add-on
 | `SOURCE_MQTT_PORT` | ✅ | `1883` | Port of the source MQTT broker |
 | `SOURCE_MQTT_TLS` | | `false` | Set to `true` to connect to the source broker via TLS |
 | `SOURCE_MQTT_TLS_VERIFY` ⚙️ | | `false` | Set to `true` to verify the certificate and hostname of the source broker. Requires TLS, see [below](#optional-mqtt-tls-verification) |
-| `SOURCE_MQTT_CA_FILE` ⚙️ | | | Optional PEM CA bundle inside the container. Requires TLS verification |
+| `SOURCE_MQTT_CA_FILE` ⚙️ | | | Optional PEM CA bundle inside the container. A relative path is resolved against `/config`. Requires TLS verification |
 | `SOURCE_MQTT_USER` | | | Username for the source broker |
 | `SOURCE_MQTT_PASS` | | | Password for the source broker |
 | `TARGET_MQTT_HOST` | ✅ | source host | Hostname or IP of the target MQTT broker used by Home Assistant |
@@ -160,11 +160,14 @@ environment:
 ```
 
 Use a hostname matching the broker certificate. When no CA file is specified,
-Python uses the container's default trusted CA store. For a private CA, mount its
-PEM trust bundle read-only and set `SOURCE_MQTT_CA_FILE` to the path inside the
-container. The target broker has the equivalent `TARGET_` options. Verification
-and CA settings are independent and are not inherited from the source broker.
-A CA file replaces the default trust store for that connection.
+Python uses the container's default trusted CA store. For a private CA, put its
+PEM trust bundle into the volume mounted at `/config` and set
+`SOURCE_MQTT_CA_FILE` to its path relative to that folder (e.g. `ca.pem` for
+`/config/ca.pem`), or mount it anywhere else read-only and use the absolute
+path inside the container. The target broker has the equivalent `TARGET_`
+options. Verification and CA settings are independent and are not inherited
+from the source broker. A CA file replaces the default trust store for that
+connection.
 
 Verification is disabled by default for compatibility. When enabled, an invalid
 certificate, hostname mismatch or unreadable CA file fails the connection/setup;
