@@ -1,10 +1,25 @@
-## Unreleased
+## v3.0.0
+
+### Breaking Changes
++ The MOD register map was rebuilt on the standard 3000 register layout shared with MIN and TL-XH inverters. Most MOD values were read from wrong registers before, so their values change. The `Temperature` sensor was removed, use `Temp1` instead (#213)
++ Devices behind a ShineWiFi-X datalogger (`VWQ` serial) are now identified by the serial of their inverter. Single-phase inverters get the TL-XH map instead of the MOD map, so their entities change (#251)
++ XH2 battery voltage, current, SOC, charge and discharge power and lifetime battery energy are now read from the first battery (BDC1). Before, the values of the second battery were used (#251)
++ The NEXA work mode value `2` is now shown as `Smart Mode` instead of `Grid First`, matching the slot modes. Automations comparing the old state need to be updated (#251)
++ The NEXA `Default Smart Mode Enabled` switch was replaced by a `Default Mode` select (Load First, Battery First, Smart Mode). Register 321 is the default work mode, the switch could only set Battery First (#251)
 
 ### New Features
-+ `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through
++ Devices behind dataloggers GroBro doesn't know yet are now identified by the serial of their inverter. This adds experimental support for MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3 and WIT inverters
++ Added experimental support for SPH and SPA storage inverters, including priority, charge and discharge settings and time slots for Grid First, Battery First and Load First
++ Added battery controls for TL-XH and MOD inverters: charge and discharge rate, stop SOC, AC charge, 9 time slots and peak shaving. These write directly to the battery settings of your inverter and are not verified on real devices yet, please test them carefully
++ Added export limit controls for TL-XH, MOD and SPH inverters
++ MOD inverters now expose grid import and export, load, per PV energy, battery values and the inverter on/off switch and power limit
++ Firmware, serials, Wi-Fi signal and the device type are now diagnostic entities, MQTT and interval settings are configuration entities (#212)
++ `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through (#249)
++ Reworked README and documentation, added a list of supported devices and a hint for dataloggers that only work with EMQX (#213, #220)
 
 ### Bug Fixes
-+ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities
++ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities (#249)
++ Fixed XH2 and MOD output power and phase currents showing huge values instead of negative ones
 
 ## v2.8.3
 
