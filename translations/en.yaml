@@ -7,7 +7,7 @@ configuration:
     description: Port number of the source MQTT broker
   SOURCE_MQTT_TLS:
     name: SOURCE_MQTT_TLS
-    description: Set to true to enable TLS without certificate validation
+    description: Enable to use TLS without certificate validation
   SOURCE_MQTT_USER:
     name: SOURCE_MQTT_USER
     description: Username for the source MQTT broker (if authentication is required)
@@ -22,7 +22,7 @@ configuration:
     description: Port number of the target MQTT broker
   TARGET_MQTT_TLS:
     name: TARGET_MQTT_TLS
-    description: Set to true to enable TLS without certificate validation
+    description: Enable to use TLS without certificate validation
   TARGET_MQTT_USER:
     name: TARGET_MQTT_USER
     description: Username for the target MQTT broker (if authentication is required)
@@ -37,16 +37,16 @@ configuration:
     description: No longer used, devices are detected automatically.
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
-    description: Set to True to redirect messages to and from the Growatt Server. Default is False
+    description: When enabled, messages are forwarded to and from the Growatt Cloud, so the ShinePhone app keeps working. Default is false.
   GROWATT_CLOUD_CONFIG_FILTER:
     name: GROWATT_CLOUD_CONFIG_FILTER
-    description: Enable to prevent forwarding config messages. This protects the datalogger from remote setting changes initiated by the Growatt Cloud. Default is False
+    description: When enabled, config messages from the Growatt Cloud are not forwarded. This protects your devices from remote setting changes initiated by the Growatt Cloud. Default is false.
   LOG_LEVEL:
     name: LOG_LEVEL
-    description: Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR.
+    description: Sets the log level, ERROR, INFO or DEBUG. Default is ERROR.
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: Dumps every received messages into /config/dump for later in-depth inspection.
+    description: When enabled, every received message is saved to /config/dump for later in-depth inspection. Default is false.
   MAX_SLOTS:
     name: MAX_SLOTS
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH, NEXA, TL-XH and MOD, max 9). Default is 1.
@@ -55,7 +55,7 @@ configuration:
     description: How many battery packs to display in Home Assistant. With "auto" (default) the count is detected from the device and only ever grows, so a disconnected battery keeps its entities (and its last known values with KEEP_LAST_VALUES). Set a number to override; entities of batteries above it are removed.
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
-    description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.
+    description: Seconds without data after which a device is shown as unavailable. Default is 0 (disabled). Recommended are 300 seconds or more.
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: Expose device availability only as a dedicated online sensor instead of marking the device and all its entities unavailable after timeout.

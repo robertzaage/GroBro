@@ -46,16 +46,16 @@ configuration:
     description: "Niveau de journalisation : ERROR, INFO ou DEBUG. ERROR par défaut."
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: "Enregistre tous les messages reçus dans /config/dump pour une analyse détaillée ultérieure."
+    description: "Enregistre tous les messages reçus dans /config/dump pour une analyse détaillée ultérieure. Désactivé par défaut."
   MAX_SLOTS:
     name: MAX_SLOTS
     description: "Nombre de plages horaires affichées dans Home Assistant pour la planification de la batterie (NOAH, NEXA, TL-XH et MOD, max. 9). 1 par défaut."
   MAX_BAT:
     name: MAX_BAT
-    description: "Nombre de packs de batteries affichés dans Home Assistant. \"auto\" (par défaut) détecte le nombre depuis l'appareil, un nombre le fixe et supprime les entités des batteries au-delà."
+    description: "Nombre de packs de batteries affichés dans Home Assistant. Avec \"auto\" (par défaut) le nombre est détecté depuis l'appareil et ne fait qu'augmenter, une batterie déconnectée garde ainsi ses entités (et avec KEEP_LAST_VALUES ses dernières valeurs). Un nombre le fixe et supprime les entités des batteries au-delà."
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
-    description: "Délai en secondes pour la communication avec l'appareil. 0 par défaut (désactivé). Recommandé : 300 ou plus."
+    description: "Secondes sans données après lesquelles un appareil est affiché comme indisponible. 0 par défaut (désactivé). Recommandé : 300 ou plus."
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: "Afficher la disponibilité uniquement via un capteur en ligne dédié, au lieu de marquer l'appareil et toutes ses entités comme indisponibles après le délai."

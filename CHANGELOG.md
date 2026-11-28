@@ -1,3 +1,6 @@
+### Bug Fixes
++ Fixed wrong and outdated add-on option descriptions, e.g. `DEVICE_TIMEOUT` is the time without data until a device is shown as unavailable, and typos in the German translation
+
 ## v3.0.0
 
 ### Breaking Changes

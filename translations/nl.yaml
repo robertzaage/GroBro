@@ -46,16 +46,16 @@ configuration:
     description: "Logniveau: ERROR, INFO of DEBUG. Standaard ERROR."
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: "Slaat alle ontvangen berichten op in /config/dump voor latere analyse."
+    description: "Slaat alle ontvangen berichten op in /config/dump voor latere analyse. Standaard uitgeschakeld."
   MAX_SLOTS:
     name: MAX_SLOTS
     description: "Hoeveel tijdsloten in Home Assistant worden getoond voor de batterijplanning (NOAH, NEXA, TL-XH en MOD, max. 9). Standaard 1."
   MAX_BAT:
     name: MAX_BAT
-    description: "Hoeveel batterijpakketten in Home Assistant worden getoond. \"auto\" (standaard) herkent het aantal via het apparaat, een getal legt het vast en verwijdert de entiteiten van batterijen daarboven."
+    description: "Hoeveel batterijpakketten in Home Assistant worden getoond. Met \"auto\" (standaard) wordt het aantal via het apparaat herkend en neemt het alleen toe, zodat een losgekoppelde batterij haar entiteiten (en met KEEP_LAST_VALUES haar laatste waarden) behoudt. Een getal legt het aantal vast en verwijdert de entiteiten van batterijen daarboven."
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
-    description: "Time-out in seconden voor de communicatie met het apparaat. Standaard 0 (uitgeschakeld). Aanbevolen 300 of meer."
+    description: "Seconden zonder gegevens waarna een apparaat als onbeschikbaar wordt getoond. Standaard 0 (uitgeschakeld). Aanbevolen 300 of meer."
   AVAILABILITY_SENSOR:
     name: AVAILABILITY_SENSOR
     description: "Beschikbaarheid alleen als aparte online-sensor tonen, in plaats van het apparaat en alle entiteiten na de time-out als onbeschikbaar te markeren."
