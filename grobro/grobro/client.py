@@ -1,14 +1,12 @@
 """
-Client for the grobro mqtt side, handling messages from/to
-* growatt cloud
-* growatt devices
+Client for the grobro mqtt side, handling messages from and to the Growatt devices.
+Forwarding to the Growatt Cloud lives in forward.py.
 """
 
 import os
 import re
 import struct
 import logging
-import ssl
 from typing import Callable
 
 
@@ -19,6 +17,7 @@ from grobro import model, settings
 from grobro.grobro import parser
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
+from grobro.grobro.forward import MQTT_PROP_FORWARD_HA, CloudForwardMixin
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_message import GrowattModbusMessage
@@ -61,20 +60,7 @@ def _normalize_neo_output_power_limit(value: float | int) -> float | int:
 
 LOG = logging.getLogger(__name__)
 
-# Property to flag messages forwarded from growatt cloud
-MQTT_PROP_FORWARD_GROWATT = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
-MQTT_PROP_FORWARD_GROWATT.UserProperty = [("forwarded-for", "growatt")]
-
-# Property to flag messages forwarded from ha
-MQTT_PROP_FORWARD_HA = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
-MQTT_PROP_FORWARD_HA.UserProperty = [("forwarded-for", "ha")]
-
-# Property to flag messages as dry-run for debugging purposes
-MQTT_PROP_DRY_RUN = mqtt.Properties(mqtt.PacketTypes.PUBLISH)
-MQTT_PROP_DRY_RUN.UserProperty = [("dry-run", "true")]
-
-
-class Client:
+class Client(CloudForwardMixin):
     on_config: Callable[[str, model.DeviceConfig], None]
     on_input_register: Callable[HomeAssistantInputRegister, None]
     on_holding_register_input: Callable[HomeAssistantHoldingRegisterInput, None]
@@ -203,8 +189,8 @@ class Client:
         )
 
     def _on_connect(self, client, userdata, flags, reason_code, properties):
-      LOG.info(f"Connected to GroBro MQTT server with result code {reason_code}")
-      self._client.subscribe("c/#")      
+        LOG.info(f"Connected to GroBro MQTT server with result code {reason_code}")
+        self._client.subscribe("c/#")
 
     def _on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
@@ -219,35 +205,7 @@ class Client:
             dump_message_binary(msg.topic, msg.payload)
         try:
             device_id = _extract_device_id(msg.topic)
-            if settings.GROWATT_CLOUD_ENABLED:
-                if settings.GROWATT_CLOUD == "true" or device_id in settings.GROWATT_CLOUD_FILTER:
-                    try:
-                        if settings.GROWATT_CLOUD_CONFIG_FILTER:
-                            try:
-                                unscrambled = parser.unscramble(msg.payload)
-                                msg_type = struct.unpack_from(">H", unscrambled, 6)[0]
-                                if msg_type in (0x0118, 0x0110):
-                                    LOG.warning(
-                                        "Blocked config write from Growatt Cloud for %s",
-                                        device_id,
-                                    )
-                                    return
-                            except Exception as e:
-                                LOG.error(
-                                    "Failed to inspect message before forwarding: %s",
-                                    e,
-                                )
-                                return
-
-                        forward_client = self._connect_to_growatt_server(device_id)
-                        forward_client.publish(
-                            msg.topic,
-                            payload=msg.payload,
-                            qos=msg.qos,
-                            retain=msg.retain,
-                        )
-                    except Exception as e:
-                        LOG.error(f"Forwarding to Growatt Cloud failed: {e}")
+            self._forward_to_cloud(msg, device_id)
 
             unscrambled = parser.unscramble(msg.payload)
             LOG.debug("Received: %s %s", msg.topic, unscrambled.hex(" "))
@@ -258,212 +216,217 @@ class Client:
 
             # Config TLV: NEO=340,341 / NOAH=387 at offset 4; ShineWeLink=0x0129 at offset 6
             if msg_type_4 in (340, 341, 387) or msg_type == 0x0129:
-                config_offset = parser.find_config_offset(unscrambled)
-                config = parser.parse_config_type(unscrambled, config_offset)
-                if config and (msg_type_4 in (340, 341, 387) or msg_type == 0x0129 or config.serial_number):
-                    self.on_config(device_id, config)
-                    LOG.info("Received config message for %s", device_id)
-                    # Extract PTQ inverter serial from ShineWeLink dongle config
-                    if msg_type == 0x0129 and len(unscrambled) >= 68:
-                        ptq_serial = unscrambled[38:68].rstrip(b"\x00").decode("ascii", errors="replace").strip()
-                        if ptq_serial.startswith("PTQ"):
-                            self._ptq_for_raq[device_id] = ptq_serial
-                            ptq_config = model.DeviceConfig(serial_number=ptq_serial)
-                            ptq_config.device_type = "55"
-                            if getattr(config, 'model_id', None):
-                                ptq_config.model_id = config.model_id
-                            if getattr(config, 'sw_version', None):
-                                ptq_config.sw_version = config.sw_version
-                            self.on_config(ptq_serial, ptq_config)
-                            LOG.info("Registered PTQ inverter %s behind %s", ptq_serial, device_id)
-                return
-
-            # Config READ response (281)
-            if msg_type == 281:
-                cfg = parser.parse_config_message(unscrambled)
-                LOG.info(
-                    "Received config read response for %s reg=%s value=%s",
-                    cfg["device_id"],
-                    cfg["register_no"],
-                    cfg["value"],
-                )
-
-
-                value = cfg["value"]
-
-                # Cast value for HA number entities (INT config registers)
-                try:
-                    known_registers = get_known_registers(cfg["device_id"])
-                    if known_registers:
-                        for reg in known_registers.config_registers.values():
-                            if reg.growatt.register_no == cfg["register_no"]:
-                                if reg.growatt.data.data_type == "INT":
-                                    value = int(value)
-                                break
-                except Exception as e:
-                    LOG.debug(
-                        "Failed to cast config value for %s reg=%s: %s",
-                        cfg["device_id"],
-                        cfg["register_no"],
-                        e,
-                    )
-
-
-                if self.on_config_read_response:
-                    self.on_config_read_response(
-                        cfg["device_id"],
-                        cfg["register_no"],
-                        value,
-                    )
-                return
-
-            # Config WRITE response (280)
-            if msg_type == 280:
+                self._handle_config(device_id, unscrambled, msg_type_4, msg_type)
+            elif msg_type == 281:
+                self._handle_config_read_response(unscrambled)
+            elif msg_type == 280:
                 cfg = parser.parse_config_ack(unscrambled)
-                LOG.info(
-                    "Received config write response for %s reg=%s accepted",
-                    cfg["device_id"],
-                    cfg["register_no"],
-                )
-                return
-
-            # NOAH/NEXA Smart Meter (EcoTracker, Shelly etc.) JSON data (0x6F64)
-            if msg_type == 0x6F64:
-                smart_meter = parser.parse_noah_6f64(unscrambled)
-                LOG.debug("Smart Meter data for %s: %s", smart_meter["device_id"], smart_meter["data"])
-                topic = f"{settings.HA_BASE_TOPIC}/sensor/grobro/{smart_meter['device_id']}/smart_meter/state"
-                self._client.publish(topic, smart_meter["data"], retain=settings.PUBLISH_SENSORS_RETAINED)
-                return
-
-            # NOAH/NEXA-specific message types (FE19 config, etc.)
-            noah_msg = parser.parse_noah_message(unscrambled)
-            if noah_msg and noah_msg.get("message_type") == 0xFE19:
-                if device_id.startswith("0PVP") or device_id.startswith("0HVR"):
-                    config = noah_msg.get("config")
-                    if config and config.serial_number:
-                        LOG.info("Received config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
-                        self.on_config(device_id, config)
-                        return
-
-            # NEO preset-single responses carry the confirmed register value after
-            # a one-byte status field, unlike standard Modbus register blocks.
-            preset_response = GrowattModbusFunctionSingle.parse_response_grobro(unscrambled)
-            if preset_response and device_id.startswith("QMN"):
-                state = HomeAssistantHoldingRegisterInput(device_id=device_id)
-                for name, register in KNOWN_NEO_REGISTERS.holding_registers.items():
-                    if register.growatt.position.register_no != preset_response.register_no:
-                        continue
-                    value = register.growatt.data.parse(preset_response.value.to_bytes(2, "big"))
-                    if name == "output_power_limit":
-                        value = _normalize_neo_output_power_limit(value)
-                    if value is not None:
-                        state.payload.append(
-                            HomeAssistantHoldingRegisterValue(
-                                name=name,
-                                value=value,
-                                register=register.homeassistant,
-                            )
-                        )
-                    break
-                if state.payload:
-                    self.on_holding_register_input(state)
-                return
-
-            # Generic modbus message
-            modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
-            LOG.debug("Received Modbus response: %s", modbus_message)
-
-            if modbus_message:
-                ptq_device_id = self._ptq_for_raq.get(device_id)
-                modbus_device_id = ptq_device_id or device_id
-                known_registers = get_known_registers(modbus_device_id)
-                if modbus_message.metadata and (
-                    not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
-                ):
-                    # Unknown or generic datalogger, identify the device by the serial of its inverter
-                    detected = detect_device_by_inverter_serial(
-                        modbus_device_id, modbus_message.metadata.device_sn
-                    )
-                    if detected:
-                        known_registers = detected
-                        LOG.info(
-                            "Detected %s inverter %s behind datalogger %s",
-                            get_device_type_name(modbus_device_id),
-                            modbus_message.metadata.device_sn,
-                            modbus_device_id,
-                        )
-                if modbus_message.metadata:
-                    remember_inverter_serial(modbus_device_id, modbus_message.metadata.device_sn)
-                if modbus_message.function in (
-                    GrowattModbusFunction.READ_SINGLE_REGISTER,
-                    GrowattModbusFunction.READ_HOLDING_REGISTER,
-                ) and (not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)):
-                    detected = detect_device_by_type_code(modbus_device_id, _device_type_code(modbus_message))
-                    if detected:
-                        known_registers = detected
-                        LOG.info(
-                            "Detected %s by device type code behind datalogger %s",
-                            get_device_type_name(modbus_device_id),
-                            modbus_device_id,
-                        )
-                if not known_registers:
-                    LOG.info("Modbus message from unknown device type: %s", device_id)
-                    self._request_device_type_code(modbus_device_id)
-                    return
-
-                if modbus_message.function in (
-                    GrowattModbusFunction.READ_SINGLE_REGISTER,
-                    GrowattModbusFunction.READ_HOLDING_REGISTER,
-                ):
-                    state = HomeAssistantHoldingRegisterInput(device_id=modbus_device_id)
-                    
-                    for name, register in known_registers.holding_registers.items():
-                        data_raw = modbus_message.get_data(register.growatt.position)
-                        if data_raw is None:
-                            continue
-                        value = register.growatt.data.parse(data_raw)
-                        if value is None:
-                            continue
-                        if modbus_device_id.startswith("QMN") and name == "output_power_limit":
-                            value = _normalize_neo_output_power_limit(value)
-                        if register.homeassistant.type=="switch":
-                            value = "ON" if value==1 else "OFF"
-                        state.payload.append(
-                            HomeAssistantHoldingRegisterValue(
-                                name=name,
-                                value=value,
-                                register=register.homeassistant,
-                            )
-                        )
-                    self.on_holding_register_input(state)
-
-                if modbus_message.function == GrowattModbusFunction.READ_INPUT_REGISTER:
-                    state = HomeAssistantInputRegister(device_id=modbus_device_id)
-                    
-                    for name, register in known_registers.input_registers.items():
-                        data_raw = modbus_message.get_data(register.growatt.position)
-                        value = register.growatt.data.parse(data_raw)
-                        # TODO: this is a workaround for broken messages sent by neo inverters at night.
-                        # They emmit state updates with incredible high wattage, which spoils HA statistics.
-                        # Assuming no one runs a balkony plant with more than a million peak wattage, we drop such messages.
-                        if name == "Ppv" and value > 1000000:
-                            LOG.debug("Dropping bad payload: %s", device_id)
-                            return
-                        state.payload[name] = value
-                    self.on_input_register(state)
-                    return
-
-                return
-
-            # NOAH: MSG-TYPE 37 is response when setting a register was succeful
-            # TODO impmlement a proper response handling
-            #example hex: 00 01 00 07 00 25 01 06 30 50 56 50 46 24 6a 52 32 31 42 54 30 30 32 52 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc 00 00 14 8c af
-
-            # NOAH: MSG-TYPE 831 looks like published Holding Register??
-
-            LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
+                LOG.info("Received config write response for %s reg=%s accepted", cfg["device_id"], cfg["register_no"])
+            elif msg_type == 0x6F64:
+                self._handle_smart_meter(unscrambled)
+            elif self._handle_noah_config(device_id, unscrambled):
+                pass
+            elif self._handle_neo_preset_response(device_id, unscrambled):
+                pass
+            elif not self._handle_modbus(device_id, unscrambled):
+                # NOAH: msg type 37 is the response when setting a register was successful,
+                # msg type 831 looks like published holding registers. Both aren't handled yet.
+                LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
             LOG.error(f"Processing message: {e}")
+
+    def _handle_config(self, device_id: str, unscrambled: bytes, msg_type_4: int, msg_type: int):
+        """Datalogger config (TLV)."""
+        config_offset = parser.find_config_offset(unscrambled)
+        config = parser.parse_config_type(unscrambled, config_offset)
+        if not config:
+            return
+        self.on_config(device_id, config)
+        LOG.info("Received config message for %s", device_id)
+        # Extract PTQ inverter serial from ShineWeLink dongle config
+        if msg_type == 0x0129 and len(unscrambled) >= 68:
+            ptq_serial = unscrambled[38:68].rstrip(b"\x00").decode("ascii", errors="replace").strip()
+            if ptq_serial.startswith("PTQ"):
+                self._ptq_for_raq[device_id] = ptq_serial
+                ptq_config = model.DeviceConfig(serial_number=ptq_serial)
+                ptq_config.device_type = "55"
+                if getattr(config, 'model_id', None):
+                    ptq_config.model_id = config.model_id
+                if getattr(config, 'sw_version', None):
+                    ptq_config.sw_version = config.sw_version
+                self.on_config(ptq_serial, ptq_config)
+                LOG.info("Registered PTQ inverter %s behind %s", ptq_serial, device_id)
+
+    def _handle_config_read_response(self, unscrambled: bytes):
+        """Config read response (msg type 281)."""
+        cfg = parser.parse_config_message(unscrambled)
+        LOG.info(
+            "Received config read response for %s reg=%s value=%s",
+            cfg["device_id"],
+            cfg["register_no"],
+            cfg["value"],
+        )
+
+        value = cfg["value"]
+
+        # Cast value for HA number entities (INT config registers)
+        try:
+            known_registers = get_known_registers(cfg["device_id"])
+            if known_registers:
+                for reg in known_registers.config_registers.values():
+                    if reg.growatt.register_no == cfg["register_no"]:
+                        if reg.growatt.data.data_type == "INT":
+                            value = int(value)
+                        break
+        except Exception as e:
+            LOG.debug(
+                "Failed to cast config value for %s reg=%s: %s",
+                cfg["device_id"],
+                cfg["register_no"],
+                e,
+            )
+
+        if self.on_config_read_response:
+            self.on_config_read_response(cfg["device_id"], cfg["register_no"], value)
+
+    def _handle_smart_meter(self, unscrambled: bytes):
+        """Smart meter readings (EcoTracker, Shelly etc.) reported by NOAH and NEXA (msg type 0x6F64)."""
+        smart_meter = parser.parse_noah_6f64(unscrambled)
+        LOG.debug("Smart Meter data for %s: %s", smart_meter["device_id"], smart_meter["data"])
+        topic = f"{settings.HA_BASE_TOPIC}/sensor/grobro/{smart_meter['device_id']}/smart_meter/state"
+        self._client.publish(topic, smart_meter["data"], retain=settings.PUBLISH_SENSORS_RETAINED)
+
+    def _handle_noah_config(self, device_id: str, unscrambled: bytes) -> bool:
+        """NOAH and NEXA config (msg type 0xFE19)."""
+        noah_msg = parser.parse_noah_message(unscrambled)
+        if not noah_msg or noah_msg.get("message_type") != 0xFE19:
+            return False
+        if not device_id.startswith(("0PVP", "0HVR")):
+            return False
+        config = noah_msg.get("config")
+        if not (config and config.serial_number):
+            return False
+        LOG.info("Received config for %s (sw_version=%s)", config.serial_number, config.sw_version or "?")
+        self.on_config(device_id, config)
+        return True
+
+    def _handle_neo_preset_response(self, device_id: str, unscrambled: bytes) -> bool:
+        """NEO preset-single responses carry the confirmed register value after
+        a one-byte status field, unlike standard Modbus register blocks."""
+        preset_response = GrowattModbusFunctionSingle.parse_response_grobro(unscrambled)
+        if not (preset_response and device_id.startswith("QMN")):
+            return False
+        state = HomeAssistantHoldingRegisterInput(device_id=device_id)
+        for name, register in KNOWN_NEO_REGISTERS.holding_registers.items():
+            if register.growatt.position.register_no != preset_response.register_no:
+                continue
+            value = register.growatt.data.parse(preset_response.value.to_bytes(2, "big"))
+            if name == "output_power_limit":
+                value = _normalize_neo_output_power_limit(value)
+            if value is not None:
+                state.payload.append(
+                    HomeAssistantHoldingRegisterValue(
+                        name=name,
+                        value=value,
+                        register=register.homeassistant,
+                    )
+                )
+            break
+        if state.payload:
+            self.on_holding_register_input(state)
+        return True
+
+    def _handle_modbus(self, device_id: str, unscrambled: bytes) -> bool:
+        """Modbus register blocks (input and holding registers)."""
+        modbus_message = GrowattModbusMessage.parse_grobro(unscrambled)
+        LOG.debug("Received Modbus response: %s", modbus_message)
+        if not modbus_message:
+            return False
+
+        # The LoRa inverter behind a ShineWeLink datalogger reports under the datalogger serial
+        modbus_device_id = self._ptq_for_raq.get(device_id) or device_id
+        known_registers = self._identify_device(modbus_device_id, modbus_message)
+        if not known_registers:
+            LOG.info("Modbus message from unknown device type: %s", device_id)
+            self._request_device_type_code(modbus_device_id)
+            return True
+
+        if modbus_message.function in (
+            GrowattModbusFunction.READ_SINGLE_REGISTER,
+            GrowattModbusFunction.READ_HOLDING_REGISTER,
+        ):
+            self._publish_holding_registers(modbus_device_id, known_registers, modbus_message)
+
+        if modbus_message.function == GrowattModbusFunction.READ_INPUT_REGISTER:
+            self._publish_input_registers(device_id, modbus_device_id, known_registers, modbus_message)
+        return True
+
+    def _identify_device(self, modbus_device_id: str, modbus_message: GrowattModbusMessage):
+        """Register map of a device. Unknown and generic dataloggers are identified by
+        the serial of their inverter, then by its device type code."""
+        known_registers = get_known_registers(modbus_device_id)
+        unknown_or_generic = not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+        if modbus_message.metadata and unknown_or_generic:
+            detected = detect_device_by_inverter_serial(modbus_device_id, modbus_message.metadata.device_sn)
+            if detected:
+                known_registers = detected
+                LOG.info(
+                    "Detected %s inverter %s behind datalogger %s",
+                    get_device_type_name(modbus_device_id),
+                    modbus_message.metadata.device_sn,
+                    modbus_device_id,
+                )
+        if modbus_message.metadata:
+            remember_inverter_serial(modbus_device_id, modbus_message.metadata.device_sn)
+        if modbus_message.function in (
+            GrowattModbusFunction.READ_SINGLE_REGISTER,
+            GrowattModbusFunction.READ_HOLDING_REGISTER,
+        ) and (not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)):
+            detected = detect_device_by_type_code(modbus_device_id, _device_type_code(modbus_message))
+            if detected:
+                known_registers = detected
+                LOG.info(
+                    "Detected %s by device type code behind datalogger %s",
+                    get_device_type_name(modbus_device_id),
+                    modbus_device_id,
+                )
+        return known_registers
+
+    def _publish_holding_registers(self, modbus_device_id: str, known_registers, modbus_message: GrowattModbusMessage):
+        state = HomeAssistantHoldingRegisterInput(device_id=modbus_device_id)
+        for name, register in known_registers.holding_registers.items():
+            data_raw = modbus_message.get_data(register.growatt.position)
+            if data_raw is None:
+                continue
+            value = register.growatt.data.parse(data_raw)
+            if value is None:
+                continue
+            if modbus_device_id.startswith("QMN") and name == "output_power_limit":
+                value = _normalize_neo_output_power_limit(value)
+            if register.homeassistant.type == "switch":
+                value = "ON" if value == 1 else "OFF"
+            state.payload.append(
+                HomeAssistantHoldingRegisterValue(
+                    name=name,
+                    value=value,
+                    register=register.homeassistant,
+                )
+            )
+        self.on_holding_register_input(state)
+
+    def _publish_input_registers(self, device_id: str, modbus_device_id: str, known_registers, modbus_message: GrowattModbusMessage):
+        state = HomeAssistantInputRegister(device_id=modbus_device_id)
+        for name, register in known_registers.input_registers.items():
+            data_raw = modbus_message.get_data(register.growatt.position)
+            value = register.growatt.data.parse(data_raw)
+            # NEO inverters sometimes send broken messages at night with an incredibly high
+            # wattage, which spoils the HA statistics. Nobody runs a balcony plant with more
+            # than a million watts peak, so such messages are dropped.
+            if name == "Ppv" and value > 1000000:
+                LOG.debug("Dropping bad payload: %s", device_id)
+                return
+            state.payload[name] = value
+        self.on_input_register(state)
 
     def _request_device_type_code(self, device_id: str):
         """Ask an unknown device once for its device type code (holding register 43)."""
@@ -479,63 +442,6 @@ class Client:
                 value=DEVICE_TYPE_CODE_REGISTERS[0],
             )
         )
-
-    def _on_message_forward_client(self, client, userdata, msg: MQTTMessage):
-        LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
-        if settings.DUMP_MESSAGES:
-            dump_message_binary(msg.topic, msg.payload)
-        try:
-            device_id = _extract_device_id(msg.topic)
-
-            unscrambled = parser.unscramble(msg.payload)
-            LOG.debug("Received Growatt forward: %s %s", msg.topic, unscrambled.hex(" "))
-
-            if not settings.GROWATT_CLOUD_ENABLED:
-                return
-            if settings.GROWATT_CLOUD != "true" and device_id not in settings.GROWATT_CLOUD_FILTER:
-                LOG.debug(
-                    "Dropping Growatt message for device %s not in GROWATT_CLOUD filter",
-                    device_id,
-                )
-                return
-            LOG.debug("Forwarding message from Growatt for client %s", device_id)
-            # We need to publish the messages from Growatt on the Topic
-            # s/33/{deviceid}. Growatt sends them on Topic s/{deviceid}
-            self._client.publish(
-                msg.topic.split("/")[0] + "/33/" + device_id,
-                payload=msg.payload,
-                qos=msg.qos,
-                retain=msg.retain,
-                properties=MQTT_PROP_FORWARD_GROWATT,
-            )
-        except Exception as e:
-            LOG.error(f"Forwarding message: {e}")
-
-    # Setup Growatt MQTT broker for forwarding messages
-    def _connect_to_growatt_server(self, client_id):
-        if f"forward_client_{client_id}" not in self._forward_clients:
-            LOG.info(
-                "Connecting to Growatt broker at '%s:%s', subscribed to '+/%s'",
-                self._forward_mqtt_config.host,
-                self._forward_mqtt_config.port,
-                client_id,
-            )
-            client = mqtt.Client(
-                client_id=client_id,
-                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-            )
-            client.tls_set(cert_reqs=ssl.CERT_NONE)
-            client.tls_insecure_set(True)
-            client.on_message = self._on_message_forward_client
-            client.connect(
-                self._forward_mqtt_config.host,
-                self._forward_mqtt_config.port,
-                60,
-            )
-            client.subscribe(f"+/{client_id}")
-            client.loop_start()
-            self._forward_clients[f"forward_client_{client_id}"] = client
-        return self._forward_clients[f"forward_client_{client_id}"]
 
 
 # Ensure that the dump directory exists
