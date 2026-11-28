@@ -95,6 +95,7 @@ class HomeAssistantHoldingRegister(BaseModel):
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
     options: Optional[dict[str, str]] = None
+    entity_category: Optional[str] = None
     
     model_config = ConfigDict(extra="forbid")
 
@@ -106,6 +107,7 @@ class HomeassistantInputRegister(BaseModel):
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
+    entity_category: Optional[str] = None
 
 
 class HomeAssistantHoldingRegisterValue(BaseModel):
@@ -150,6 +152,7 @@ class HomeAssistantConfigRegister(BaseModel):
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
+    entity_category: Optional[str] = None
 
 class GroBroConfigRegisterDef(BaseModel):
     growatt: GroBroConfigRegister

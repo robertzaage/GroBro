@@ -496,6 +496,27 @@ class TestClientDiscovery:
         assert component["device_class"] == "signal_strength"
         assert component["state_class"] == "measurement"
 
+    @pytest.mark.parametrize("device_id", ["QMN000ABC1D2E3FG", "0PVP0000TEST0001", "0HVR1234567890"])
+    def test_discovery_splits_diagnostic_and_config_entities(self, ha_client, device_id):
+        ha_client._Client__publish_device_discovery(device_id)
+
+        payload = next(
+            json.loads(call.args[1])
+            for call in ha_client._client.publish.call_args_list
+            if call.args[0] == f"homeassistant/device/{device_id}/config" and call.args[1]
+        )
+        cmps = payload["cmps"]
+
+        assert cmps[f"grobro_{device_id}_serial"]["entity_category"] == "diagnostic"
+        assert cmps[f"grobro_{device_id}_type"]["entity_category"] == "diagnostic"
+        assert cmps[f"grobro_{device_id}_cmd_data_interval"]["entity_category"] == "config"
+        assert cmps[f"grobro_{device_id}_cmd_mqtt_port"]["entity_category"] == "config"
+        assert cmps[f"grobro_{device_id}_cmd_wifi_signal_strength"]["entity_category"] == "diagnostic"
+        # Measurements and controls stay in their regular sections
+        for uid, cmp in cmps.items():
+            if cmp.get("device_class") in ("power", "energy") or "_cmd_slot" in uid:
+                assert "entity_category" not in cmp, uid
+
     def test_discovery_skip_unchanged_payload(self, ha_client):
         ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
         first_calls = len(ha_client._client.publish.call_args_list)

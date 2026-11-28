@@ -9,6 +9,7 @@
         "publish": true,
         "name": "Update Interval",
         "type": "number",
+        "entity_category": "config",
         "unit_of_measurement": "min",
         "min": 0,
         "max": 60,
@@ -24,6 +25,7 @@
         "publish": true,
         "name": "MQTT Port",
         "type": "number",
+        "entity_category": "config",
         "min": 1,
         "max": 65535
       }
@@ -37,6 +39,7 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
+        "entity_category": "config",
         "icon": "mdi:server-network"
       }
     },
@@ -49,6 +52,7 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
+        "entity_category": "config",
         "icon": "mdi:clock-outline"
       }
     }

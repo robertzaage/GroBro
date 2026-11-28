@@ -14,7 +14,8 @@
         "unit_of_measurement": "s",
         "min": 0,
         "max": 60,
-        "step": 1
+        "step": 1,
+        "entity_category": "config"
       }
     },
     "dns_server": {
@@ -27,7 +28,8 @@
       "homeassistant": {
         "publish": false,
         "name": "DNS Server",
-        "type": "text"
+        "type": "text",
+        "entity_category": "config"
       }
     },
     "mqtt_ip": {
@@ -41,7 +43,8 @@
         "publish": true,
         "name": "MQTT IP",
         "type": "text",
-        "icon": "mdi:ip-network"
+        "icon": "mdi:ip-network",
+        "entity_category": "config"
       }
     },
     "mqtt_port": {
@@ -56,7 +59,8 @@
         "name": "MQTT Port",
         "type": "number",
         "min": 1,
-        "max": 65535
+        "max": 65535,
+        "entity_category": "config"
       }
     },
     "mqtt_broker": {
@@ -70,7 +74,8 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
-        "icon": "mdi:server-network"
+        "icon": "mdi:server-network",
+        "entity_category": "config"
       }
     },
     "time_zone": {
@@ -84,7 +89,8 @@
         "publish": true,
         "name": "Time Zone",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     },
     "system_time": {
@@ -98,7 +104,8 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     },
     "wifi_signal_strength": {
@@ -115,7 +122,8 @@
         "state_class": "measurement",
         "device_class": "signal_strength",
         "unit_of_measurement": "dBm",
-        "icon": "mdi:wifi"
+        "icon": "mdi:wifi",
+        "entity_category": "diagnostic"
       }
     }
   },
@@ -1697,7 +1705,8 @@
       "homeassistant": {
         "name": "Register No 71",
         "publish": true,
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "entity_category": "diagnostic"
       }
     },
     "eacToday": {

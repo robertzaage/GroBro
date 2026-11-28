@@ -14,7 +14,8 @@
         "unit_of_measurement": "min",
         "min": 0,
         "max": 60,
-        "step": 1
+        "step": 1,
+        "entity_category": "config"
       }
     },
     "mqtt_ip": {
@@ -28,7 +29,8 @@
         "publish": true,
         "name": "MQTT IP",
         "type": "text",
-        "icon": "mdi:ip-network"
+        "icon": "mdi:ip-network",
+        "entity_category": "config"
       }
     },
     "mqtt_port": {
@@ -43,7 +45,8 @@
         "name": "MQTT Port",
         "type": "number",
         "min": 1,
-        "max": 65535
+        "max": 65535,
+        "entity_category": "config"
       }
     },
     "mqtt_broker": {
@@ -57,7 +60,8 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
-        "icon": "mdi:server-network"
+        "icon": "mdi:server-network",
+        "entity_category": "config"
       }
     },
     "system_time": {
@@ -71,7 +75,8 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     }
   },

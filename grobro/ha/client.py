@@ -710,6 +710,8 @@ class Client:
                 "unit_of_measurement": state.homeassistant.unit_of_measurement,
                 "icon": state.homeassistant.icon,
             }
+            if state.homeassistant.entity_category:
+                payload["cmps"][unique_id]["entity_category"] = state.homeassistant.entity_category
 
         # Combined battery serial entities (NOAH only — has _ser_part_ registers)
         has_bat_ser_parts = any(
@@ -725,6 +727,7 @@ class Client:
                 payload["cmps"][uid] = {
                     "platform": "sensor",
                     "name": f"Bat{bat_num} Serial",
+                    "entity_category": "diagnostic",
                     "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
                     "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
                     "unique_id": uid,
@@ -750,6 +753,7 @@ class Client:
             payload["cmps"][firmware_unique_id] = {
                 "platform": "sensor",
                 "name": "Firmware Version",
+                "entity_category": "diagnostic",
                 "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
                 "value_template": value_template,
                 "unique_id": firmware_unique_id,
@@ -761,6 +765,7 @@ class Client:
         payload["cmps"][serial_unique_id] = {
             "platform": "sensor",
             "name": "Device SN",
+            "entity_category": "diagnostic",
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/serial",
             "unique_id": serial_unique_id,
             "icon": "mdi:identifier",
@@ -771,6 +776,7 @@ class Client:
         payload["cmps"][type_unique_id] = {
             "platform": "sensor",
             "name": "Device Type",
+            "entity_category": "diagnostic",
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/type",
             "unique_id": type_unique_id,
             "icon": "mdi:chip",
@@ -782,6 +788,7 @@ class Client:
             payload["cmps"][online_unique_id] = {
                 "platform": "binary_sensor",
                 "name": "Online",
+                "entity_category": "diagnostic",
                 "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
                 "device_class": "connectivity",
                 "unique_id": online_unique_id,
