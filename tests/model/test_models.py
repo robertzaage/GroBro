@@ -366,3 +366,11 @@ def test_bms_battery_current_is_signed(family):
 
     reg = getattr(regs, f"KNOWN_{family}_REGISTERS").input_registers["BMS_BatteryCurr"]
     assert reg.growatt.data.parse(struct.pack("!h", -250)) == pytest.approx(-2.5)
+
+
+@pytest.mark.parametrize("key, raw, expected", [("Pac", struct.pack("!i", -5000), -500.0), ("Iac1", struct.pack("!h", -15), -1.5)])
+def test_xh2_output_power_and_current_are_signed(key, raw, expected):
+    from grobro.model.growatt_registers import KNOWN_XH2_REGISTERS
+
+    reg = KNOWN_XH2_REGISTERS.input_registers[key]
+    assert reg.growatt.data.parse(raw) == pytest.approx(expected)
