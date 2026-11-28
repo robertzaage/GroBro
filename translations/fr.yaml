@@ -46,16 +46,13 @@ configuration:
     description: "Niveau de journalisation : ERROR, INFO ou DEBUG. ERROR par défaut."
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: "Enregistre tous les messages reçus dans $DUMP_DIR pour une analyse détaillée ultérieure."
+    description: "Enregistre tous les messages reçus dans /config/dump pour une analyse détaillée ultérieure."
   MAX_SLOTS:
     name: MAX_SLOTS
     description: "Nombre de plages horaires affichées dans Home Assistant pour la planification de la batterie (NOAH, NEXA, TL-XH et MOD, max. 9). 1 par défaut."
   MAX_BAT:
     name: MAX_BAT
     description: "Nombre de packs de batteries affichés dans Home Assistant. \"auto\" (par défaut) détecte le nombre depuis l'appareil, un nombre le fixe et supprime les entités des batteries au-delà."
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: "Répertoire des messages enregistrés. /share/GroBro/dump par défaut. Dans le module complémentaire, il doit commencer par /share"
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: "Délai en secondes pour la communication avec l'appareil. 0 par défaut (désactivé). Recommandé : 300 ou plus."

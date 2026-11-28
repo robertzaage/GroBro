@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
 import importlib.resources as resources
@@ -115,6 +115,9 @@ class HomeassistantInputRegister(BaseModel):
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
     entity_category: Optional[str] = None
+    # Value while missing from the payload: "zero" or "hold" the last known
+    # value. Derived from device_class/unit_of_measurement if unset.
+    offline: Optional[Literal["zero", "hold"]] = None
 
 
 class HomeAssistantHoldingRegisterValue(BaseModel):

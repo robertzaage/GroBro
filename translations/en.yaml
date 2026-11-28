@@ -46,16 +46,13 @@ configuration:
     description: Sets the Logging Level. The program currently only use the levels ERROR, DEBUG, and INFO. Default is ERROR.
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: Dumps every received messages into $DUMP_DIR for later in-depth inspection.
+    description: Dumps every received messages into /config/dump for later in-depth inspection.
   MAX_SLOTS:
     name: MAX_SLOTS
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH, NEXA, TL-XH and MOD, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
     description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect the count from the device, or a number to override, which also removes the entities of batteries above it.
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.

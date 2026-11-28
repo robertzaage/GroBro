@@ -18,7 +18,8 @@ build_from:
   aarch64: "ghcr.io/home-assistant/aarch64-python"
   i386: "ghcr.io/home-assistant/i386-python"
 map:
-  - share:rw
+  - type: addon_config
+    read_only: false
 options:
   SOURCE_MQTT_HOST: homeassistant.local
   SOURCE_MQTT_PORT: 7006
@@ -35,7 +36,6 @@ options:
   GROWATT_CLOUD_CONFIG_FILTER: false
   LOG_LEVEL: ERROR
   DUMP_MESSAGES: false
-  DUMP_DIR: "/share/GroBro/dump"
   MAX_SLOTS: 1
   MAX_BAT: "auto"
   AVAILABILITY_SENSOR: false
@@ -62,7 +62,6 @@ schema:
   GROWATT_CLOUD_CONFIG_FILTER: bool
   LOG_LEVEL: list(INFO|ERROR|DEBUG)?
   DUMP_MESSAGES: bool
-  DUMP_DIR: str?
   DEVICE_TIMEOUT: int?
   MAX_SLOTS: int?
   MAX_BAT: str?

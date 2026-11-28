@@ -104,6 +104,7 @@ docker run --detach \
   --env SOURCE_MQTT_TLS=true \
   --env TARGET_MQTT_HOST=<target-mqtt-host> \
   --env TARGET_MQTT_PORT=<target-mqtt-port> \
+  --volume ./grobro-config:/config \
   ghcr.io/robertzaage/grobro:latest
 ```
 
@@ -141,8 +142,9 @@ The container is configured via environment variables. The Home Assistant add-on
 | `AUTO_TIME_SYNC` | | `false` | Set to `true` to synchronize the clock of your devices at 00:00 and 12:00 |
 | `TZ` | | | Time zone (e.g. `Europe/Berlin`) used by the `Sync Time` button and `AUTO_TIME_SYNC` |
 | `LOG_LEVEL` | | `ERROR` | `ERROR`, `INFO` or `DEBUG` |
-| `DUMP_MESSAGES` | | `false` | Set to `true` to save every received message to `DUMP_DIR` for in-depth inspection |
-| `DUMP_DIR` | | `/dump` | Directory for dumped messages (`/share/GroBro/dump` in the add-on) |
+| `DUMP_MESSAGES` | | `false` | Set to `true` to save every received message to `/config/dump` for in-depth inspection |
+
+GroBro persists the device config cache, the last known sensor values and, if `DUMP_MESSAGES` is enabled, message dumps under `/config`. The Home Assistant add-on mounts this automatically; when running the plain Docker image, mount a volume to `/config` (e.g. `--volume ./grobro-config:/config`) so this data survives a container restart.
 
 ## Optional MQTT TLS verification
 
