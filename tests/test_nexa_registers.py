@@ -105,3 +105,17 @@ def test_nexa_additional_sensors(key, register_no, raw, expected):
     assert reg.growatt.position.register_no == register_no
     assert reg.homeassistant.publish
     assert reg.growatt.data.parse(struct.pack("!H", raw)) == pytest.approx(expected)
+
+
+def test_nexa_work_mode_2_is_smart_mode():
+    reg = KNOWN_NEXA_REGISTERS.input_registers["workMode"]
+    assert reg.growatt.data.parse(struct.pack("!H", 2)) == "Smart Mode"
+
+
+def test_nexa_default_mode_select():
+    holding = KNOWN_NEXA_REGISTERS.holding_registers
+    assert "smart_mode" not in holding
+    reg = holding["default_mode"]
+    assert reg.growatt.position.register_no == 321
+    assert reg.homeassistant.type == "select"
+    assert reg.homeassistant.options == {"0": "Load First", "1": "Battery First", "2": "Smart Mode"}

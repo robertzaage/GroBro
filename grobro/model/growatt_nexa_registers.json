@@ -1159,7 +1159,7 @@
         "type": "switch"
       }
     },
-    "smart_mode": {
+    "default_mode": {
       "growatt": {
         "position": {
           "register_no": 321,
@@ -1167,13 +1167,26 @@
           "size": 2
         },
         "data": {
-          "data_type": "INT"
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Smart Mode"
+            }
+          }
         }
       },
       "homeassistant": {
         "publish": true,
-        "name": "Default Smart Mode Enabled",
-        "type": "switch"
+        "name": "Default Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Smart Mode"
+        }
       }
     },
     "default_power": {
@@ -1295,7 +1308,7 @@
             "values": {
               "0": "Load First",
               "1": "Battery First",
-              "2": "Grid First"
+              "2": "Smart Mode"
             }
           }
         }
@@ -1303,7 +1316,7 @@
       "homeassistant": {
         "name": "Work Mode",
         "publish": true,
-        "icon": "mdi:alert-circle"
+        "icon": "mdi:cog"
       }
     },
     "totalBatteryPackChargingStatus": {

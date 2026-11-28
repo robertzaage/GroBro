@@ -374,3 +374,12 @@ def test_xh2_output_power_and_current_are_signed(key, raw, expected):
 
     reg = KNOWN_XH2_REGISTERS.input_registers[key]
     assert reg.growatt.data.parse(raw) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "key, register_no", [("Vbat", 3169), ("Ibat", 3170), ("SOC", 3171), ("Pdischr", 3178), ("Pchr", 3180), ("Edischr_total", 3127), ("Echr_total", 3131)]
+)
+def test_xh2_battery_values_use_first_bdc(key, register_no):
+    from grobro.model.growatt_registers import KNOWN_XH2_REGISTERS
+
+    assert KNOWN_XH2_REGISTERS.input_registers[key].growatt.position.register_no == register_no

@@ -3143,7 +3143,7 @@
     "Edischr_total": {
       "growatt": {
         "position": {
-          "register_no": 3205,
+          "register_no": 3127,
           "offset": 0,
           "size": 4
         },
@@ -3191,7 +3191,7 @@
     "Echr_total": {
       "growatt": {
         "position": {
-          "register_no": 3207,
+          "register_no": 3131,
           "offset": 0,
           "size": 4
         },
@@ -3716,7 +3716,7 @@
     "Vbat": {
       "growatt": {
         "position": {
-          "register_no": 3192,
+          "register_no": 3169,
           "offset": 0,
           "size": 2
         },
@@ -3740,12 +3740,12 @@
     "Ibat": {
       "growatt": {
         "position": {
-          "register_no": 3193,
+          "register_no": 3170,
           "offset": 0,
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -3764,7 +3764,7 @@
     "SOC": {
       "growatt": {
         "position": {
-          "register_no": 3194,
+          "register_no": 3171,
           "offset": 0,
           "size": 2
         },
@@ -3932,7 +3932,7 @@
     "Pdischr": {
       "growatt": {
         "position": {
-          "register_no": 3201,
+          "register_no": 3178,
           "offset": 0,
           "size": 4
         },
@@ -3956,7 +3956,7 @@
     "Pchr": {
       "growatt": {
         "position": {
-          "register_no": 3203,
+          "register_no": 3180,
           "offset": 0,
           "size": 4
         },

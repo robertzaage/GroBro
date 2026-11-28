@@ -99,3 +99,17 @@ def test_detected_device_gets_discovery():
 
     topics = [call.args[0] for call in factory.return_value.publish.call_args_list]
     assert "homeassistant/device/XYZ0000TEST0001/config" in topics
+
+
+def test_shinewifi_x_follows_the_inverter_serial():
+    # VWQ (ShineWiFi-X) falls back to MOD, but a known inverter serial wins
+    assert regs.get_known_registers("VWQ0000TEST0001") is regs.KNOWN_MOD_REGISTERS
+    assert regs.detect_device_by_inverter_serial("VWQ0000TEST0001", "HJU0TEST01") is regs.KNOWN_XH2_REGISTERS
+    assert regs.get_known_registers("VWQ0000TEST0001") is regs.KNOWN_XH2_REGISTERS
+    assert regs.get_device_type_name("VWQ0000TEST0001") == "MIN TL-XH"
+
+
+def test_shinewifi_x_with_unknown_inverter_stays_mod():
+    assert regs.detect_device_by_inverter_serial("VWQ0000TEST0001", "ZZZ0TEST01") is None
+    assert regs.get_known_registers("VWQ0000TEST0001") is regs.KNOWN_MOD_REGISTERS
+    assert regs.get_device_type_name("VWQ0000TEST0001") == "MOD"

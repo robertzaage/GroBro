@@ -236,31 +236,42 @@ INVERTER_PREFIXES: dict[str, tuple[str, GroBroRegisters]] = {
     **{p: ("SPA", KNOWN_SPH_REGISTERS) for p in ("WPD",)},
 }
 
+# Dataloggers used with different inverter families. Their devices are identified by the
+# inverter serial, the map in DEVICE_PREFIXES is only the fallback (ShineWiFi-X: MOD).
+GENERIC_DATALOGGER_PREFIXES = ("VWQ",)
+
 # Devices identified by their inverter serial, keyed by the serial in the MQTT topic
 DETECTED_DEVICES: dict[str, tuple[str, GroBroRegisters]] = {}
 
 
 def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
     """Return the register map for a device, based on its serial prefix."""
+    detected = DETECTED_DEVICES.get(device_id)
+    if detected:
+        return detected[1]
     for prefix, _, registers in DEVICE_PREFIXES:
         if device_id.startswith(prefix):
             return registers
-    detected = DETECTED_DEVICES.get(device_id)
-    return detected[1] if detected else None
+    return None
 
 
 def get_device_type_name(device_id: str) -> str:
     """Return the device type name for a device, based on its serial prefix."""
+    detected = DETECTED_DEVICES.get(device_id)
+    if detected:
+        return detected[0]
     for prefix, name, _ in DEVICE_PREFIXES:
         if device_id.startswith(prefix):
             return name
-    detected = DETECTED_DEVICES.get(device_id)
-    return detected[0] if detected else "UNKNOWN"
+    return "UNKNOWN"
 
 
 def detect_device_by_inverter_serial(device_id: str, inverter_serial: Optional[str]) -> Optional[GroBroRegisters]:
-    """Identify a device with an unknown topic prefix by the serial of its inverter."""
-    if get_known_registers(device_id) is not None or not inverter_serial:
+    """Identify a device behind an unknown or generic datalogger by the serial of its inverter."""
+    if not inverter_serial or device_id in DETECTED_DEVICES:
+        return None
+    generic = device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+    if not generic and get_known_registers(device_id) is not None:
         return None
     match = INVERTER_PREFIXES.get(inverter_serial[:3])
     if match is None:

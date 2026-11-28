@@ -27,6 +27,7 @@ from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.model.growatt_registers import (
+    GENERIC_DATALOGGER_PREFIXES,
     KNOWN_NEO_REGISTERS,
     detect_device_by_inverter_serial,
     get_device_type_name,
@@ -390,12 +391,15 @@ class Client:
                 ptq_device_id = self._ptq_for_raq.get(device_id)
                 modbus_device_id = ptq_device_id or device_id
                 known_registers = get_known_registers(modbus_device_id)
-                if not known_registers and modbus_message.metadata:
-                    # Unknown datalogger, identify the device by the serial of its inverter
-                    known_registers = detect_device_by_inverter_serial(
+                if modbus_message.metadata and (
+                    not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+                ):
+                    # Unknown or generic datalogger, identify the device by the serial of its inverter
+                    detected = detect_device_by_inverter_serial(
                         modbus_device_id, modbus_message.metadata.device_sn
                     )
-                    if known_registers:
+                    if detected:
+                        known_registers = detected
                         LOG.info(
                             "Detected %s inverter %s behind datalogger %s",
                             get_device_type_name(modbus_device_id),
