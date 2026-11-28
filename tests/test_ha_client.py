@@ -517,6 +517,23 @@ class TestClientDiscovery:
             if cmp.get("device_class") in ("power", "energy") or "_cmd_slot" in uid:
                 assert "entity_category" not in cmp, uid
 
+    def test_discovery_after_restart_is_not_cleared(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        topic = f"homeassistant/device/{device_id}/config"
+        ha_client._Client__publish_device_discovery(device_id)
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
+        assert "" not in payloads
+        assert len(payloads) == 1
+
+    def test_changed_discovery_is_cleared_first(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        topic = f"homeassistant/device/{device_id}/config"
+        ha_client._discovery_payload_cache[device_id] = "{}"
+        ha_client._Client__publish_device_discovery(device_id)
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
+        assert payloads[0] == ""
+        assert payloads[1] != ""
+
     def test_discovery_skip_unchanged_payload(self, ha_client):
         ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
         first_calls = len(ha_client._client.publish.call_args_list)

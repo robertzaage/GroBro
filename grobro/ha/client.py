@@ -823,18 +823,21 @@ class Client:
 
         payload_str = json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
-        if self._discovery_payload_cache.get(device_id) == payload_str:
+        old_payload_str = self._discovery_payload_cache.get(device_id)
+        if old_payload_str == payload_str:
             LOG.debug("Discovery unchanged for %s, skipping", device_id)
             if device_id not in self._discovery_cache:
                 self._discovery_cache.append(device_id)
             # trotzdem States aktualisieren
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
-            self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/sw_version", device_id, retain=True)
             return
 
         LOG.info("Publishing updated discovery for %s", device_id)
-        self._client.publish(topic, "", retain=True)  # force HA to refresh
+        # Only clear the discovery when it changed while running. Clearing it after a restart
+        # would make Home Assistant delete and recreate the device and its customizations.
+        if old_payload_str is not None:
+            self._client.publish(topic, "", retain=True)
         self._client.publish(topic, payload_str, retain=True)
         self._discovery_payload_cache[device_id] = payload_str
         if device_id not in self._discovery_cache:
