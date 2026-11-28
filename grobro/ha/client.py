@@ -155,6 +155,26 @@ def _to_register_value(reg, cmd_type: str, raw_value: str) -> int:
     return raw & 0xFFFF if raw < 0 else raw
 
 
+def _has_status_summary(known_registers) -> bool:
+    regs = known_registers.input_registers
+    return "Inverter_Status" in regs and ("Derating_Mode" in regs or "Fault_code" in regs)
+
+
+def _status_summary(payload: dict) -> Optional[str]:
+    """Combine status, derating reason and fault code into one readable text."""
+    status = payload.get("Inverter_Status")
+    if not isinstance(status, str) or status == "unknown":
+        return None
+    parts = [status.removesuffix("Status") or status]
+    derating = payload.get("Derating_Mode")
+    if isinstance(derating, str) and derating not in ("No derating", "unknown"):
+        parts.append(derating)
+    fault = payload.get("Fault_code")
+    if isinstance(fault, (int, float)) and fault > 0:
+        parts.append(f"Code {int(fault)}")
+    return " – ".join(parts)
+
+
 def _get_bat_number(name: str) -> Optional[int]:
     if name.startswith("battery"):
         rest = name[7:]
@@ -323,6 +343,10 @@ class Client:
                 reg = known_registers.input_registers.get(key)
                 if reg:
                     payload[key] = map_enum_value(reg, value)
+
+        status_summary = _status_summary(payload)
+        if status_summary:
+            payload["Status_Summary"] = status_summary
 
         # Prevent glitches on total_increasing sensors (energy counters)
         if FILTER_DATA_GLITCHES and known_registers:
@@ -765,6 +789,18 @@ class Client:
             }
             if state.homeassistant.entity_category:
                 payload["cmps"][unique_id]["entity_category"] = state.homeassistant.entity_category
+
+        # Combined status text (status, derating reason and fault code)
+        if _has_status_summary(known_registers):
+            summary_uid = f"grobro_{device_id}_Status_Summary"
+            payload["cmps"][summary_uid] = {
+                "platform": "sensor",
+                "name": "Status",
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "value_template": "{{ value_json['Status_Summary'] | default('unknown') }}",
+                "unique_id": summary_uid,
+                "icon": "mdi:information-outline",
+            }
 
         # Combined battery serial entities (NOAH only — has _ser_part_ registers)
         has_bat_ser_parts = any(

@@ -1260,3 +1260,31 @@ class TestBatteryPositionWatch:
 
         assert "moved" not in caplog.text
         assert "re-enumeration" not in caplog.text
+
+
+class TestStatusSummary:
+    @pytest.mark.parametrize(
+        "payload, expected",
+        [
+            ({"Inverter_Status": "NormalStatus", "Derating_Mode": "No derating", "Fault_code": 0}, "Normal"),
+            ({"Inverter_Status": "NormalStatus", "Derating_Mode": "Over-frequency"}, "Normal – Over-frequency"),
+            ({"Inverter_Status": "Fault", "Fault_code": 117}, "Fault – Code 117"),
+            ({"Inverter_Status": "unknown"}, None),
+            ({"Ppv": 100}, None),
+        ],
+    )
+    def test_status_summary(self, payload, expected):
+        from grobro.ha.client import _status_summary
+        assert _status_summary(payload) == expected
+
+    def test_status_summary_is_published_and_discovered(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        device_id = "ZGQ0000TEST0001"
+        ha_client.publish_input_register(HomeAssistantInputRegister(
+            device_id=device_id, payload={"Inverter_Status": "NormalStatus", "Derating_Mode": "Grid voltage high"},
+        ))
+        published = {call.args[0]: call.args[1] for call in ha_client._client.publish.call_args_list}
+        state = json.loads(published[f"homeassistant/grobro/{device_id}/state"])
+        discovery = json.loads(published[f"homeassistant/device/{device_id}/config"])
+        assert state["Status_Summary"] == "Normal – Grid voltage high"
+        assert f"grobro_{device_id}_Status_Summary" in discovery["cmps"]
