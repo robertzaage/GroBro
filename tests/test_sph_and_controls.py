@@ -119,3 +119,21 @@ def test_sph_controls(ha_client, platform, name, payload, register_no, value):
     command = ha_client.on_command.call_args_list[0].args[0]
     assert command.register_no == register_no
     assert command.value == value
+
+
+@pytest.mark.parametrize(
+    "key, register_no, raw, expected",
+    [
+        ("Vbat", 1013, struct.pack(">H", 542), 54.2),
+        ("Ibat", 1088, struct.pack(">h", -1640), -16.4),
+        ("BMS_Full_Capacity", 1092, struct.pack(">H", 3000), 300.0),
+        ("BMS_Max_Cell_Voltage", 1108, struct.pack(">H", 3307), 3.307),
+        ("Derating_Mode", 104, struct.pack(">H", 0), "No derating"),
+        ("Temp1", 93, struct.pack(">h", -52), -5.2),
+    ],
+)
+def test_sph_battery_and_diagnostic_registers(key, register_no, raw, expected):
+    reg = regs.KNOWN_SPH_REGISTERS.input_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    value = reg.growatt.data.parse(raw)
+    assert value == expected if isinstance(expected, str) else value == pytest.approx(expected)

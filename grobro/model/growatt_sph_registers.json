@@ -1277,7 +1277,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -1301,7 +1301,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -1325,7 +1325,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -1341,28 +1341,67 @@
         "icon": "mdi:thermometer"
       }
     },
-    "Vbat": {
+    "Derating_Mode": {
       "growatt": {
         "position": {
-          "register_no": 97,
+          "register_no": 104,
           "offset": 0,
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 0.1
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "No derating",
+              "1": "Bus voltage high",
+              "2": "Aging fixed power",
+              "3": "Grid voltage high",
+              "4": "Over-frequency",
+              "5": "Single DC source mode",
+              "6": "Inverter module over-temperature",
+              "7": "Output limited by user setting",
+              "8": "Load speed process",
+              "9": "Over back by time",
+              "10": "Internal over-temperature",
+              "11": "External over-temperature",
+              "12": "Wire impedance",
+              "13": "Parallel inverter export limit",
+              "14": "Single inverter export limit",
+              "15": "Load first mode",
+              "16": "CT installation issue",
+              "17": "Zero current mode",
+              "18": "Boost module over-temperature",
+              "19": "Zero power mode",
+              "20": "Under-frequency",
+              "21": "Bus bar current limit"
+            }
           }
         }
       },
       "homeassistant": {
-        "name": "Battery voltage",
+        "name": "Derating mode",
         "publish": true,
-        "state_class": "measurement",
-        "device_class": "voltage",
-        "unit_of_measurement": "V",
-        "icon": "mdi:battery"
+        "icon": "mdi:alert-circle",
+        "entity_category": "diagnostic"
+      }
+    },
+    "Fault_code": {
+      "growatt": {
+        "position": {
+          "register_no": 105,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter fault code",
+        "publish": true,
+        "icon": "mdi:alert-circle",
+        "entity_category": "diagnostic"
       }
     },
     "Priority": {
@@ -1492,6 +1531,30 @@
         "device_class": "power",
         "unit_of_measurement": "W",
         "icon": "mdi:battery-arrow-up"
+      }
+    },
+    "Vbat": {
+      "growatt": {
+        "position": {
+          "register_no": 1013,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:battery"
       }
     },
     "SOC": {
@@ -1852,6 +1915,186 @@
         "device_class": "energy",
         "unit_of_measurement": "kWh",
         "icon": "mdi:home-lightning-bolt"
+      }
+    },
+    "Ibat": {
+      "growatt": {
+        "position": {
+          "register_no": 1088,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "SIGNED_FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-dc"
+      }
+    },
+    "BMS_Remaining_Capacity": {
+      "growatt": {
+        "position": {
+          "register_no": 1091,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery remaining capacity",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "Ah",
+        "icon": "mdi:battery"
+      }
+    },
+    "BMS_Full_Capacity": {
+      "growatt": {
+        "position": {
+          "register_no": 1092,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery full charge capacity",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "Ah",
+        "icon": "mdi:battery",
+        "entity_category": "diagnostic"
+      }
+    },
+    "BMS_CycleCnt": {
+      "growatt": {
+        "position": {
+          "register_no": 1095,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery cycle count",
+        "publish": true,
+        "state_class": "total_increasing",
+        "icon": "mdi:battery-sync",
+        "entity_category": "diagnostic"
+      }
+    },
+    "BMS_SOH": {
+      "growatt": {
+        "position": {
+          "register_no": 1096,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery state of health",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:battery-heart-variant",
+        "entity_category": "diagnostic"
+      }
+    },
+    "BMS_Max_Cell_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 1108,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.001
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery max cell voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:battery"
+      }
+    },
+    "BMS_Min_Cell_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 1109,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.001
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery min cell voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:battery"
+      }
+    },
+    "BMS_Module_Count": {
+      "growatt": {
+        "position": {
+          "register_no": 1110,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery packs",
+        "publish": true,
+        "icon": "mdi:battery",
+        "entity_category": "diagnostic"
       }
     }
   }
