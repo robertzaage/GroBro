@@ -119,3 +119,20 @@ def test_nexa_default_mode_select():
     assert reg.growatt.position.register_no == 321
     assert reg.homeassistant.type == "select"
     assert reg.homeassistant.options == {"0": "Load First", "1": "Battery First", "2": "Smart Mode"}
+
+
+@pytest.mark.parametrize(
+    "key, register_no, platform",
+    [("ac_couple", 303, "switch"), ("always_on", 304, "switch"), ("export_limitation", 323, "switch"), ("export_limitation_power", 324, "number")],
+)
+def test_nexa_additional_controls(key, register_no, platform):
+    reg = KNOWN_NEXA_REGISTERS.holding_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    assert reg.homeassistant.type == platform
+
+
+@pytest.mark.parametrize("key, register_no", [("internalFaults", 2), ("gridFaults", 3), ("outputFaults", 4)])
+def test_nexa_fault_words_are_diagnostic(key, register_no):
+    reg = KNOWN_NEXA_REGISTERS.input_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    assert reg.homeassistant.entity_category == "diagnostic"

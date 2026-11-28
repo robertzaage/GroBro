@@ -170,6 +170,45 @@
         "step": 1
       }
     },
+    "export_limitation": {
+      "growatt": {
+        "position": {
+          "register_no": 323,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limitation",
+        "type": "switch",
+        "icon": "mdi:transmission-tower-export"
+      }
+    },
+    "export_limitation_power": {
+      "growatt": {
+        "position": {
+          "register_no": 324,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limitation Power",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    },
     "power_plus": {
       "growatt": {
         "position": {
@@ -1142,6 +1181,42 @@
         "type": "switch"
       }
     },
+    "ac_couple": {
+      "growatt": {
+        "position": {
+          "register_no": 303,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "AC Couple",
+        "type": "switch",
+        "icon": "mdi:power-plug"
+      }
+    },
+    "always_on": {
+      "growatt": {
+        "position": {
+          "register_no": 304,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Always On",
+        "type": "switch",
+        "icon": "mdi:power"
+      }
+    },
     "ac_always_on": {
       "growatt": {
         "position": {
@@ -1229,6 +1304,60 @@
     }
   },
   "input_registers": {
+    "internalFaults": {
+      "growatt": {
+        "position": {
+          "register_no": 2,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Internal Faults",
+        "publish": true,
+        "icon": "mdi:alert-circle",
+        "entity_category": "diagnostic"
+      }
+    },
+    "gridFaults": {
+      "growatt": {
+        "position": {
+          "register_no": 3,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Grid Faults",
+        "publish": true,
+        "icon": "mdi:alert-circle",
+        "entity_category": "diagnostic"
+      }
+    },
+    "outputFaults": {
+      "growatt": {
+        "position": {
+          "register_no": 4,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Output Faults",
+        "publish": true,
+        "icon": "mdi:alert-circle",
+        "entity_category": "diagnostic"
+      }
+    },
     "pac": {
       "growatt": {
         "position": {
