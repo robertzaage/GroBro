@@ -356,6 +356,7 @@ class Client(CloudForwardMixin):
 
         # The LoRa inverter behind a ShineWeLink datalogger reports under the datalogger serial
         modbus_device_id = self._ptq_for_raq.get(device_id) or device_id
+        self._stats.frames.record(modbus_device_id, unscrambled)
         known_registers = self._identify_device(modbus_device_id, modbus_message)
         if not known_registers:
             LOG.info("Modbus message from unknown device type: %s", device_id)

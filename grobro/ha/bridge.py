@@ -7,7 +7,9 @@ import logging
 from datetime import datetime, timezone
 from threading import Timer
 
-from grobro import settings, version
+import os
+
+from grobro import settings, support, version
 from grobro.model.growatt_registers import INVERTER_SERIALS, get_device_type_name
 
 LOG = logging.getLogger(__name__)
@@ -84,6 +86,13 @@ class BridgeMixin:
                 "entity_category": "diagnostic",
                 "icon": "mdi:alert-circle-outline",
             },
+            f"{uid}_last_support_bundle": {
+                "platform": "sensor",
+                "name": "Last Support Bundle",
+                "value_template": "{{ value_json.last_support_bundle | default('none', true) }}",
+                "entity_category": "diagnostic",
+                "icon": "mdi:file-document-outline",
+            },
             f"{uid}_started": {
                 "platform": "sensor",
                 "name": "Started",
@@ -95,6 +104,14 @@ class BridgeMixin:
         for component_id, component in components.items():
             component["unique_id"] = component_id
             component["state_topic"] = state_topic
+        components[f"{uid}_support_bundle"] = {
+            "platform": "button",
+            "name": "Create Support Bundle",
+            "unique_id": f"{uid}_support_bundle",
+            "command_topic": f"{settings.HA_BASE_TOPIC}/button/grobro/{uid}/support_bundle/set",
+            "entity_category": "diagnostic",
+            "icon": "mdi:lifebuoy",
+        }
         payload = {
             "dev": self._bridge_device_info(),
             "avty": [{"t": settings.BRIDGE_AVAILABILITY_TOPIC}],
@@ -117,6 +134,7 @@ class BridgeMixin:
             "messages": stats.messages,
             "decode_errors": stats.decode_errors,
             "started": _iso(stats.started_at),
+            "last_support_bundle": os.path.basename(stats.last_support_bundle) if stats.last_support_bundle else None,
         }
         attributes = {}
         for device_id, info in sorted(devices.items()):
@@ -131,6 +149,15 @@ class BridgeMixin:
             attributes[device_id] = entry
         self._client.publish(self._bridge_topic("state"), json.dumps(state, sort_keys=True), retain=True)
         self._client.publish(self._bridge_topic("devices"), json.dumps(attributes, sort_keys=True), retain=True)
+
+    def _handle_bridge_command(self, cmd_name: str):
+        if cmd_name != "support_bundle":
+            return
+        bundle = support.build_bundle(self._stats, dict(self._last_states), dict(self._holding_values))
+        path = support.write_bundle(bundle)
+        if path:
+            self._stats.last_support_bundle = path
+            self._publish_bridge_state()
 
     def _schedule_bridge_state(self):
         def refresh():

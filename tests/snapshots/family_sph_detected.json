@@ -2212,12 +2212,12 @@ true
 ],
 [
 "homeassistant/device/grobro_bridge/config",
-"@33203d9f88b3",
+"@7423a3f02240",
 true
 ],
 [
 "homeassistant/grobro/grobro_bridge/state",
-"@1d02da9fedac",
+"@fd0a32f5570f",
 true
 ],
 [
@@ -4144,15 +4144,7 @@ false
 "url": "https://github.com/robertzaage/GroBro"
 }
 },
-"@1d02da9fedac": {
-"decode_errors": 0,
-"devices": 0,
-"messages": 0,
-"source_connected": "OFF",
-"started": "1970-01-01T00:00:00+00:00",
-"version": "0.0.0-test"
-},
-"@33203d9f88b3": {
+"@7423a3f02240": {
 "avty": [
 {
 "t": "homeassistant/grobro/bridge/availability"
@@ -4178,6 +4170,15 @@ false
 "state_topic": "homeassistant/grobro/grobro_bridge/state",
 "unique_id": "grobro_bridge_devices",
 "value_template": "{{ value_json.devices }}"
+},
+"grobro_bridge_last_support_bundle": {
+"entity_category": "diagnostic",
+"icon": "mdi:file-document-outline",
+"name": "Last Support Bundle",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_last_support_bundle",
+"value_template": "{{ value_json.last_support_bundle | default('none', true) }}"
 },
 "grobro_bridge_messages": {
 "entity_category": "diagnostic",
@@ -4206,6 +4207,14 @@ false
 "state_topic": "homeassistant/grobro/grobro_bridge/state",
 "unique_id": "grobro_bridge_started",
 "value_template": "{{ value_json.started }}"
+},
+"grobro_bridge_support_bundle": {
+"command_topic": "homeassistant/button/grobro/grobro_bridge/support_bundle/set",
+"entity_category": "diagnostic",
+"icon": "mdi:lifebuoy",
+"name": "Create Support Bundle",
+"platform": "button",
+"unique_id": "grobro_bridge_support_bundle"
 },
 "grobro_bridge_version": {
 "entity_category": "diagnostic",
@@ -4293,6 +4302,15 @@ false
 "Vbat": 97.5,
 "Vpv1": 7.5,
 "Vpv2": 28.5
+},
+"@fd0a32f5570f": {
+"decode_errors": 0,
+"devices": 0,
+"last_support_bundle": null,
+"messages": 0,
+"source_connected": "OFF",
+"started": "1970-01-01T00:00:00+00:00",
+"version": "0.0.0-test"
 }
 }
 }

@@ -10,6 +10,7 @@ from threading import Timer
 from typing import Optional
 
 from grobro import settings
+from grobro.ha.bridge import bridge_id
 from grobro.model.growatt_registers import (
     KNOWN_NEXA_REGISTERS,
     KNOWN_NOAH_REGISTERS,
@@ -102,6 +103,10 @@ class CommandsMixin:
         cmd_type, _, device_id, cmd_name, action = parts
 
         LOG.debug("Received %s %s command %s for device %s", cmd_type, action, cmd_name, device_id)
+
+        if device_id == bridge_id():
+            self._handle_bridge_command(cmd_name)
+            return
 
         known_registers = get_known_registers(device_id)
         if not known_registers:

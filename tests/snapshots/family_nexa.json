@@ -5840,12 +5840,12 @@ true
 ],
 [
 "homeassistant/device/grobro_bridge/config",
-"@33203d9f88b3",
+"@7423a3f02240",
 true
 ],
 [
 "homeassistant/grobro/grobro_bridge/state",
-"@1d02da9fedac",
+"@fd0a32f5570f",
 true
 ],
 [
@@ -7480,94 +7480,6 @@ false
 ]
 ],
 "payloads": {
-"@1d02da9fedac": {
-"decode_errors": 0,
-"devices": 0,
-"messages": 0,
-"source_connected": "OFF",
-"started": "1970-01-01T00:00:00+00:00",
-"version": "0.0.0-test"
-},
-"@33203d9f88b3": {
-"avty": [
-{
-"t": "homeassistant/grobro/bridge/availability"
-}
-],
-"cmps": {
-"grobro_bridge_decode_errors": {
-"entity_category": "diagnostic",
-"icon": "mdi:alert-circle-outline",
-"name": "Decode Errors",
-"platform": "sensor",
-"state_class": "total_increasing",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_decode_errors",
-"value_template": "{{ value_json.decode_errors }}"
-},
-"grobro_bridge_devices": {
-"icon": "mdi:solar-power-variant",
-"json_attributes_topic": "homeassistant/grobro/grobro_bridge/devices",
-"name": "Devices",
-"platform": "sensor",
-"state_class": "measurement",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_devices",
-"value_template": "{{ value_json.devices }}"
-},
-"grobro_bridge_messages": {
-"entity_category": "diagnostic",
-"icon": "mdi:message-processing-outline",
-"name": "Messages Received",
-"platform": "sensor",
-"state_class": "total_increasing",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_messages",
-"value_template": "{{ value_json.messages }}"
-},
-"grobro_bridge_source_connected": {
-"device_class": "connectivity",
-"entity_category": "diagnostic",
-"name": "Device Broker",
-"platform": "binary_sensor",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_source_connected",
-"value_template": "{{ value_json.source_connected }}"
-},
-"grobro_bridge_started": {
-"device_class": "timestamp",
-"entity_category": "diagnostic",
-"name": "Started",
-"platform": "sensor",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_started",
-"value_template": "{{ value_json.started }}"
-},
-"grobro_bridge_version": {
-"entity_category": "diagnostic",
-"icon": "mdi:tag-outline",
-"name": "Version",
-"platform": "sensor",
-"state_topic": "homeassistant/grobro/grobro_bridge/state",
-"unique_id": "grobro_bridge_version",
-"value_template": "{{ value_json.version }}"
-}
-},
-"dev": {
-"identifiers": [
-"grobro_bridge"
-],
-"manufacturer": "GroBro",
-"model": "Growatt MQTT Bridge",
-"name": "GroBro",
-"sw_version": "0.0.0-test"
-},
-"o": {
-"name": "grobro",
-"sw": "0.0.0-test",
-"url": "https://github.com/robertzaage/GroBro"
-}
-},
 "@4e57b4a0b625": {
 "acOutputEnergyToday": 104.5,
 "battery1Alarm": 38,
@@ -7650,6 +7562,103 @@ false
 "totalBatteryPackSoc": 70.5,
 "totalHouseholdLoad": 84.5,
 "workMode": "Load First"
+},
+"@7423a3f02240": {
+"avty": [
+{
+"t": "homeassistant/grobro/bridge/availability"
+}
+],
+"cmps": {
+"grobro_bridge_decode_errors": {
+"entity_category": "diagnostic",
+"icon": "mdi:alert-circle-outline",
+"name": "Decode Errors",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_decode_errors",
+"value_template": "{{ value_json.decode_errors }}"
+},
+"grobro_bridge_devices": {
+"icon": "mdi:solar-power-variant",
+"json_attributes_topic": "homeassistant/grobro/grobro_bridge/devices",
+"name": "Devices",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_devices",
+"value_template": "{{ value_json.devices }}"
+},
+"grobro_bridge_last_support_bundle": {
+"entity_category": "diagnostic",
+"icon": "mdi:file-document-outline",
+"name": "Last Support Bundle",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_last_support_bundle",
+"value_template": "{{ value_json.last_support_bundle | default('none', true) }}"
+},
+"grobro_bridge_messages": {
+"entity_category": "diagnostic",
+"icon": "mdi:message-processing-outline",
+"name": "Messages Received",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_messages",
+"value_template": "{{ value_json.messages }}"
+},
+"grobro_bridge_source_connected": {
+"device_class": "connectivity",
+"entity_category": "diagnostic",
+"name": "Device Broker",
+"platform": "binary_sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_source_connected",
+"value_template": "{{ value_json.source_connected }}"
+},
+"grobro_bridge_started": {
+"device_class": "timestamp",
+"entity_category": "diagnostic",
+"name": "Started",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_started",
+"value_template": "{{ value_json.started }}"
+},
+"grobro_bridge_support_bundle": {
+"command_topic": "homeassistant/button/grobro/grobro_bridge/support_bundle/set",
+"entity_category": "diagnostic",
+"icon": "mdi:lifebuoy",
+"name": "Create Support Bundle",
+"platform": "button",
+"unique_id": "grobro_bridge_support_bundle"
+},
+"grobro_bridge_version": {
+"entity_category": "diagnostic",
+"icon": "mdi:tag-outline",
+"name": "Version",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_version",
+"value_template": "{{ value_json.version }}"
+}
+},
+"dev": {
+"identifiers": [
+"grobro_bridge"
+],
+"manufacturer": "GroBro",
+"model": "Growatt MQTT Bridge",
+"name": "GroBro",
+"sw_version": "0.0.0-test"
+},
+"o": {
+"name": "grobro",
+"sw": "0.0.0-test",
+"url": "https://github.com/robertzaage/GroBro"
+}
 },
 "@8c64deab3341": {
 "avty": [
@@ -9952,6 +9961,15 @@ false
 "sw": "0.0.0-test",
 "url": "https://github.com/robertzaage/GroBro"
 }
+},
+"@fd0a32f5570f": {
+"decode_errors": 0,
+"devices": 0,
+"last_support_bundle": null,
+"messages": 0,
+"source_connected": "OFF",
+"started": "1970-01-01T00:00:00+00:00",
+"version": "0.0.0-test"
 }
 }
 }

@@ -144,6 +144,8 @@ class TestBridgeDevice:
         assert discovery["o"]["sw"] == version.VERSION
         assert discovery["avty"] == [{"t": "homeassistant/grobro/bridge/availability"}]
         cmps = discovery["cmps"]
+        button = cmps.pop("grobro_bridge_support_bundle")
+        assert button["command_topic"] == "homeassistant/button/grobro/grobro_bridge/support_bundle/set"
         assert {c["platform"] for c in cmps.values()} == {"sensor", "binary_sensor"}
         assert all(c["state_topic"] == "homeassistant/grobro/grobro_bridge/state" for c in cmps.values())
         assert cmps["grobro_bridge_devices"]["json_attributes_topic"] == "homeassistant/grobro/grobro_bridge/devices"

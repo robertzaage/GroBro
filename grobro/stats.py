@@ -5,6 +5,8 @@ from __future__ import annotations
 import time
 from threading import Lock
 
+from grobro.support import FrameRecorder
+
 
 class BridgeStats:
     """Counts what the device side receives. Shared by both clients, so it is thread safe."""
@@ -16,6 +18,9 @@ class BridgeStats:
         self.messages = 0
         self.decode_errors = 0
         self._devices: dict[str, dict] = {}
+        # Last register frames per device, for the support bundle
+        self.frames = FrameRecorder()
+        self.last_support_bundle: str | None = None
 
     def message_received(self, device_id: str):
         with self._lock:
