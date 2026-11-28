@@ -333,7 +333,7 @@
         "position": {
           "register_no": 15,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -736,7 +736,7 @@
         "position": {
           "register_no": 38,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1000,7 +1000,7 @@
         "position": {
           "register_no": 71,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1024,7 +1024,7 @@
         "position": {
           "register_no": 73,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1048,7 +1048,7 @@
         "position": {
           "register_no": 75,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
