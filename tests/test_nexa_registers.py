@@ -84,3 +84,24 @@ def test_nexa_energy_counters_are_32_bit(key, register_no):
     assert reg.growatt.position.register_no == register_no
     assert reg.growatt.position.size == 4
     assert reg.growatt.data.parse(struct.pack("!HH", 1, 5)) == pytest.approx(6554.1)
+
+
+@pytest.mark.parametrize(
+    "key, register_no, raw, expected",
+    [
+        ("meterConnected", 6, 1, 1),
+        ("offGridModeActive", 18, 1, 1),
+        ("meterPower", 19, 30250, 250.0),
+        ("batteryDischargeEnergyToday", 79, 12, 1.2),
+        ("batteryChargeEnergyToday", 80, 34, 3.4),
+        ("acOutputEnergyToday", 82, 56, 5.6),
+        ("offGridVoltage", 109, 2301, 230.1),
+        ("inverterTemp", 113, 2931, 20.0),
+        ("batteryCurrent", 118, 30025, 2.5),
+    ],
+)
+def test_nexa_additional_sensors(key, register_no, raw, expected):
+    reg = KNOWN_NEXA_REGISTERS.input_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    assert reg.homeassistant.publish
+    assert reg.growatt.data.parse(struct.pack("!H", raw)) == pytest.approx(expected)

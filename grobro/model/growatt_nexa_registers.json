@@ -1232,6 +1232,23 @@
         "icon": "mdi:flash"
       }
     },
+    "meterConnected": {
+      "growatt": {
+        "position": {
+          "register_no": 6,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Smart Meter Connected",
+        "publish": true,
+        "icon": "mdi:meter-electric"
+      }
+    },
     "ppv": {
       "growatt": {
         "position": {
@@ -1455,6 +1472,47 @@
         "device_class": "power",
         "unit_of_measurement": "W",
         "icon": "mdi:flash"
+      }
+    },
+    "offGridModeActive": {
+      "growatt": {
+        "position": {
+          "register_no": 18,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Off-grid Mode Active",
+        "publish": true,
+        "icon": "mdi:power-plug-off"
+      }
+    },
+    "meterPower": {
+      "growatt": {
+        "position": {
+          "register_no": 19,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -30000.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Smart Meter Power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:meter-electric"
       }
     },
     "ser_part_1": {
@@ -1736,6 +1794,78 @@
         "device_class": "energy",
         "unit_of_measurement": "kWh",
         "icon": "mdi:solar-power"
+      }
+    },
+    "batteryDischargeEnergyToday": {
+      "growatt": {
+        "position": {
+          "register_no": 79,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery discharge energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:battery-arrow-down"
+      }
+    },
+    "batteryChargeEnergyToday": {
+      "growatt": {
+        "position": {
+          "register_no": 80,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery charge energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:battery-arrow-up"
+      }
+    },
+    "acOutputEnergyToday": {
+      "growatt": {
+        "position": {
+          "register_no": 82,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AC output energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:transmission-tower-export"
       }
     },
     "dischargeSocLimit": {
@@ -2184,6 +2314,30 @@
         "icon": "mdi:thermometer"
       }
     },
+    "offGridVoltage": {
+      "growatt": {
+        "position": {
+          "register_no": 109,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Off-grid Voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:flash"
+      }
+    },
     "register_110": {
       "growatt": {
         "position": {
@@ -2352,6 +2506,30 @@
         "icon": "mdi:thermometer"
       }
     },
+    "inverterTemp": {
+      "growatt": {
+        "position": {
+          "register_no": 113,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Inverter Temperature",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
     "register_114": {
       "growatt": {
         "position": {
@@ -2446,6 +2624,30 @@
         "icon": "mdi:current-ac",
         "unit_of_measurement": "A",
         "device_class": "current"
+      }
+    },
+    "batteryCurrent": {
+      "growatt": {
+        "position": {
+          "register_no": 118,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -3000.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery Current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:current-dc"
       }
     },
     "fw_version_part_1": {
