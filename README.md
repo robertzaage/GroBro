@@ -67,5 +67,7 @@ docker run --rm \
 Growatt NEO, NOAH and NEXA devices rely on a TLS-enabled Mosquitto broker to send their packages. 
 The full trust chain must be present, including the root certificate. [View the Certificates Guide](https://github.com/robertzaage/GroBro/blob/main/CERTIFICATES.md) for setup instructions.
 
+For diagnostic steps, see [MQTT and network troubleshooting](TROUBLESHOOTING.md).
+
 ## Contributions
 Questions? Issues? PRs welcome!
