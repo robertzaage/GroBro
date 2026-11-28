@@ -1645,9 +1645,9 @@
     "eacToday": {
       "growatt": {
         "position": {
-          "register_no": 72,
+          "register_no": 71,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1669,9 +1669,9 @@
     "eacMonth": {
       "growatt": {
         "position": {
-          "register_no": 74,
+          "register_no": 73,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1693,9 +1693,9 @@
     "eacYear": {
       "growatt": {
         "position": {
-          "register_no": 76,
+          "register_no": 75,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1717,9 +1717,9 @@
     "eacTotal": {
       "growatt": {
         "position": {
-          "register_no": 78,
+          "register_no": 77,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -2194,16 +2194,18 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
+            "delta": -300.0,
+            "multiplier": 0.01
           }
         }
       },
       "homeassistant": {
-        "name": "Register No 110",
+        "name": "Off-grid Current",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:thermometer"
+        "icon": "mdi:current-ac",
+        "unit_of_measurement": "A",
+        "device_class": "current"
       }
     },
     "register_111": {
@@ -2216,16 +2218,18 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
+            "delta": -3000.0,
+            "multiplier": 0.1
           }
         }
       },
       "homeassistant": {
-        "name": "Register No 111",
+        "name": "Off-grid Power",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "unit_of_measurement": "W",
+        "device_class": "power"
       }
     },
     "register_112": {
@@ -2239,15 +2243,17 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.1
           }
         }
       },
       "homeassistant": {
-        "name": "Register No 112",
+        "name": "Inverter Input Voltage",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:thermometer"
+        "icon": "mdi:flash",
+        "unit_of_measurement": "V",
+        "device_class": "voltage"
       }
     },
     "battery1Temp": {
@@ -2357,15 +2363,17 @@
           "data_type": "FLOAT",
           "float_options": {
             "delta": 0.0,
-            "multiplier": 1.0
+            "multiplier": 0.1
           }
         }
       },
       "homeassistant": {
-        "name": "Register No 114",
+        "name": "Inverter Bus Voltage",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "unit_of_measurement": "V",
+        "device_class": "voltage"
       }
     },
     "onGridVoltage": {
@@ -2402,8 +2410,8 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
+            "delta": -3000.0,
+            "multiplier": 0.1
           }
         }
       },
@@ -2426,16 +2434,18 @@
         "data": {
           "data_type": "FLOAT",
           "float_options": {
-            "delta": -30000.0,
-            "multiplier": 1.0
+            "delta": -300.0,
+            "multiplier": 0.01
           }
         }
       },
       "homeassistant": {
-        "name": "Register No 117",
+        "name": "Grid Current",
         "publish": true,
         "state_class": "measurement",
-        "icon": "mdi:thermometer"
+        "icon": "mdi:current-ac",
+        "unit_of_measurement": "A",
+        "device_class": "current"
       }
     },
     "fw_version_part_1": {
