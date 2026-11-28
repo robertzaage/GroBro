@@ -1292,23 +1292,28 @@
           "enum_options": {
             "enum_type": "INT_MAP",
             "values": {
-              "0": "cNOTDerate",
-              "1": "cPVHighDerate",
-              "2": "cPowerConstantDerate",
-              "3": "cGridVHighDerate",
-              "4": "cFreqHighDerate",
-              "5": "cDcSoureModeDerate",
-              "6": "cInvTemprDerate",
-              "7": "cActivePowerOrder",
-              "8": "cLoadSpeedProcess",
-              "9": "cOverBackbyTime",
-              "10": "cInternalTemprDerate",
-              "11": "cOutTemprDerate",
-              "12": "cLineImpeCalcDerate",
-              "13": "cParallelAntiBackflowDerate",
-              "14": "cLocalAntiBackflowDerate",
-              "15": "cBdcLoadPriDerate",
-              "16": "cChkCTErrDerate"
+              "0": "No derating",
+              "1": "Bus voltage high",
+              "2": "Aging fixed power",
+              "3": "Grid voltage high",
+              "4": "Over-frequency",
+              "5": "Single DC source mode",
+              "6": "Inverter module over-temperature",
+              "7": "Output limited by user setting",
+              "8": "Load speed process",
+              "9": "Over back by time",
+              "10": "Internal over-temperature",
+              "11": "External over-temperature",
+              "12": "Wire impedance",
+              "13": "Parallel inverter export limit",
+              "14": "Single inverter export limit",
+              "15": "Load first mode",
+              "16": "CT installation issue",
+              "17": "Zero current mode",
+              "18": "Boost module over-temperature",
+              "19": "Zero power mode",
+              "20": "Under-frequency",
+              "21": "Bus bar current limit"
             }
           }
         }
@@ -2931,10 +2936,19 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Dormant",
+              "1": "Charging",
+              "2": "Discharging",
+              "3": "Idle",
+              "4": "Standby",
+              "5": "Soft start",
+              "6": "Fault",
+              "7": "Update"
+            }
           }
         }
       },
@@ -3333,6 +3347,34 @@
         "publish": false,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
+      }
+    },
+    "AFCI_Status": {
+      "growatt": {
+        "position": {
+          "register_no": 3112,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Waiting",
+              "1": "Self-check",
+              "2": "Arc detection",
+              "3": "Fault",
+              "4": "Update"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AFCI status",
+        "publish": true,
+        "icon": "mdi:flash-alert",
+        "entity_category": "diagnostic"
       }
     }
   }

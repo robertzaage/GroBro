@@ -1428,11 +1428,13 @@
             "values": {
               "0": "Waiting",
               "1": "Self Test",
+              "2": "Reserved",
               "3": "Fault",
               "4": "Update",
-              "5": "PV Bat Online",
-              "6": "Bat Online",
-              "8": "Normal",
+              "5": "PV On-Grid",
+              "6": "Battery On-Grid",
+              "7": "PV & Battery Off-Grid",
+              "8": "Battery Off-Grid",
               "9": "Bypass"
             }
           }

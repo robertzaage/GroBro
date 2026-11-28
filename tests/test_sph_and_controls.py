@@ -67,7 +67,7 @@ def sph_payload():
         ("Ppv", 5000.0),
         ("Pac", -1200.0),
         ("Priority", "Battery First"),
-        ("Inverter_Status", "PV Bat Online"),
+        ("Inverter_Status", "PV On-Grid"),
         ("SOC", 76),
         ("Ptogrid_total", 300.0),
         ("Etouser_today", 5.5),

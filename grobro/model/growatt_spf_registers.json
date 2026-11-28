@@ -95,7 +95,7 @@
             "enum_type": "INT_MAP",
             "values": {
               "0": "Standby",
-              "1": "(No Use)",
+              "1": "PV & Grid Supporting Loads",
               "2": "Discharge",
               "3": "Fault",
               "4": "Flash",
@@ -106,7 +106,25 @@
               "9": "PV charge and Bypass",
               "10": "AC charge and Bypass",
               "11": "Bypass",
-              "12": "PV charge and Discharge"
+              "12": "PV charge and Discharge",
+              "13": "PV Discharging",
+              "14": "PV & Battery Discharging",
+              "15": "Gen Charging",
+              "16": "Gen Charging and Gen Bypass",
+              "17": "PV & Gen Charging",
+              "18": "PV & Gen Charging and Gen Bypass",
+              "19": "PV Charging and Gen Bypass",
+              "20": "Gen Bypass",
+              "21": "PV Export to Grid",
+              "22": "PV Export to Grid and Loads Supporting",
+              "23": "PV Charging and Export to Grid",
+              "24": "PV Charging, Export to Grid and Loads Supporting",
+              "25": "Battery Export to Grid",
+              "26": "Battery Export to Grid and Loads Supporting",
+              "27": "Battery & PV Export to Grid",
+              "28": "Battery & PV Export to Grid and Loads Supporting",
+              "29": "Battery & Grid Supporting Loads",
+              "30": "PV, Battery & Grid Supporting Loads"
             }
           }
         }

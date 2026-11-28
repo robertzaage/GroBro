@@ -383,3 +383,24 @@ def test_xh2_battery_values_use_first_bdc(key, register_no):
     from grobro.model.growatt_registers import KNOWN_XH2_REGISTERS
 
     assert KNOWN_XH2_REGISTERS.input_registers[key].growatt.position.register_no == register_no
+
+
+@pytest.mark.parametrize(
+    "family, key, raw, expected",
+    [
+        ("SPF", "System_Status", 1, "PV & Grid Supporting Loads"),
+        ("SPF", "System_Status", 21, "PV Export to Grid"),
+        ("SPF", "System_Status", 2, "Discharge"),
+        ("SPH", "Inverter_Status", 8, "Battery Off-Grid"),
+        ("XH2", "Derating_Mode", 21, "Bus bar current limit"),
+        ("MOD", "Derating_Mode", 0, "No derating"),
+        ("XH2", "BMS_Status", 1, "Charging"),
+        ("XH2", "AFCI_Status", 2, "Arc detection"),
+        ("MOD", "AFCI_Status", 0, "Waiting"),
+    ],
+)
+def test_status_tables(family, key, raw, expected):
+    import grobro.model.growatt_registers as regs
+
+    reg = getattr(regs, f"KNOWN_{family}_REGISTERS").input_registers[key]
+    assert reg.growatt.data.parse(struct.pack("!H", raw)) == expected
