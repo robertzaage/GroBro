@@ -11,6 +11,8 @@ services:
   grobro:
     image: ghcr.io/robertzaage/grobro:latest
     restart: unless-stopped
+    volumes:
+      - ./ca:/mqtt-certs:ro
     network_mode: host
     depends_on:
       - source-mqtt
@@ -18,11 +20,15 @@ services:
       SOURCE_MQTT_HOST: "${SOURCE_MQTT_HOST:?Set SOURCE_MQTT_HOST}"
       SOURCE_MQTT_PORT: "7006"
       SOURCE_MQTT_TLS: "true"
+      SOURCE_MQTT_TLS_VERIFY: "true"
+      SOURCE_MQTT_CA_FILE: "${SOURCE_MQTT_CA_FILE:-}"
       SOURCE_MQTT_USER: grobro
       SOURCE_MQTT_PASS: "${SOURCE_MQTT_PASS:?Set SOURCE_MQTT_PASS}"
       TARGET_MQTT_HOST: "${TARGET_MQTT_HOST:-127.0.0.1}"
       TARGET_MQTT_PORT: "${TARGET_MQTT_PORT:-1883}"
       TARGET_MQTT_TLS: "${TARGET_MQTT_TLS:-false}"
+      TARGET_MQTT_TLS_VERIFY: "${TARGET_MQTT_TLS_VERIFY:-false}"
+      TARGET_MQTT_CA_FILE: "${TARGET_MQTT_CA_FILE:-}"
       TARGET_MQTT_USER: grobro
       TARGET_MQTT_PASS: "${TARGET_MQTT_PASS:?Set TARGET_MQTT_PASS}"
       HA_BASE_TOPIC: homeassistant

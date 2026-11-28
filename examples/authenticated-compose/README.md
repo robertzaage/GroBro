@@ -9,7 +9,7 @@ This example runs a dedicated TLS-enabled source broker and GroBro alongside an 
 3. Create the source broker password file interactively. Replace `DEVICE_SERIAL` with the actual MQTT username described in the [configuration guide](../../CONFIGURATION.md). Repeat without `-c` for each additional device. The device password is documented there. Use a separate strong password for the GroBro account.
 
 ```sh
-mkdir -p mosquitto/certs mosquitto/data
+mkdir -p mosquitto/certs mosquitto/data ca
 docker run --rm -it --user 0:0 \
   -v "$PWD/mosquitto/config:/work" eclipse-mosquitto:2 \
   mosquitto_passwd -c /work/passwd DEVICE_SERIAL
@@ -20,7 +20,15 @@ docker run --rm -it --user 0:0 \
 
 Ensure the container's Mosquitto runtime user can read the certificate and password files and write the data directory. Check its UID/GID for the selected image (typically 1883:1883). Restrict private keys and password hashes to the necessary users; do not make them world-readable. `-c` overwrites an existing password file, so use it only on initial setup.
 
-4. Create a separate `grobro` account on the existing HA broker using its normal administrative process. Enter the two passwords in `.env` (quote values as required by Compose). If the target broker uses TLS, set `TARGET_MQTT_TLS=true` and use its appropriate hostname/port. GroBro currently enables TLS without peer certificate validation, as documented in the configuration guide; keep this traffic on a trusted network.
+4. Create a separate `grobro` account on the existing HA broker using its normal administrative process. Enter the two passwords in `.env` (quote values as required by Compose). Use GroBro v2.8.2 or newer. This example enables certificate and hostname verification for the source broker via `SOURCE_MQTT_TLS_VERIFY=true`. Use the hostname matching the broker certificate. Publicly trusted certificates use the container's default trust store.
+
+   For a private source CA, copy its public PEM trust bundle to `ca/root.pem` and set `SOURCE_MQTT_CA_FILE=/mqtt-certs/root.pem` in `.env`.
+
+   The target broker defaults to plaintext on the host loopback interface. If it uses TLS, set both `TARGET_MQTT_TLS=true` and `TARGET_MQTT_TLS_VERIFY=true`, and configure its certificate hostname and TLS port.
+
+   For a private target CA, copy its public PEM bundle to `ca/target-ca.pem` and set `TARGET_MQTT_CA_FILE=/mqtt-certs/target-ca.pem`.
+
+   Verification settings are independent for each broker. A custom CA replaces the default trust store for that connection. Resolve certificate verification failures rather than bypassing them. Keep only public CA certificates in `ca/`, never private keys. See the [configuration guide](../../CONFIGURATION.md#optional-mqtt-tls-verification) for details.
 5. Before starting, restrict source port 7006 to the intended devices and bridge on your network using firewall rules appropriate for Docker-published ports (including IPv6 where applicable). Do not forward the port from the internet. This example authenticates users but does not implement per-topic ACLs: apply and test ACLs appropriate to your device topics and GroBro's required subscriptions/publishes before using an untrusted network.
 
 ```sh
@@ -33,4 +41,4 @@ Check that both brokers accept GroBro's connections, then follow the upstream de
 
 ## Validation scope
 
-The underlying two-broker layout, ARM64 container startup, local DNS, TLS 1.2/1.3 handshakes and separate MQTT authentication were verified in a Raspberry Pi 5 installation. This generalized Compose example still needs review and end-to-end testing with actual inverter telemetry and Home Assistant discovery. Pin reviewed image versions or digests for a long-lived installation.
+The underlying two-broker layout, ARM64 container startup, local DNS, TLS 1.2/1.3 handshakes and separate MQTT authentication were verified in a Raspberry Pi 5 installation. The updated TLS verification settings have not been runtime-tested end to end. This generalized Compose example still needs review and end-to-end testing with actual inverter telemetry and Home Assistant discovery. Pin reviewed image versions or digests for a long-lived installation.
