@@ -263,7 +263,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -367,7 +367,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -471,7 +471,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -575,7 +575,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -679,7 +679,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -783,7 +783,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -887,7 +887,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -991,7 +991,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
@@ -1095,7 +1095,7 @@
         "unit_of_measurement": "W",
         "type": "number",
         "min": 0,
-        "max": 800,
+        "max": 1000,
         "step": 1
       }
     },
