@@ -39,6 +39,8 @@ except ValueError:
     MAX_BAT = MAX_BAT_RAW
 FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
 KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
+AUTO_TIME_SYNC = os.getenv("AUTO_TIME_SYNC", "False").lower() == "true"
+TIME_SYNC_HOURS = (0, 12)
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
@@ -261,6 +263,9 @@ class Client:
         mqtt_config.configure_tls(self._client)
         self._client.will_set(BRIDGE_AVAILABILITY_TOPIC, "offline", retain=True)
         self._last_states: dict[str, str] = {}
+        self._time_sync_timer: Optional[Timer] = None
+        if AUTO_TIME_SYNC:
+            self.__schedule_time_sync()
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         # Subscriptions are (re)established in __on_connect so they survive
@@ -580,6 +585,32 @@ class Client:
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)
             return
+
+    def __schedule_time_sync(self):
+        from datetime import datetime, timedelta
+
+        now = datetime.now()
+        candidates = [now.replace(hour=h, minute=0, second=0, microsecond=0) for h in TIME_SYNC_HOURS]
+        candidates += [c + timedelta(days=1) for c in candidates]
+        next_sync = min(c for c in candidates if c > now)
+        self._time_sync_timer = Timer((next_sync - now).total_seconds(), self.sync_time_of_all_devices, args=(True,))
+        self._time_sync_timer.daemon = True
+        self._time_sync_timer.start()
+
+    def sync_time_of_all_devices(self, reschedule: bool = False):
+        """Write the current time to every known device that supports it (config register 31)."""
+        from datetime import datetime
+
+        value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for device_id in list(self._discovery_cache):
+            known_registers = get_known_registers(device_id)
+            if not known_registers or not self.on_config_command:
+                continue
+            if any(reg.growatt.register_no == 31 for reg in known_registers.config_registers.values()):
+                LOG.info("Synchronizing time of %s", device_id)
+                self.on_config_command(device_id, 31, value)
+        if reschedule:
+            self.__schedule_time_sync()
 
     def __republish_after_ha_restart(self):
         """Home Assistant restarted: send discovery and the last states again."""

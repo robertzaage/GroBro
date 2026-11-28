@@ -43,6 +43,7 @@ options:
   TZ: ""
   KEEP_BATTERY_POSITION: false
   PUBLISH_SENSORS_RETAINED: false
+  AUTO_TIME_SYNC: false
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -70,3 +71,4 @@ schema:
   TZ: str
   KEEP_BATTERY_POSITION: bool
   PUBLISH_SENSORS_RETAINED: bool
+  AUTO_TIME_SYNC: bool

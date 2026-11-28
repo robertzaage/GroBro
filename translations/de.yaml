@@ -73,4 +73,7 @@ configuration:
     description: Wenn aktiviert, überwacht GroBro die Seriennummern der NOAH-Batterien über Positionswechsel und protokolliert eine Warnung, wenn eine Batterie in einen anderen Steckplatz wechselt. Standard ist deaktiviert.
   PUBLISH_SENSORS_RETAINED:
     name: PUBLISH_SENSORS_RETAINED
-    description: Wenn aktiviert, werden Sensorzustände als retained MQTT-Nachrichten veröffentlicht, sodass Home Assistant nach seinem eigenen Neustart sofort den zuletzt von GroBro gesendeten Stand erhält. Ist die Option deaktiviert, zeigen die Sensoren nach einem Neustart von Home Assistant "unbekannt", bis das Gerät neue Daten sendet. Standard ist deaktiviert.
+    description: Wenn aktiviert, werden Sensorzustände als retained MQTT-Nachrichten veröffentlicht, sodass sie auch nach einem Neustart des MQTT-Brokers oder von GroBro wiederhergestellt werden. Neustarts von Home Assistant werden auch ohne diese Option abgefangen, GroBro sendet dann die letzten Zustände erneut. Standard ist deaktiviert.
+  AUTO_TIME_SYNC:
+    name: AUTO_TIME_SYNC
+    description: Wenn aktiviert, synchronisiert GroBro die Uhrzeit deiner Geräte um 00:00 und 12:00 Uhr. Standard ist deaktiviert.

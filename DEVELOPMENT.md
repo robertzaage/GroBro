@@ -947,7 +947,8 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
 | `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only grows while running; set to a number to override and remove the entities of batteries above it. |
 | `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |
-| `TZ` | (system) | Time zone used by the `Sync Time` button |
+| `AUTO_TIME_SYNC` | `False` | Write the current time (config register 31) to all known devices at 00:00 and 12:00 |
+| `TZ` | (system) | Time zone used by the `Sync Time` button and `AUTO_TIME_SYNC` |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |

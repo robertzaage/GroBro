@@ -1288,3 +1288,26 @@ class TestStatusSummary:
         discovery = json.loads(published[f"homeassistant/device/{device_id}/config"])
         assert state["Status_Summary"] == "Normal – Grid voltage high"
         assert f"grobro_{device_id}_Status_Summary" in discovery["cmps"]
+
+
+class TestAutoTimeSync:
+    def test_sync_time_of_all_devices(self, ha_client):
+        ha_client._discovery_cache.clear()
+        ha_client._discovery_cache.extend(["QMN000ABC1D2E3FG", "UNKNOWN0001"])
+        ha_client.sync_time_of_all_devices()
+        ha_client.on_config_command.assert_called_once()
+        device_id, register_no, value = ha_client.on_config_command.call_args.args
+        assert (device_id, register_no) == ("QMN000ABC1D2E3FG", 31)
+        assert len(value) == 19
+        ha_client._discovery_cache.clear()
+
+    def test_time_sync_is_scheduled_only_when_enabled(self, mock_mqtt):
+        with patch("grobro.ha.client.os.listdir", return_value=[]), patch("grobro.ha.client.Timer") as timer:
+            with patch("grobro.ha.client.AUTO_TIME_SYNC", False):
+                Client(MQTTConfig(host="localhost", port=1883))
+            timer.assert_not_called()
+            with patch("grobro.ha.client.AUTO_TIME_SYNC", True):
+                Client(MQTTConfig(host="localhost", port=1883))
+            delay = timer.call_args.args[0]
+            assert 0 < delay <= 12 * 3600
+            timer.return_value.start.assert_called_once()

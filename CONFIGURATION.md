@@ -138,7 +138,8 @@ The container is configured via environment variables. The Home Assistant add-on
 | `FILTER_DATA_GLITCHES` | | `false` | Set to `true` to suppress energy counters dropping after a device reconnects |
 | `KEEP_BATTERY_POSITION` | | `false` | Set to `true` to log a warning when a NOAH battery moves to a different position in the stack |
 | `PUBLISH_SENSORS_RETAINED` | | `false` | Set to `true` to publish sensor states with the MQTT retain flag, so Home Assistant gets the last state right after its own restart instead of showing "unknown" until the device sends new data |
-| `TZ` | | | Time zone (e.g. `Europe/Berlin`) used by the `Sync Time` button |
+| `AUTO_TIME_SYNC` | | `false` | Set to `true` to synchronize the clock of your devices at 00:00 and 12:00 |
+| `TZ` | | | Time zone (e.g. `Europe/Berlin`) used by the `Sync Time` button and `AUTO_TIME_SYNC` |
 | `LOG_LEVEL` | | `ERROR` | `ERROR`, `INFO` or `DEBUG` |
 | `DUMP_MESSAGES` | | `false` | Set to `true` to save every received message to `DUMP_DIR` for in-depth inspection |
 | `DUMP_DIR` | | `/dump` | Directory for dumped messages (`/share/GroBro/dump` in the add-on) |
