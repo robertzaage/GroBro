@@ -1,6 +1,9 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import grobro.ha.client as firmware_client
+import json
+
+from grobro.model.growatt_registers import HomeAssistantInputRegister
+from grobro.model.mqtt_config import MQTTConfig
 from grobro.settings import HA_BASE_TOPIC
 from grobro.ha.client import (
     Client,
@@ -115,46 +118,44 @@ def test_compact_datalogger_version_rejects_empty_and_invalid_values():
     assert _compact_datalogger_version("4.0.beta.1") is None
 
 
-def test_discovery_invalid_json_is_forwarded_unchanged():
-    client = Client.__new__(Client)
-    original_publish = MagicMock()
-    client._client = MagicMock()
-    client._client.publish = original_publish
+def _client():
+    with patch("grobro.ha.client.mqtt.Client"):
+        return Client(MQTTConfig(host="localhost", port=1883))
 
+
+def _discovery_publishes(client, device_id):
+    topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+    return [c.args[1] for c in client._client.publish.call_args_list if c.args[0] == topic]
+
+
+def test_noah_discovery_and_state_use_the_combined_firmware():
+    client = _client()
     device_id = "0PVP0000TEST0001"
-    discovery_topic = f"{HA_BASE_TOPIC}/device/{device_id}/config"
+    payload = {"fw_version_part_1": 19, "fw_version_part_2": 19, "fw_version_part_3": 14}
+    client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload=payload))
 
-    def fake_discovery(self, _device_id, _effective_max_bat=None):
-        self._client.publish(discovery_topic, "{invalid-json", retain=True)
-
-    with patch.object(
-        firmware_client,
-        "_ORIGINAL_PUBLISH_DEVICE_DISCOVERY",
-        fake_discovery,
-    ):
-        client._Client__publish_device_discovery(device_id)
-
-    original_publish.assert_called_once_with(
-        discovery_topic,
-        "{invalid-json",
-        retain=True,
-    )
+    discovery = json.loads(_discovery_publishes(client, device_id)[-1])
+    assert discovery["dev"]["sw_version"] == "19.19.14"
+    assert discovery["cmps"][f"grobro_{device_id}_fw_version"]["value_template"] == "{{ value_json['fw_version'] }}"
+    state = [c.args[1] for c in client._client.publish.call_args_list if c.args[0].endswith(f"{device_id}/state")][-1]
+    assert json.loads(state)["fw_version"] == "19.19.14"
 
 
-def test_discovery_non_combined_device_delegates_to_base_client():
-    client = Client.__new__(Client)
-    client._client = MagicMock()
+def test_firmware_update_republishes_discovery_without_clearing():
+    client = _client()
+    device_id = "0PVP0000TEST0001"
+    payload = {"fw_version_part_1": 19, "fw_version_part_2": 19, "fw_version_part_3": 14}
+    client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload=payload))
+    client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload={**payload, "fw_version_part_3": 15}))
 
-    with patch.object(
-        firmware_client,
-        "_ORIGINAL_PUBLISH_DEVICE_DISCOVERY",
-        return_value="delegated",
-    ) as base_discovery:
-        result = client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+    publishes = _discovery_publishes(client, device_id)
+    assert "" not in publishes
+    assert json.loads(publishes[-1])["dev"]["sw_version"] == "19.19.15"
 
-    assert result == "delegated"
-    base_discovery.assert_called_once_with(
-        client,
-        "QMN000ABC1D2E3FG",
-        None,
-    )
+
+def test_other_devices_keep_the_firmware_parts_template():
+    client = _client()
+    client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+    discovery = json.loads(_discovery_publishes(client, "QMN000ABC1D2E3FG")[-1])
+    assert all("fw_version" not in c.get("value_template", "") or "fw_version_part" in c["value_template"]
+               for c in discovery["cmps"].values())

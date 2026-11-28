@@ -302,6 +302,8 @@ class Client:
         self._client.on_connect = self.__on_connect
 
         self._discovery_payload_cache: dict[str, str] = {}
+        # Firmware versions of NOAH and NEXA devices, see compose_combined_firmware
+        self._combined_firmware_versions: dict[str, str] = {}
         # Last published holding register values, needed to update packed registers
         self._holding_values: dict[tuple[str, str], str] = {}
         self._neo_pv_count: dict[str, int] = {}
@@ -381,6 +383,7 @@ class Client:
 
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
+        state = self.__add_combined_firmware(state)
         prev_max_bat = _MAX_BAT_CACHE.get(state.device_id)
         effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
         if _MAX_BAT_CACHE.get(state.device_id) != prev_max_bat:
@@ -483,6 +486,21 @@ class Client:
         state_str = json.dumps(payload, separators=(",", ":"))
         self._last_states[topic] = state_str
         self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
+
+    def __add_combined_firmware(self, state: HomeAssistantInputRegister) -> HomeAssistantInputRegister:
+        """Add the firmware version of NOAH and NEXA devices, composed like the ShinePhone app shows it."""
+        if not state.device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
+            return state
+        config = self._config_cache.get(state.device_id)
+        datalogger_version = getattr(config, "sw_version", None) if config else None
+        firmware_version = compose_combined_firmware(state.payload, datalogger_version)
+        if not firmware_version:
+            return state
+        if self._combined_firmware_versions.get(state.device_id) != firmware_version:
+            self._combined_firmware_versions[state.device_id] = firmware_version
+            # Republish the discovery with the new version, without clearing it first
+            self._discovery_payload_cache.pop(state.device_id, None)
+        return HomeAssistantInputRegister(device_id=state.device_id, payload={**state.payload, "fw_version": firmware_version})
 
     def __fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
         """Keep HA entities from dropping to "unknown" when a value is missing
@@ -1060,10 +1078,14 @@ class Client:
             combined_name = "fw_version"
             firmware_unique_id = f"grobro_{device_id}_{combined_name}"
 
-            value_template = ".".join(
-                f"{{{{ value_json['{part}'] }}}}"
-                for part in fw_version_parts
-            )
+            if device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
+                # Composed like the ShinePhone app shows it, see compose_combined_firmware
+                value_template = "{{ value_json['fw_version'] }}"
+            else:
+                value_template = ".".join(
+                    f"{{{{ value_json['{part}'] }}}}"
+                    for part in fw_version_parts
+                )
 
             payload["cmps"][firmware_unique_id] = {
                 "platform": "sensor",
@@ -1108,6 +1130,10 @@ class Client:
                 "device_class": "connectivity",
                 "unique_id": online_unique_id,
             }
+
+        combined_firmware = self._combined_firmware_versions.get(device_id)
+        if combined_firmware and device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
+            payload["dev"]["sw_version"] = combined_firmware
 
         payload_str = json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
@@ -1340,81 +1366,3 @@ def compose_combined_firmware(payload: dict, datalogger_version: object) -> str 
     suffix = _compact_datalogger_version(datalogger_version)
     return f"{base_version}.{suffix}" if suffix else base_version
 
-
-# Backwards-compatible name for callers/tests that used the first implementation.
-compose_noah_firmware = compose_combined_firmware
-
-
-_ORIGINAL_PUBLISH_INPUT_REGISTER = Client.publish_input_register
-_ORIGINAL_PUBLISH_DEVICE_DISCOVERY = Client._Client__publish_device_discovery
-
-
-def _publish_input_register_with_firmware(self, state: HomeAssistantInputRegister):
-    if state.device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
-        config = getattr(self, "_config_cache", {}).get(state.device_id)
-        datalogger_version = getattr(config, "sw_version", None) if config else None
-        firmware_version = compose_combined_firmware(state.payload, datalogger_version)
-
-        if firmware_version:
-            versions = getattr(self, "_combined_firmware_versions", None)
-            if versions is None:
-                versions = {}
-                self._combined_firmware_versions = versions
-
-            if versions.get(state.device_id) != firmware_version:
-                versions[state.device_id] = firmware_version
-                self._discovery_payload_cache.pop(state.device_id, None)
-
-            payload = dict(state.payload)
-            payload["fw_version"] = firmware_version
-            state = HomeAssistantInputRegister(
-                device_id=state.device_id,
-                payload=payload,
-            )
-
-    return _ORIGINAL_PUBLISH_INPUT_REGISTER(self, state)
-
-
-def _publish_device_discovery_with_firmware(
-    self,
-    device_id: str,
-    effective_max_bat: int | None = None,
-):
-    if not device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
-        return _ORIGINAL_PUBLISH_DEVICE_DISCOVERY(self, device_id, effective_max_bat)
-
-    original_publish = self._client.publish
-    discovery_topic = f"{settings.HA_BASE_TOPIC}/device/{device_id}/config"
-
-    def publish(topic, payload=None, *args, **kwargs):
-        if topic == discovery_topic and payload:
-            try:
-                data = json.loads(payload)
-                version = getattr(self, "_combined_firmware_versions", {}).get(device_id)
-
-                if version:
-                    device = data.get("dev")
-                    if isinstance(device, dict):
-                        device["sw_version"] = version
-
-                components = data.get("cmps")
-                if isinstance(components, dict):
-                    firmware = components.get(f"grobro_{device_id}_fw_version")
-                    if isinstance(firmware, dict):
-                        firmware["value_template"] = "{{ value_json['fw_version'] }}"
-
-                payload = json.dumps(data, sort_keys=True, separators=(",", ":"))
-            except (TypeError, ValueError):
-                pass
-
-        return original_publish(topic, payload, *args, **kwargs)
-
-    self._client.publish = publish
-    try:
-        return _ORIGINAL_PUBLISH_DEVICE_DISCOVERY(self, device_id, effective_max_bat)
-    finally:
-        self._client.publish = original_publish
-
-
-Client.publish_input_register = _publish_input_register_with_firmware
-Client._Client__publish_device_discovery = _publish_device_discovery_with_firmware
