@@ -42,6 +42,7 @@ options:
   FILTER_DATA_GLITCHES: false
   TZ: ""
   KEEP_BATTERY_POSITION: false
+  PUBLISH_SENSORS_RETAINED: false
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -68,3 +69,4 @@ schema:
   FILTER_DATA_GLITCHES: bool
   TZ: str
   KEEP_BATTERY_POSITION: bool
+  PUBLISH_SENSORS_RETAINED: bool

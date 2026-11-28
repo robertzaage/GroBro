@@ -52,7 +52,7 @@ configuration:
     description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (nur NOAH, max 9). Standard ist 1.
   MAX_BAT:
     name: MAX_BAT
-    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung anhand der Seriennummern, oder eine Zahl für manuelle Einstellung.
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung, oder eine Zahl für manuelle Einstellung. Entitäten von Batterien oberhalb dieser Zahl werden dann entfernt.
   DUMP_DIR:
     name: DUMP_DIR
     description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.
@@ -71,3 +71,6 @@ configuration:
   KEEP_BATTERY_POSITION:
     name: KEEP_BATTERY_POSITION
     description: Wenn aktiviert, überwacht GroBro die Seriennummern der NOAH-Batterien über Positionswechsel und protokolliert eine Warnung, wenn eine Batterie in einen anderen Steckplatz wechselt. Standard ist deaktiviert.
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: Wenn aktiviert, werden Sensorzustände als retained MQTT-Nachrichten veröffentlicht, sodass Home Assistant nach seinem eigenen Neustart sofort den zuletzt von GroBro gesendeten Stand erhält. Ist die Option deaktiviert, zeigen die Sensoren nach einem Neustart von Home Assistant "unbekannt", bis das Gerät neue Daten sendet. Standard ist deaktiviert.
