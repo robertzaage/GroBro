@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 import json
 import logging
 from threading import Timer
@@ -41,12 +42,55 @@ FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "tr
 KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
 AUTO_TIME_SYNC = os.getenv("AUTO_TIME_SYNC", "False").lower() == "true"
 TIME_SYNC_HOURS = (0, 12)
+# Opt-in: fill in values missing from a payload from the last known ones and
+# restore them after a restart, see _offline_behavior.
+KEEP_LAST_VALUES = os.getenv("KEEP_LAST_VALUES", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
 _LAST_BAT_SERIALS: dict[str, dict[int, str]] = {}
 
+# Persistent storage for device configs and the sensor value cache.
+# The HA add-on maps this via addon_config; plain Docker needs a volume.
+CONFIG_DIR = os.getenv("CONFIG_DIR", "/config")
+
+# Offline handling of sensor values (KEEP_LAST_VALUES): a value missing from a
+# payload keeps its last known reading for brief gaps. Once it has been missing
+# from OFFLINE_MISS_THRESHOLD consecutive payloads (or the device timed out),
+# live readings (power, current, voltage, frequency) drop to 0 while
+# state-like values (SoC, temperature, status, serials) keep their last known
+# value. Live readings are never restored after a restart, so the history
+# shows a gap instead of a dip to 0.
+OFFLINE_MISS_THRESHOLD = 3
+_ZERO_WHEN_OFFLINE_DEVICE_CLASSES = {"power", "apparent_power", "reactive_power", "current", "voltage", "frequency"}
+_ZERO_WHEN_OFFLINE_UNITS = {"W", "kW", "VA", "var", "A", "mA", "ma", "V", "Hz"}
+# Minimum seconds between two writes of a device's value cache to disk
+# (values change on nearly every message; avoid wearing out SD cards).
+VALUE_CACHE_SAVE_INTERVAL = 300
+
 # ------------------- Helpfunctions -------------------
+
+def _offline_behavior(known_registers, key: str) -> Optional[str]:
+    """How a sensor value behaves while missing: "zero", "hold" or None (not cached).
+
+    total_increasing/total counters (kWh energy meters, used by the HA Energy
+    dashboard) are not cached at all: HA already handles gaps in those
+    correctly, and a cached value could get reinstated after a legitimate
+    reset (e.g. daily "_today" counters at midnight), which combined with
+    FILTER_DATA_GLITCHES could suppress the correct lower value as a glitch.
+    """
+    reg = known_registers.input_registers.get(key) if known_registers else None
+    if not reg:
+        return "hold"
+    ha = reg.homeassistant
+    if ha.offline:
+        return ha.offline
+    if ha.state_class in ("total_increasing", "total"):
+        return None
+    if ha.device_class in _ZERO_WHEN_OFFLINE_DEVICE_CLASSES or ha.unit_of_measurement in _ZERO_WHEN_OFFLINE_UNITS:
+        return "zero"
+    return "hold"
+
 
 def _detect_bat_count(payload: dict) -> int:
     bat_cnt = payload.get("bat_cnt")
@@ -86,9 +130,9 @@ def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
     if isinstance(MAX_BAT, int):
         return MAX_BAT
     if payload is not None and _has_bat_info(payload):
-        # The count only grows while GroBro runs: a battery that stops
-        # reporting, e.g. because it was disconnected, keeps its entities
-        # instead of having them removed. Set MAX_BAT to drop it for good.
+        # The count only ever grows (and is persisted with the value cache):
+        # a battery that stops reporting, e.g. because it was disconnected,
+        # keeps its entities and last known values. Set MAX_BAT to drop it.
         c = max(_detect_bat_count(payload), _MAX_BAT_CACHE.get(device_id, 0))
         _MAX_BAT_CACHE[device_id] = c
         return c
@@ -96,9 +140,9 @@ def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
         return _MAX_BAT_CACHE[device_id]
     if payload is not None or not _can_detect_bat_count(device_id):
         return 4
-    # No payload seen since startup: assume a single battery. Entities of
-    # further batteries are added once a payload reports them, which (unlike
-    # removing entities again) leaves no orphans behind in Home Assistant.
+    # No payload seen yet and no persisted count: assume a single battery.
+    # Entities of further batteries are added once a payload reports them,
+    # which (unlike removing entities again) leaves no orphans behind in HA.
     return 1
 
 
@@ -273,17 +317,54 @@ class Client:
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
 
-        # Configs laden (Cache aus Dateien)
-        for fname in os.listdir("."):
-            if fname.startswith("config_") and fname.endswith(".json"):
-                config = model.DeviceConfig.from_file(fname)
-                if config:
-                    self._config_cache[config.device_id] = config
-
         self._discovery_payload_cache: dict[str, str] = {}
         # Last published holding register values, needed to update packed registers
         self._holding_values: dict[tuple[str, str], str] = {}
         self._neo_pv_count: dict[str, int] = {}
+
+        # Values to publish for keys missing from a payload, per device,
+        # persisted to disk so they survive both GroBro and HA restarts.
+        self._value_cache: dict[str, dict] = {}
+        self._value_miss_counts: dict[str, dict[str, int]] = {}
+        self._value_cache_dirty: set[str] = set()
+        self._value_cache_saved_at: dict[str, float] = {}
+
+        try:
+            os.makedirs(CONFIG_DIR, exist_ok=True)
+        except OSError as e:
+            LOG.warning("Cannot create config dir %s, persistence disabled: %s", CONFIG_DIR, e)
+
+        # Load from cached files
+        cached_files = os.listdir(CONFIG_DIR) if os.path.isdir(CONFIG_DIR) else []
+        for fname in cached_files:
+            if fname.startswith("config_") and fname.endswith(".json"):
+                config = model.DeviceConfig.from_file(os.path.join(CONFIG_DIR, fname))
+                if config:
+                    self._config_cache[config.device_id] = config
+
+        for fname in cached_files:
+            if fname.startswith("state_cache_") and fname.endswith(".json"):
+                device_id = fname[len("state_cache_"):-len(".json")]
+                try:
+                    with open(os.path.join(CONFIG_DIR, fname), "r") as f:
+                        data = json.load(f)
+                    cached = data["values"]
+                except Exception as e:
+                    LOG.warning("Failed to load state cache %s: %s", fname, e)
+                    continue
+                if isinstance(data.get("max_bat"), int):
+                    _MAX_BAT_CACHE[device_id] = data["max_bat"]
+                if not KEEP_LAST_VALUES:
+                    continue
+                # Live readings are not restored: they were only valid at the
+                # time they were saved, and restoring them (or 0) would show
+                # up as a wrong value or a dip in the history.
+                known_registers = get_known_registers(device_id)
+                self._value_cache[device_id] = {
+                    key: value for key, value in cached.items()
+                    if _offline_behavior(known_registers, key) == "hold"
+                }
+                LOG.info("Loaded cached sensor values for %s from disk", device_id)
 
     # ------------------- Lifecycle -------------------
 
@@ -291,17 +372,19 @@ class Client:
         self._client.loop_start()
 
     def stop(self):
+        for device_id in list(self._value_cache_dirty):
+            self.__save_value_cache(device_id)
         self._client.loop_stop()
         self._client.disconnect()
 
     # ------------------- Config Handling -------------------
 
     def set_config(self, device_id: str, config: model.DeviceConfig):
-        config_path = f"config_{device_id}.json"
+        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
         existing_config = model.DeviceConfig.from_file(config_path)
         if existing_config is None or existing_config != config:
             LOG.info(f"Saving updated config for {device_id}")
-            config.to_file(config_path)
+            self.__save_config(config, config_path)
         else:
             LOG.debug(f"No config change for {device_id}")
         self._config_cache[device_id] = config
@@ -314,7 +397,10 @@ class Client:
 
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
+        prev_max_bat = _MAX_BAT_CACHE.get(state.device_id)
         effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
+        if _MAX_BAT_CACHE.get(state.device_id) != prev_max_bat:
+            self._value_cache_dirty.add(state.device_id)
         self.__detect_neo_pv_count(state.device_id, state.payload)
         # discovery + availability
         self.__publish_device_discovery(state.device_id, effective_max_bat)
@@ -326,7 +412,9 @@ class Client:
         payload = dict(state.payload)
         known_registers = get_known_registers(state.device_id)
 
-        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C
+        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C.
+        # They are published as unknown and never filled in from the cache.
+        absent_keys: set[str] = set()
         if known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
@@ -336,6 +424,7 @@ class Client:
                     continue
                 if isinstance(value, (int, float)) and value == -273.1:
                     payload[key] = None
+                    absent_keys.add(key)
 
         for key in list(payload.keys()):
             bat_num = _get_bat_number(key)
@@ -401,11 +490,63 @@ class Client:
                             )
             _LAST_BAT_SERIALS[state.device_id] = current_serials
 
+        if KEEP_LAST_VALUES:
+            self.__fill_in_last_values(state.device_id, known_registers, state.payload, payload, absent_keys, effective_max_bat)
+        self.__maybe_save_value_cache(state.device_id)
+
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
         state_str = json.dumps(payload, separators=(",", ":"))
         self._last_states[topic] = state_str
         self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+
+    def __fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
+        """Keep HA entities from dropping to "unknown" when a value is missing
+        from the payload (absent or None, e.g. a disconnected battery, or after
+        a GroBro/HA restart), see OFFLINE_MISS_THRESHOLD."""
+        # Batteries beyond the currently reported count (e.g. disconnected
+        # ones) still show up as 0 / empty registers: treat those as missing
+        # so their SoC and serial keep the last known value. Their
+        # temperatures are absent sensors and become unknown.
+        if _has_bat_info(raw_payload):
+            reported_bat_cnt = _detect_bat_count(raw_payload)
+            for key in list(payload):
+                bat_num = _get_bat_number(key)
+                if bat_num is not None and bat_num > reported_bat_cnt:
+                    payload[key] = None
+                    reg = known_registers.input_registers.get(key) if known_registers else None
+                    if reg and reg.homeassistant.device_class == "temperature":
+                        absent_keys.add(key)
+
+        device_value_cache = self._value_cache.setdefault(device_id, {})
+        miss_counts = self._value_miss_counts.setdefault(device_id, {})
+        for key in set(payload) | set(device_value_cache):
+            behavior = _offline_behavior(known_registers, key)
+            if behavior is None:
+                continue
+            bat_num = _get_bat_number(key)
+            if bat_num is not None and bat_num > effective_max_bat:
+                continue
+            if key in absent_keys:
+                miss_counts.pop(key, None)
+                if device_value_cache.pop(key, None) is not None:
+                    self._value_cache_dirty.add(device_id)
+                payload[key] = None
+                continue
+            value = payload.get(key)
+            if value is not None:
+                miss_counts.pop(key, None)
+                if device_value_cache.get(key) != value:
+                    device_value_cache[key] = value
+                    self._value_cache_dirty.add(device_id)
+                continue
+            if key not in device_value_cache:
+                continue
+            miss_counts[key] = miss_counts.get(key, 0) + 1
+            if behavior == "zero" and miss_counts[key] >= OFFLINE_MISS_THRESHOLD and device_value_cache[key] != 0:
+                device_value_cache[key] = 0
+                self._value_cache_dirty.add(device_id)
+            payload[key] = device_value_cache[key]
 
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
@@ -425,6 +566,25 @@ class Client:
         self._client.publish(BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
         self._client.subscribe(HA_STATUS_TOPIC)
         self.__subscribe_commands()
+        # Immediately republish the last known state-like values for every
+        # device we have a cache for, so entities don't wait for the next
+        # device poll (or stay "unknown") after GroBro or the broker connection
+        # restarts. Live readings are left out, they'd be outdated by now.
+        for device_id, device_value_cache in list(self._value_cache.items()):
+            known_registers = get_known_registers(device_id)
+            cached_payload = {
+                key: value for key, value in device_value_cache.items()
+                if _offline_behavior(known_registers, key) == "hold"
+            }
+            if not cached_payload:
+                continue
+            topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+            self._client.publish(
+                topic,
+                json.dumps(cached_payload, separators=(",", ":")),
+                retain=PUBLISH_SENSORS_RETAINED,
+            )
+            LOG.info("Republished cached values for %s after (re)connect", device_id)
 
     def __subscribe_commands(self):
         for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
@@ -650,9 +810,52 @@ class Client:
 
     # ------------------- Internals -------------------
 
+    def __save_config(self, config: model.DeviceConfig, path: str):
+        try:
+            config.to_file(path)
+        except OSError as e:
+            LOG.warning("Failed to persist config %s: %s", path, e)
+
+    def __maybe_save_value_cache(self, device_id: str):
+        if device_id not in self._value_cache_dirty:
+            return
+        saved_at = self._value_cache_saved_at.get(device_id)
+        if saved_at is None or time.monotonic() - saved_at >= VALUE_CACHE_SAVE_INTERVAL:
+            self.__save_value_cache(device_id)
+
+    def __save_value_cache(self, device_id: str):
+        path = os.path.join(CONFIG_DIR, f"state_cache_{device_id}.json")
+        tmp_path = f"{path}.tmp"
+        self._value_cache_saved_at[device_id] = time.monotonic()
+        try:
+            with open(tmp_path, "w") as f:
+                json.dump({"values": self._value_cache.get(device_id, {}), "max_bat": _MAX_BAT_CACHE.get(device_id)}, f)
+            os.replace(tmp_path, path)
+            self._value_cache_dirty.discard(device_id)
+        except Exception as e:
+            LOG.warning("Failed to persist state cache for %s: %s", device_id, e)
+
+    def __publish_offline_values(self, device_id: str):
+        """Drop live readings of a timed-out device to 0 and publish the result."""
+        device_value_cache = self._value_cache.get(device_id)
+        if not device_value_cache:
+            return
+        known_registers = get_known_registers(device_id)
+        for key, value in list(device_value_cache.items()):
+            if value != 0 and _offline_behavior(known_registers, key) == "zero":
+                device_value_cache[key] = 0
+                self._value_cache_dirty.add(device_id)
+        topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"
+        state_str = json.dumps(device_value_cache, separators=(",", ":"))
+        # Also used when Home Assistant restarts, see __republish_after_ha_restart
+        self._last_states[topic] = state_str
+        self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+        self.__maybe_save_value_cache(device_id)
+
     def __reset_device_timer(self, device_id: str):
         def set_device_unavailable(d_id: str):
             LOG.warning("Device %s timed out. Mark it as unavailable.", d_id)
+            self.__publish_offline_values(d_id)
             self.__publish_availability(d_id, False)
 
         if device_id in self._device_timers:
@@ -971,7 +1174,7 @@ class Client:
     def __device_info_from_config(self, device_id: str):
         # Find matching config
         config = self._config_cache.get(device_id)
-        config_path = f"config_{device_id}.json"
+        config_path = os.path.join(CONFIG_DIR, f"config_{device_id}.json")
 
         # Fallback: try loading from file
         if not config:
@@ -982,7 +1185,7 @@ class Client:
         # Fallback 2: save minimal config if it was neither in cache nor on disk
         if not config:
             config = model.DeviceConfig(serial_number=device_id)
-            config.to_file(config_path)
+            self.__save_config(config, config_path)
             self._config_cache[device_id] = config
             LOG.info(f"Saved minimal config for new device: {config}")
 

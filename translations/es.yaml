@@ -46,16 +46,13 @@ configuration:
     description: "Nivel de registro: ERROR, INFO o DEBUG. Por defecto ERROR."
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: "Guarda todos los mensajes recibidos en $DUMP_DIR para un análisis detallado posterior."
+    description: "Guarda todos los mensajes recibidos en /config/dump para un análisis detallado posterior."
   MAX_SLOTS:
     name: MAX_SLOTS
     description: "Cuántas franjas horarias mostrar en Home Assistant para la programación de la batería (NOAH, NEXA, TL-XH y MOD, máx. 9). Por defecto 1."
   MAX_BAT:
     name: MAX_BAT
     description: "Cuántos paquetes de baterías mostrar en Home Assistant. \"auto\" (por defecto) detecta la cantidad del dispositivo, un número la fija y elimina las entidades de las baterías por encima."
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: "Directorio para los mensajes guardados. Por defecto /share/GroBro/dump. En el complemento debe empezar con /share"
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: "Tiempo de espera en segundos para la comunicación con el dispositivo. Por defecto 0 (desactivado). Recomendado 300 o más."
@@ -77,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: "GroBro sincroniza la hora de tus dispositivos a las 00:00 y a las 12:00. Por defecto desactivado."
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: "Si está activado, los valores que faltan en los datos del dispositivo (p. ej. con una batería desconectada) conservan su último valor conocido en lugar de mostrar \"desconocido\", y los valores de estado como el SoC y el estado se restauran tras un reinicio. Las lecturas en vivo como la potencia bajan a 0 cuando el dispositivo deja de informar y no se restauran tras un reinicio. Los sensores de temperatura ausentes muestran \"desconocido\". Desactivado por defecto."

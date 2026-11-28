@@ -1554,7 +1554,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:battery"
+        "icon": "mdi:battery",
+        "offline": "hold"
       }
     },
     "SOC": {
@@ -2052,7 +2053,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:battery"
+        "icon": "mdi:battery",
+        "offline": "hold"
       }
     },
     "BMS_Min_Cell_Voltage": {
@@ -2076,7 +2078,8 @@
         "state_class": "measurement",
         "device_class": "voltage",
         "unit_of_measurement": "V",
-        "icon": "mdi:battery"
+        "icon": "mdi:battery",
+        "offline": "hold"
       }
     },
     "BMS_Module_Count": {

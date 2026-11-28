@@ -46,16 +46,13 @@ configuration:
     description: "Logniveau: ERROR, INFO of DEBUG. Standaard ERROR."
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: "Slaat alle ontvangen berichten op in $DUMP_DIR voor latere analyse."
+    description: "Slaat alle ontvangen berichten op in /config/dump voor latere analyse."
   MAX_SLOTS:
     name: MAX_SLOTS
     description: "Hoeveel tijdsloten in Home Assistant worden getoond voor de batterijplanning (NOAH, NEXA, TL-XH en MOD, max. 9). Standaard 1."
   MAX_BAT:
     name: MAX_BAT
     description: "Hoeveel batterijpakketten in Home Assistant worden getoond. \"auto\" (standaard) herkent het aantal via het apparaat, een getal legt het vast en verwijdert de entiteiten van batterijen daarboven."
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: "Map voor opgeslagen berichten. Standaard /share/GroBro/dump. In de add-on moet deze met /share beginnen"
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: "Time-out in seconden voor de communicatie met het apparaat. Standaard 0 (uitgeschakeld). Aanbevolen 300 of meer."
@@ -77,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: "GroBro synchroniseert de tijd van je apparaten om 00:00 en 12:00. Standaard uitgeschakeld."
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: "Indien ingeschakeld behouden waarden die in de apparaatgegevens ontbreken (bijv. bij een losgekoppelde batterij) hun laatst bekende waarde in plaats van \"onbekend\" te tonen, en statuswaarden zoals SoC en status worden na een herstart hersteld. Live-metingen zoals vermogen vallen terug naar 0 als het apparaat niets meer meldt en worden na een herstart niet hersteld. Ontbrekende temperatuursensoren tonen \"onbekend\". Standaard uitgeschakeld."

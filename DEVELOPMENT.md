@@ -146,10 +146,35 @@ these tags. Messages tagged `"ha"` or `"growatt"` are skipped to avoid echo loop
 ### Config persistence
 
 Device configs are cached in memory (`_config_cache` dict) and also persisted to disk as
-`config_{device_id}.json` files in the working directory. On startup, if a device's config
+`config_{device_id}.json` files under `/config`. On startup, if a device's config
 is not in the cache, `__device_info_from_config` falls back to loading from file, then to
 creating a minimal config with just the serial number. Config files are written via
 `DeviceConfig.to_file()` and read via `DeviceConfig.from_file()`.
+
+The same `/config` directory also holds `state_cache_{device_id}.json` files with the
+persisted battery count (`max_bat`, see [3.4](#34-_get_bat_number-and-max_bat)) and, with
+`KEEP_LAST_VALUES` enabled, the value to publish per input register while it is missing from
+a payload (absent or `None`, e.g. a disconnected battery no longer reporting `bat*`
+registers), so Home Assistant entities don't drop to "unknown". Without the option, payloads
+are published as received:
+
+- A missing value keeps its last known reading for brief gaps.
+- After `OFFLINE_MISS_THRESHOLD` (3) consecutive payloads without it, or when the device hits
+  `DEVICE_TIMEOUT`, live readings (`device_class` power/apparent_power/reactive_power/current/
+  voltage/frequency, or unit W/kW/VA/var/A/mA/V/Hz) drop to `0`. State-like values (SoC,
+  temperature, status, serials) keep their last known value.
+- `total_increasing`/`total` energy counters are not cached; HA handles gaps in those itself.
+- A register can override the derived behavior with `"offline": "zero"` or `"hold"` in its
+  `homeassistant` block. Battery and cell voltages (and the BMS CV setpoint) use `"hold"`,
+  since a battery keeps its voltage like its SoC when the device stops reporting (e.g. at
+  the discharge limit); load/output percentages and fan speeds use `"zero"`.
+- Absent temperature sensors (raw 0 K, decoded as -273.1 °C) and the temperatures of
+  batteries beyond the reported `bat_cnt` are published as `None` and removed from the cache,
+  so they never show an old value.
+- The file is written at most every `VALUE_CACHE_SAVE_INTERVAL` (300 s) per device and on
+  shutdown, atomically via a `.tmp` file. On startup and in the republish on MQTT (re)connect,
+  only `"hold"` values are restored; live readings stay unknown until the device reports
+  again, so the history shows a gap instead of a dip to `0`.
 
 ### Three-broker topology
 
@@ -447,7 +472,8 @@ import time into `GroBroRegisters` Pydantic models.
         "state_class": "measurement",
         "device_class": "power",
         "unit_of_measurement": "W",
-        "icon": "mdi:flash"
+        "icon": "mdi:flash",
+        "offline": "zero"
       }
     }
   },
@@ -467,6 +493,9 @@ import time into `GroBroRegisters` Pydantic models.
 ```
 
 The value is calculated as `raw × multiplier + delta`. `size` is in bytes, so a 32 bit value spanning two registers uses `"size": 4`. `entity_category` is optional: use `diagnostic` for read-only information like serials or firmware and `config` for writable settings, measurements and controls leave it out. Holding and config registers need a `type` (`number`, `switch`, `select`, `time`, `text`, `sensor`).
+
+`offline` is optional (`"zero"` or `"hold"`) and controls the value published while the
+register is missing from a payload; see [Config persistence](#config-persistence).
 
 Three sections mirror the three modbus register spaces:
 
@@ -577,19 +606,19 @@ the `bat{2,3,4}_ser_part_1` values are checked, and when no serial parts have da
 integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
 in both `publish_input_register` and `__publish_device_discovery`.
 
-In auto mode, the detected count is kept per device in `_MAX_BAT_CACHE` and only
-ever grows while GroBro runs, so a battery that stops reporting keeps its
-entities. Before the first payload after a restart, devices whose count can be
-detected (`bat_cnt` / `bat*_ser_part_1` registers, i.e. NOAH) assume a single
-battery instead of 4; entities of further batteries are added once a payload
-reports them. Devices without detection (e.g. NEXA) keep the default of 4.
+In `"auto"` mode, `_resolve_max_bat()` keeps the highest count seen per device in
+`_MAX_BAT_CACHE`, persisted as `max_bat` in `state_cache_{device_id}.json`. The count
+only ever grows: a disconnected battery keeps its entities. With `KEEP_LAST_VALUES`, its
+values (which the NOAH still reports as `0` / empty registers beyond `bat_cnt`) are treated
+as missing, so SoC and serial keep their last known value, while its temperatures become
+unknown. Payloads without battery info (no `bat_cnt`, no serial
+parts) don't change the count. Before the first payload, a device whose count can be
+detected (NOAH) without a persisted count assumes a single battery; other devices
+(e.g. NEXA) fall back to `4`.
 
-Once the count is known (detected or `MAX_BAT`), discovery sends the entities
-of batteries above it as `{"platform": "sensor"}`, the documented way to remove
-a single component from a device discovery payload. Simply leaving a component
-out does not remove it in HA and leaves an orphaned entity. While the count is
-only a guess, they are left out instead, so existing entities aren't removed and
-re-added on every restart.
+Once the count is known (detected/persisted or `MAX_BAT`), discovery sends entities of
+batteries above it as `{"platform": "sensor"}`, which makes HA remove them. While the
+count is only a guess, they are left out instead.
 
 After filtering, the four `bat{N}_ser_part_{1-4}` values are concatenated into a
 single `bat{N}_serial` key in the state payload, and the individual part keys are
@@ -944,16 +973,17 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `DEVICE_TIMEOUT` | `0` | Seconds after which a device is considered offline (`0` = disabled) |
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
+| `KEEP_LAST_VALUES` | `False` | Fill in values missing from a payload from the value cache and restore state-like values after a restart, see [Config persistence](#config-persistence) |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only grows while running; set to a number to override and remove the entities of batteries above it. |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only ever grows; set to a number to override (removes entities of batteries above it). |
 | `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |
 | `AUTO_TIME_SYNC` | `False` | Write the current time (config register 31) to all known devices at 00:00 and 12:00 |
 | `TZ` | (system) | Time zone used by the `Sync Time` button and `AUTO_TIME_SYNC` |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |
 | `GROWATT_CLOUD` | `"false"` | Forward messages to Growatt Cloud. `"true"` forwards all; comma-separated serial list forwards only matching devices |
 | `GROWATT_CLOUD_CONFIG_FILTER` | `"false"` | When `True`, blocks config messages from being forwarded to the cloud |
-| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `<DUMP_DIR>/<topic_path>/<timestamp_ms>.bin` |
-| `DUMP_DIR` | `"/dump"` | Directory for dumped message files (in HA add-on: `"/share/GroBro/dump"`) |
+| `DUMP_MESSAGES` | `False` | Save every raw MQTT payload as `/config/dump/<topic_path>/<timestamp_ms>.bin` |
+| `CONFIG_DIR` | `"/config"` | Directory for persisted device configs, sensor value cache and message dumps (created if missing). Relative `SOURCE_MQTT_CA_FILE` / `TARGET_MQTT_CA_FILE` paths are resolved against it |
 
 ### 8.2 Message dump file naming
 
@@ -961,12 +991,12 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 with millisecond-precision timestamps:
 
 ```
-<DUMP_DIR>/<topic_parts>/<epoch_millis>.bin
+/config/dump/<topic_parts>/<epoch_millis>.bin
 ```
 
 For example, a message on topic `c/33/QMN000ABC1D2E3FG` is saved as:
 ```
-/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
+/config/dump/c/33/QMN000ABC1D2E3FG/1700123456789.bin
 ```
 
 Because the payload is saved before unscrambling, you must call `unscramble()` on the

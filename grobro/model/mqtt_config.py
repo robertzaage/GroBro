@@ -50,6 +50,10 @@ class MQTTConfig(BaseModel):
                 raise ValueError(f"{prefix}_MQTT_TLS_VERIFY must be true or false")
             tls_verify = verify_value == "true"
             tls_ca_file = os.getenv(f"{prefix}_MQTT_CA_FILE") or None
+            # Relative paths point into the persisted config dir, which is
+            # the only folder mapped into the add-on (its addon_config).
+            if tls_ca_file and not os.path.isabs(tls_ca_file):
+                tls_ca_file = os.path.join(os.getenv("CONFIG_DIR", "/config"), tls_ca_file)
 
         LOG.info(f"Loading MQTT configuration from environment (prefix: {prefix})")
         LOG.info(f"MQTT Host: {username if username else 'anonymous'}{':***' if password else ''}@{host}:{port} (TLS: {use_tls})")

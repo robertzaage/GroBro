@@ -46,16 +46,13 @@ configuration:
     description: Legt den Logging-Level fest. Das Programm verwendet derzeit nur die Level ERROR, DEBUG und INFO. Standard ist ERROR.
   DUMP_MESSAGES:
     name: DUMP_MESSAGES
-    description: Speichert jede empfangene Nachricht in $DUMP_DIR für eine spätere detaillierte Analyse.
+    description: Speichert jede empfangene Nachricht in /config/dump für eine spätere detaillierte Analyse.
   MAX_SLOTS:
     name: MAX_SLOTS
     description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (NOAH, NEXA, TL-XH und MOD, max 9). Standard ist 1.
   MAX_BAT:
     name: MAX_BAT
-    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung, oder eine Zahl für manuelle Einstellung. Entitäten von Batterien oberhalb dieser Zahl werden dann entfernt.
-  DUMP_DIR:
-    name: DUMP_DIR
-    description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Bei "auto" (Standard) wird die Anzahl vom Gerät erkannt und nur erhöht, sodass ein abgeklemmter Akku seine Entitäten (und mit KEEP_LAST_VALUES seine letzten Werte) behält. Eine Zahl überschreibt die Erkennung; Entitäten von Batterien oberhalb davon werden entfernt.
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Legt den Timeout in Sekunden fest, wann das Gerät als Nicht Verfügbar angezeigt wird. Default ist 0 (deaktiviert). Empfehlung 300+ Sekunden.
@@ -77,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: Wenn aktiviert, synchronisiert GroBro die Uhrzeit deiner Geräte um 00:00 und 12:00 Uhr. Standard ist deaktiviert.
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: Wenn aktiviert, behalten Werte, die in den Gerätedaten fehlen (z. B. bei abgeklemmtem Akku), ihren letzten bekannten Wert statt "unbekannt" anzuzeigen, und zustandsartige Werte wie SoC und Status werden nach einem Neustart wiederhergestellt. Live-Werte wie die Leistung fallen auf 0, wenn das Gerät keine Daten mehr sendet, und werden nach einem Neustart nicht wiederhergestellt. Nicht vorhandene Temperatursensoren zeigen "unbekannt". Standard ist deaktiviert.

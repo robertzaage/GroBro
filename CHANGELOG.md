@@ -7,6 +7,9 @@
 + The NEXA work mode value `2` is now shown as `Smart Mode` instead of `Grid First`, matching the slot modes. Automations comparing the old state need to be updated (#251)
 + The TL-XH BMS status is now shown as text (e.g. `Charging`, `Idle`) instead of a number. Automations comparing the old number need to be updated
 + The NEXA `Default Smart Mode Enabled` switch was replaced by a `Default Mode` select (Load First, Battery First, Smart Mode). Register 321 is the default work mode, the switch could only set Battery First (#251)
++ Device configs, the value cache and message dumps are now stored in `/config`. The add-on uses its own `addon_config` folder and no longer maps `/share`, old dumps in `/share/GroBro/dump` are not moved. Container users should mount a volume at `/config` (e.g. `--volume ./grobro-config:/config`) to keep this data across restarts (#233)
++ The `DUMP_DIR` option was removed, dumps are written to `/config/dump` (#233)
++ An add-on `SOURCE_MQTT_CA_FILE` / `TARGET_MQTT_CA_FILE` pointing to `/share` no longer works. Move the CA file into the add-on config folder and set a relative path, it is resolved against `/config` (#233)
 
 ### New Features
 + GroBro now republishes its devices and their last values when Home Assistant restarts, and marks all devices as unavailable when GroBro itself goes offline
@@ -22,6 +25,7 @@
 + SPH devices now expose battery current, capacity, cycle count, state of health and cell voltages as well as derating mode and fault code
 + Added an AFCI (arc fault detection) status sensor for NEO, TL-XH and MOD inverters
 + Added `AUTO_TIME_SYNC` option (default: off). When enabled, GroBro synchronizes the clock of your devices at 00:00 and 12:00
++ Added `KEEP_LAST_VALUES` option (default: off). When enabled, values missing from a device's data (e.g. a disconnected battery) keep their last known value instead of showing `unknown`, and values like SOC and status are restored after a GroBro restart. Live readings like power drop to 0 when the device stops reporting and are not restored after a restart. Absent temperature sensors show `unknown`, energy counters are not affected (#233)
 + Added Spanish, French and Dutch translations of the add-on configuration
 + Firmware, serials, Wi-Fi signal and the device type are now diagnostic entities, MQTT and interval settings are configuration entities (#212)
 + `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through (#249)
@@ -32,7 +36,7 @@
 + Fixed SPF status 1 showing `(No Use)` and added the missing status 13-30. Derating modes are now shown as readable text and include 17-21
 + Fixed SPF AC input power showing huge values instead of negative ones
 + Fixed the missing description of the time zone option in the German add-on UI
-+ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities (#249)
++ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). With `MAX_BAT=auto` the highest detected battery count is now saved and only grows, until it is known a single battery is assumed. Entities of batteries above this count (or `MAX_BAT`) are now removed from Home Assistant, which also cleans up existing orphans. A disconnected battery keeps its entities (#249, #233)
 + Fixed XH2 and MOD output power and phase currents showing huge values instead of negative ones
 
 ## v2.8.3
