@@ -1,3 +1,29 @@
+## v2.8.1
+
+### Breaking Changes
++ NOAH and NEXA slot modes are now select entities and slot start/end times are now time entities instead of numbers. Home Assistant creates them with new entity IDs, so automations and dashboards using the old `number.*` slot entities need to be updated (#211, #222)
++ NEXA serial number parts 1-4 are no longer published as separate sensors. Use the existing serial number sensor instead (#215)
+
+### New Features
++ Added initial support for MOD-series inverters
++ Added an Inverter Power switch for NEO inverters (register 0). It turns the inverter fully off, which the output power limit can't do because of its ~30 W floor (#188)
++ Added Wi-Fi signal strength sensors for NEO (#227), NOAH and NEXA (#223)
++ Added firmware sensors for NOAH and NEXA, plus a combined firmware version matching the one shown in ShinePhone (#206, #231)
++ Added the MQTT IP config register (17) for all device families
++ NEXA default output power can now be set up to 1000W (#229)
++ NEXA 2000 0xFE19 config messages are now parsed (#216)
++ The 0x6F64 smart meter message is no longer EcoTracker-specific and now also works for other meters like Shelly (#218)
++ Debug logging now includes decrypted messages forwarded from the Growatt Cloud and the full EcoTracker payload (#204, #208)
++ Passwords are now masked in the add-on configuration UI and successful MQTT connections are logged as INFO (#232)
+
+### Bug Fixes
++ Fixed NEO output power limit sometimes showing "unknown". Confirmed writes from the Growatt Cloud are now synced to Home Assistant and holding register states are retained (#228)
++ Fixed config read responses including trailing protocol data in their state value (#227)
++ Fixed handling of the hourly holding register dump (message type 0x0103) (#198, #225)
++ Fixed wrong offsets of the NOAH firmware version parts (#210)
++ Fixed the description of the NEXA Default Smart Mode Enabled switch (#224)
++ Updated the configuration guide for the latest ShinePhone app (#220)
+
 ## v2.7.5
 
 ### Bug Fixes
