@@ -62,23 +62,30 @@ docker run --detach \
 
 ### 4. Setup the Growatt Device
 
-_Note: Server and IP configuration isn't possible through the ShinePhone app anymore._
-
-Open the [openapi.growatt.com](https://openapi.growatt.com) dashboard and click on `All Devices` in the `My Photovoltaic Devices` section. Select the inverter or battery you want to configure for your own MQTT server and tap `Datalogger Setting`.
-Configuration cannot be performed at night when the inverter is off and not connected to the internet.
-
-![Step 1](assets/config_dashboard.png)
-
-Next, click `All Devices` in the `My Photovoltaic Devices` section. After that select the device you want to reconfigure and click `Datalogger Setting`.
-
-![Step 2](assets/config_menu.png)
-
-First enter the password, which is based on the current date:
+There are two ways to point your device to your own MQTT server. In both cases you need the password, which is based on the current date:
 
 `growatt<YYYYMMDD>`
 
-Only when entered correctly the settings can be modified. For `Set Domain`, enter the address of your Mosquitto instance configured for TLS. Do the same for the `Port` field.
-Next, click `Yes`.
+#### Option A: ShinePhone app (Bluetooth)
+
+The ShinePhone app connects to the device via Bluetooth, so you need to be close to it.
+
+- **NEO and NOAH:** Open the device settings, tap `Wifi configuration` -> `Configuration` -> `Connect device` and open the `Advanced` settings.
+- **NEXA:** Go to `Grohome`, tap `+` in the upper right corner -> `Add device` -> `Balcony storage` -> `Nexa` and select the device you want to reconfigure. Open the `Advanced` settings.
+
+Replace `mqtt.growatt.com` with the address of your Mosquitto instance configured for TLS and set the port.
+
+#### Option B: openapi.growatt.com
+
+Open the [openapi.growatt.com](https://openapi.growatt.com) dashboard. Configuration cannot be performed at night when the inverter is off and not connected to the internet.
+
+![Step 1](assets/config_dashboard.png)
+
+Click `All Devices` in the `My Photovoltaic Devices` section. After that select the device you want to reconfigure and click `Datalogger Setting`.
+
+![Step 2](assets/config_menu.png)
+
+First enter the password. Only when entered correctly the settings can be modified. Select `Set Domain`, enter the hostname of your Mosquitto instance configured for TLS and save. Then select `Port`, enter the port and save again. Domain and port have to be saved separately, and it may take several attempts until the device picks up the new settings.
 
 Additionally: Block the device from accessing the internet after configuration to prevent it from reverting settings or syncing with the cloud.
 
