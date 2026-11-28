@@ -1,3 +1,8 @@
+## Unreleased
+
+### New Features
++ `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through
+
 ## v2.8.3
 
 ### New Features

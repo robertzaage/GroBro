@@ -71,3 +71,6 @@ configuration:
   KEEP_BATTERY_POSITION:
     name: KEEP_BATTERY_POSITION
     description: Wenn aktiviert, überwacht GroBro die Seriennummern der NOAH-Batterien über Positionswechsel und protokolliert eine Warnung, wenn eine Batterie in einen anderen Steckplatz wechselt. Standard ist deaktiviert.
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: Wenn aktiviert, werden Sensorzustände als retained MQTT-Nachrichten veröffentlicht, sodass Home Assistant nach seinem eigenen Neustart sofort den zuletzt von GroBro gesendeten Stand erhält. Ist die Option deaktiviert, zeigen die Sensoren nach einem Neustart von Home Assistant "unbekannt", bis das Gerät neue Daten sendet. Standard ist deaktiviert.

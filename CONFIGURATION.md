@@ -137,7 +137,7 @@ The container is configured via environment variables. The Home Assistant add-on
 | `MAX_BAT` | | `auto` | Number of battery packs shown in Home Assistant. `auto` uses the battery count reported by the device, set a number (e.g. `1`) to override |
 | `FILTER_DATA_GLITCHES` | | `false` | Set to `true` to suppress energy counters dropping after a device reconnects |
 | `KEEP_BATTERY_POSITION` | | `false` | Set to `true` to log a warning when a NOAH battery moves to a different position in the stack |
-| `PUBLISH_SENSORS_RETAINED` ⚙️ | | `false` | Set to `true` to publish sensor states with the MQTT retain flag |
+| `PUBLISH_SENSORS_RETAINED` | | `false` | Set to `true` to publish sensor states with the MQTT retain flag, so Home Assistant gets the last state right after its own restart instead of showing "unknown" until the device sends new data |
 | `TZ` | | | Time zone (e.g. `Europe/Berlin`) used by the `Sync Time` button |
 | `LOG_LEVEL` | | `ERROR` | `ERROR`, `INFO` or `DEBUG` |
 | `DUMP_MESSAGES` | | `false` | Set to `true` to save every received message to `DUMP_DIR` for in-depth inspection |
