@@ -17,8 +17,10 @@ DATA_DIR = Path(__file__).parent / "model" / "data"
 @pytest.fixture(autouse=True)
 def clear_detected_devices():
     regs.DETECTED_DEVICES.clear()
+    regs.INVERTER_SERIALS.clear()
     yield
     regs.DETECTED_DEVICES.clear()
+    regs.INVERTER_SERIALS.clear()
 
 
 @pytest.mark.parametrize(
@@ -81,6 +83,7 @@ def test_unknown_datalogger_with_known_inverter_is_decoded():
     assert state.device_id == "XYZ0000TEST0001"
     assert "Vac3" in state.payload
     assert regs.get_device_type_name("XYZ0000TEST0001") == "MOD TL3-XH"
+    assert regs.INVERTER_SERIALS["XYZ0000TEST0001"] == "PYL0TEST01"
 
 
 def test_unknown_datalogger_with_unknown_inverter_is_ignored():

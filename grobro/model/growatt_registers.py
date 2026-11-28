@@ -246,6 +246,16 @@ GENERIC_DATALOGGER_PREFIXES = ("VWQ",)
 # Devices identified by their inverter serial, keyed by the serial in the MQTT topic
 DETECTED_DEVICES: dict[str, tuple[str, GroBroRegisters]] = {}
 
+# Serials of the inverters behind a datalogger, keyed by the serial in the MQTT topic
+INVERTER_SERIALS: dict[str, str] = {}
+
+
+def remember_inverter_serial(device_id: str, inverter_serial: Optional[str]) -> None:
+    """Store the inverter serial reported in the metadata of a datalogger message."""
+    serial = (inverter_serial or "").strip("\x00 ")
+    if serial and serial != device_id and serial.isalnum():
+        INVERTER_SERIALS[device_id] = serial
+
 
 def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
     """Return the register map for a device, based on its serial prefix."""

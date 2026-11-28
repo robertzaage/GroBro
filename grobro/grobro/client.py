@@ -33,6 +33,7 @@ from grobro.model.growatt_registers import (
     KNOWN_NEO_REGISTERS,
     detect_device_by_inverter_serial,
     detect_device_by_type_code,
+    remember_inverter_serial,
     get_device_type_name,
     get_known_registers,
 )
@@ -404,6 +405,14 @@ class Client:
                     )
                     if detected:
                         known_registers = detected
+                        LOG.info(
+                            "Detected %s inverter %s behind datalogger %s",
+                            get_device_type_name(modbus_device_id),
+                            modbus_message.metadata.device_sn,
+                            modbus_device_id,
+                        )
+                if modbus_message.metadata:
+                    remember_inverter_serial(modbus_device_id, modbus_message.metadata.device_sn)
                 if modbus_message.function in (
                     GrowattModbusFunction.READ_SINGLE_REGISTER,
                     GrowattModbusFunction.READ_HOLDING_REGISTER,
@@ -414,12 +423,6 @@ class Client:
                         LOG.info(
                             "Detected %s by device type code behind datalogger %s",
                             get_device_type_name(modbus_device_id),
-                            modbus_device_id,
-                        )
-                        LOG.info(
-                            "Detected %s inverter %s behind datalogger %s",
-                            get_device_type_name(modbus_device_id),
-                            modbus_message.metadata.device_sn,
                             modbus_device_id,
                         )
                 if not known_registers:
