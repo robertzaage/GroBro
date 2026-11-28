@@ -1157,7 +1157,7 @@
     "heater": {
       "growatt": {
         "position": {
-          "register_no": 17,
+          "register_no": 14,
           "offset": 0,
           "size": 2
         },

@@ -43,3 +43,11 @@ def test_nexa_temperatures_are_reported_in_tenth_kelvin(key, register_no, raw, e
 def test_nexa_absent_temperature_decodes_to_zero_kelvin():
     reg = KNOWN_NEXA_REGISTERS.input_registers["battery2Temp"]
     assert reg.growatt.data.parse(struct.pack("!H", 0)) == -273.1
+
+
+@pytest.mark.parametrize("raw, expected", [(0, "Off"), (1, "1 On"), (2, "2 On"), (3, "1&2 On")])
+def test_nexa_heater_is_pack_bitmask_in_register_14(raw, expected):
+    reg = KNOWN_NEXA_REGISTERS.input_registers["heater"]
+    assert reg.growatt.position.register_no == 14
+    assert reg.growatt.data.parse(struct.pack("!H", raw)) == expected
+
