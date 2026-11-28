@@ -63,18 +63,19 @@ LOG = logging.getLogger(__name__)
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
 
 # Updated growatt cloud forwarding config
-GROWATT_CLOUD = os.getenv("GROWATT_CLOUD", "false")
-GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false").lower()
+def _parse_growatt_cloud(raw: str) -> tuple[str, bool, set[str]]:
+    """Parse GROWATT_CLOUD: "true" forwards all devices, a comma-separated list only these serials."""
+    value = (raw or "").strip()
+    if value.lower() == "true":
+        return "true", True, set()
+    if value.lower() in ("", "false"):
+        return "false", False, set()
+    serials = {serial.strip() for serial in value.split(",") if serial.strip()}
+    return value, bool(serials), serials
 
-if GROWATT_CLOUD.lower() == "true":
-    GROWATT_CLOUD_ENABLED = True
-    GROWATT_CLOUD_FILTER = set()
-elif GROWATT_CLOUD:
-    GROWATT_CLOUD_ENABLED = True
-    GROWATT_CLOUD_FILTER = set(map(str.strip, GROWATT_CLOUD.split(",")))
-else:
-    GROWATT_CLOUD_ENABLED = False
-    GROWATT_CLOUD_FILTER = set()
+
+GROWATT_CLOUD, GROWATT_CLOUD_ENABLED, GROWATT_CLOUD_FILTER = _parse_growatt_cloud(os.getenv("GROWATT_CLOUD", "false"))
+GROWATT_CLOUD_CONFIG_FILTER = os.getenv("GROWATT_CLOUD_CONFIG_FILTER", "false").strip().lower()
 
 DUMP_MESSAGES = os.getenv("DUMP_MESSAGES", "false").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"

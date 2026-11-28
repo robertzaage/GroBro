@@ -496,7 +496,7 @@ class TestClientCloudConfig:
 
 class TestClientForward:
     def test_forward_client_message(self, client):
-        with patch("grobro.grobro.client.GROWATT_CLOUD", "true"):
+        with patch("grobro.grobro.client.GROWATT_CLOUD", "true"), patch("grobro.grobro.client.GROWATT_CLOUD_ENABLED", True):
             client._Client__on_message_forward_client(None, None, _msg(
                 "s/QMN000ABC1D2E3FG", b"data", [("forwarded-for", "growatt")],
             ))
@@ -573,3 +573,20 @@ class TestExtractDeviceId:
     def test_strips_non_alphanumeric(self):
         from grobro.grobro.client import _extract_device_id
         assert _extract_device_id("c/X/AB-CD_EF.GH") == "ABCDEFGH"
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("true", ("true", True, set())),
+        ("True", ("true", True, set())),
+        (" TRUE ", ("true", True, set())),
+        ("false", ("false", False, set())),
+        ("False", ("false", False, set())),
+        ("", ("false", False, set())),
+        ("QMN000ABC1D2E3FG, 0PVP0000TEST0001", ("QMN000ABC1D2E3FG, 0PVP0000TEST0001", True, {"QMN000ABC1D2E3FG", "0PVP0000TEST0001"})),
+    ],
+)
+def test_parse_growatt_cloud(raw, expected):
+    from grobro.grobro.client import _parse_growatt_cloud
+    assert _parse_growatt_cloud(raw) == expected

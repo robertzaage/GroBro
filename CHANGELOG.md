@@ -4,6 +4,7 @@
 + Devices behind a datalogger now show the serial of their inverter in Home Assistant, detected inverters show their exact family (e.g. `MOD TL3-XH`) as model
 
 ### Bug Fixes
++ Fixed `GROWATT_CLOUD=True` (capitalized) not forwarding anything in the container image
 + Fixed a crash of the Home Assistant connection when changing a TL-XH or MOD time slot while another setting of the same slot has an unknown value
 + Fixed wrong and outdated add-on option descriptions, e.g. `DEVICE_TIMEOUT` is the time without data until a device is shown as unavailable, and typos in the German translation
 
