@@ -1,0 +1,38 @@
+services:
+  source-mqtt:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "${LAN_IP:?Set LAN_IP}:7006:7006"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./mosquitto/certs:/mosquitto/certs:ro
+      - ./mosquitto/data:/mosquitto/data
+  grobro:
+    image: ghcr.io/robertzaage/grobro:latest
+    restart: unless-stopped
+    volumes:
+      - ./ca:/mqtt-certs:ro
+    network_mode: host
+    depends_on:
+      - source-mqtt
+    environment:
+      SOURCE_MQTT_HOST: "${SOURCE_MQTT_HOST:?Set SOURCE_MQTT_HOST}"
+      SOURCE_MQTT_PORT: "7006"
+      SOURCE_MQTT_TLS: "true"
+      SOURCE_MQTT_TLS_VERIFY: "true"
+      SOURCE_MQTT_CA_FILE: "${SOURCE_MQTT_CA_FILE:-}"
+      SOURCE_MQTT_USER: grobro
+      SOURCE_MQTT_PASS: "${SOURCE_MQTT_PASS:?Set SOURCE_MQTT_PASS}"
+      TARGET_MQTT_HOST: "${TARGET_MQTT_HOST:-127.0.0.1}"
+      TARGET_MQTT_PORT: "${TARGET_MQTT_PORT:-1883}"
+      TARGET_MQTT_TLS: "${TARGET_MQTT_TLS:-false}"
+      TARGET_MQTT_TLS_VERIFY: "${TARGET_MQTT_TLS_VERIFY:-false}"
+      TARGET_MQTT_CA_FILE: "${TARGET_MQTT_CA_FILE:-}"
+      TARGET_MQTT_USER: grobro
+      TARGET_MQTT_PASS: "${TARGET_MQTT_PASS:?Set TARGET_MQTT_PASS}"
+      HA_BASE_TOPIC: homeassistant
+      DEVICE_TIMEOUT: "300"
+      AVAILABILITY_SENSOR: "true"
+      GROWATT_CLOUD: "false"
+      LOG_LEVEL: INFO

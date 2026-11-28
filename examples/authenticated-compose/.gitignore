@@ -1,0 +1,5 @@
+.env
+mosquitto/certs/
+mosquitto/data/
+mosquitto/config/passwd*
+ca/
