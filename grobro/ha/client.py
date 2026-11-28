@@ -812,7 +812,14 @@ class Client:
                         make_modbus_command(device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, register_no)
                     )
                     return None
-                value = _to_register_value(other, other.homeassistant.type, current)
+                try:
+                    value = _to_register_value(other, other.homeassistant.type, current)
+                except ValueError:
+                    LOG.error(
+                        "Invalid value %s of %s for %s, cannot change %s. Please set %s first.",
+                        current, name, device_id, cmd_name, name,
+                    )
+                    return None
             raw |= (value & ((1 << data.bit_width) - 1)) << data.bit_shift
         return raw
 

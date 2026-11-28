@@ -90,6 +90,13 @@ def test_packed_write_with_unknown_fields_reads_first(ha_client):
     assert command.register_no == 3038
 
 
+def test_packed_write_with_invalid_cached_field_is_rejected(ha_client):
+    # A mode outside the known options is published as "unknown" and must not crash the MQTT loop
+    _known_slot1(ha_client)
+    ha_client._holding_values[(XH2_ID, "slot1_mode")] = "unknown"
+    ha_client._client.on_message(None, None, _msg(f"homeassistant/switch/grobro/{XH2_ID}/slot1_enabled/set", b"OFF"))
+    ha_client.on_command.assert_not_called()
+
 def test_published_holding_values_are_cached(ha_client):
     from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput, HomeAssistantHoldingRegisterValue
 
