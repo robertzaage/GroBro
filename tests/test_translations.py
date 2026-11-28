@@ -8,9 +8,9 @@ KEY = re.compile(r"^  ([A-Z_]+):", re.MULTILINE)
 
 
 def _addon_options():
-    config = (ROOT / "config.yaml").read_text()
-    options = config.split("\noptions:\n", 1)[1].split("\nschema:\n", 1)[0]
-    return set(KEY.findall(options))
+    # The schema lists every option, including optional ones without a default
+    schema = (ROOT / "config.yaml").read_text().split("\nschema:\n", 1)[1]
+    return set(KEY.findall(schema))
 
 
 @pytest.mark.parametrize("language", ["en", "de", "es", "fr", "nl"])
