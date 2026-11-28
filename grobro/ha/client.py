@@ -285,18 +285,16 @@ class Client:
         payload = dict(state.payload)
         known_registers = get_known_registers(state.device_id)
 
-        # Replace invalid battery temperatures (-273) with None
+        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C
         if known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
                 if not reg:
                     continue
-
-                # Identify batX_temp sensors
-                name = key  # key == "bat1_temp", "bat2_temp", etc.
-                if name.startswith("bat") and name.endswith("_temp"):
-                    if isinstance(value, (int, float)) and value == -273.1:
-                        payload[key] = None
+                if getattr(reg.homeassistant, "device_class", None) != "temperature":
+                    continue
+                if isinstance(value, (int, float)) and value == -273.1:
+                    payload[key] = None
 
         for key in list(payload.keys()):
             bat_num = _get_bat_number(key)

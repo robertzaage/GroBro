@@ -299,30 +299,28 @@ class TestClientPublishInput:
         assert published.get("Ppv") == 525.1
         assert published.get("Inverter_Status") == "NormalStatus"
 
-    def test_publish_input_register_bat_temp_filter(self, ha_client):
+    @pytest.mark.parametrize(
+        "device_id, absent_key, present_key",
+        [
+            ("0PVP0000TEST0001", "bat2_temp", "bat1_temp"),
+            ("0HVR1234567890", "battery1Temp", "pv1Temp"),
+        ],
+    )
+    def test_publish_input_register_absent_temp_filter(self, ha_client, device_id, absent_key, present_key):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
-        from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS
-        bat_keys = [k for k in KNOWN_NEO_REGISTERS.input_registers.keys()
-                     if k.startswith("bat") and k.endswith("_temp")]
-        if not bat_keys:
-            pytest.skip("No batX_temp registers in NEO definition")
-        payload = {k: -273.1 for k in bat_keys}
-        payload["Ppv"] = 100
         state = HomeAssistantInputRegister(
-            device_id="QMN000ABC1D2E3FG",
-            payload=payload,
+            device_id=device_id,
+            payload={absent_key: -273.1, present_key: 21.5},
         )
         ha_client.publish_input_register(state)
         published = None
         for call_args in ha_client._client.publish.call_args_list:
-            topic = call_args[0][0]
-            if "state" in topic:
+            if call_args[0][0] == f"homeassistant/grobro/{device_id}/state":
                 published = json.loads(call_args[0][1])
                 break
         assert published is not None
-        for k in bat_keys:
-            assert published.get(k) is None
-        assert published.get("Ppv") == 100
+        assert published[absent_key] is None
+        assert published[present_key] == 21.5
 
 
 class TestClientHoldingInput:
