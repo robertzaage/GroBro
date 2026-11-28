@@ -352,3 +352,17 @@ class TestMQTTConfig:
         assert result.use_tls is False
         assert result.username == "user"
         assert result.password == "pass"
+
+
+def test_float_options_default_to_no_offset():
+    from grobro.model.growatt_registers import GrowattRegisterFloatOptions
+
+    assert GrowattRegisterFloatOptions(multiplier=0.1).delta == 0
+
+
+@pytest.mark.parametrize("family", ["NEO", "XH2"])
+def test_bms_battery_current_is_signed(family):
+    import grobro.model.growatt_registers as regs
+
+    reg = getattr(regs, f"KNOWN_{family}_REGISTERS").input_registers["BMS_BatteryCurr"]
+    assert reg.growatt.data.parse(struct.pack("!h", -250)) == pytest.approx(-2.5)

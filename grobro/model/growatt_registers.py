@@ -21,7 +21,7 @@ class GrowattRegisterEnumTypes(str, Enum):
 
 
 class GrowattRegisterFloatOptions(BaseModel):
-    delta: float = 1
+    delta: float = 0
     multiplier: float = 1
 
 
