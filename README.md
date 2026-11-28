@@ -24,7 +24,7 @@ Join us at [#grobro:matrix.org](https://matrix.to/#/#grobro:matrix.org)
 | NEXA 2000 | Balcony battery | `0HVR` |
 | SPF (Shine WiFi-X) | Off-grid inverter | `HAQ` |
 | TL-XH2 | Hybrid inverter | `ZGQ` |
-| MOD series | Inverter (initial support) | `VWQ` |
+| ShineWiFi-X (e.g. MOD series) | Datalogger, the inverter is identified by its serial | `VWQ` |
 | ShineWeLink-X2 | Datalogger for LoRa inverters like the NEO 1000M-X | `RAQ` / `PTQ` |
 
 Devices behind other dataloggers are identified by the serial of their inverter. This experimental support covers MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3, WIT and the SPH/SPA storage inverters. Please open an issue with a message dump if your device shows wrong values.
@@ -33,7 +33,7 @@ Devices behind other dataloggers are identified by the serial of their inverter.
 - Local-only setup, your devices don't need the Growatt Cloud
 - Optional forwarding to the Growatt Cloud, so the ShinePhone app keeps working
 - Home Assistant MQTT auto-discovery, sensors are split into measurements, diagnostics and configuration
-- Control your devices from Home Assistant, e.g. output power, charge and discharge limits, time slots and the NEO inverter power switch
+- Control your devices from Home Assistant, e.g. output power, charge and discharge limits, time slots, export limit and the inverter power switch. Battery controls for TL-XH, MOD and SPH inverters are experimental
 - Controls keep their last confirmed value after a Home Assistant restart
 - Publishes smart meter readings (e.g. EcoTracker, Shelly) reported by NOAH and NEXA to MQTT
 - Optional TLS certificate verification for the MQTT connections

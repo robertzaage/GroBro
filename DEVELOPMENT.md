@@ -488,6 +488,16 @@ Three sections mirror the three modbus register spaces:
 | `TIME_HHMM` | hi byte = hours, lo byte = minutes | — | raw `0x17 0x2D` → `"23:45"` |
 | `ENUM` | mapped via `INT_MAP` or `BITFIELD` | — | `{ "0": "Normal", "1": "Fault" }` |
 
+**Packed registers**: some registers hold several fields, e.g. the TL-XH/MOD time slots
+(bit 15 enabled, bits 13-14 mode, bits 0-12 start time). Each field is its own entry with
+`"bit_shift"` and `"bit_width"` in its `data` block. When one field is written, the HA client
+combines it with the last published values of the other fields of the same register
+(`_holding_values`). If one of them is unknown, it reads the register first and skips the write.
+
+**Scaled holding registers**: `FLOAT` / `SIGNED_FLOAT` holding registers with `float_options`
+are written as `(value - delta) / multiplier`, negative values as two's complement. This allows
+e.g. an export limit in 0.1 % steps (`"step": 0.1`).
+
 **Temperature with delta correction** (used by NOAH battery temperature sensors):
 
 ```json
@@ -531,7 +541,9 @@ know yet), `detect_device_by_inverter_serial()` matches the first three characte
 inverter serial against `INVERTER_PREFIXES` and remembers the result in `DETECTED_DEVICES`.
 This covers MIN/MIC TL-X and MIN TL-XH (XH2 map) as well as MOD/MID TL3-XH, MOD TL3-HU,
 MAX TL3 and WIT (MOD map) as well as SPH/SPA storage inverters (`growatt_sph_registers.json`,
-input registers 0-124 and 1000-1124). A known topic prefix always takes precedence. Detection happens
+input registers 0-124 and 1000-1124). A known topic prefix always takes precedence, except for generic dataloggers in
+`GENERIC_DATALOGGER_PREFIXES` (ShineWiFi-X, `VWQ`), which are used with different inverter
+families: their map in `DEVICE_PREFIXES` is only the fallback. Detection happens
 on the first input register message, so holding and config messages of such a device are
 only routed after that.
 
