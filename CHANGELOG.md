@@ -3,6 +3,9 @@
 ### New Features
 + `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through
 
+### Bug Fixes
++ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities
+
 ## v2.8.3
 
 ### New Features

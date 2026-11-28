@@ -551,6 +551,20 @@ the `bat{2,3,4}_ser_part_1` values are checked, and when no serial parts have da
 integer to override (e.g. `MAX_BAT=1`). Filtering uses `bat_number > resolved_max_bat`
 in both `publish_input_register` and `__publish_device_discovery`.
 
+In auto mode, the detected count is kept per device in `_MAX_BAT_CACHE` and only
+ever grows while GroBro runs, so a battery that stops reporting keeps its
+entities. Before the first payload after a restart, devices whose count can be
+detected (`bat_cnt` / `bat*_ser_part_1` registers, i.e. NOAH) assume a single
+battery instead of 4; entities of further batteries are added once a payload
+reports them. Devices without detection (e.g. NEXA) keep the default of 4.
+
+Once the count is known (detected or `MAX_BAT`), discovery sends the entities
+of batteries above it as `{"platform": "sensor"}`, the documented way to remove
+a single component from a device discovery payload. Simply leaving a component
+out does not remove it in HA and leaves an orphaned entity. While the count is
+only a guess, they are left out instead, so existing entities aren't removed and
+re-added on every restart.
+
 After filtering, the four `bat{N}_ser_part_{1-4}` values are concatenated into a
 single `bat{N}_serial` key in the state payload, and the individual part keys are
 removed. Discovery skips `_ser_part_` entities and instead publishes a single
@@ -902,7 +916,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
-| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` uses the `bat_cnt` register (falls back to `bat{N}_ser_part_1` presence); set to a number to override. |
+| `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only grows while running; set to a number to override and remove the entities of batteries above it. |
 | `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |
 | `TZ` | (system) | Time zone used by the `Sync Time` button |
 | `FILTER_DATA_GLITCHES` | `False` | When `True`, prevents decreases on `total_increasing` sensors (energy counters) after device reconnect |

@@ -134,7 +134,7 @@ The container is configured via environment variables. The Home Assistant add-on
 | `DEVICE_TIMEOUT` | | `0` | Seconds without data until a device is considered offline. `0` disables availability tracking, `300` or more is recommended |
 | `AVAILABILITY_SENSOR` | | `false` | Requires `DEVICE_TIMEOUT`. Set to `true` to get a dedicated `Online` sensor instead of marking all entities as unavailable |
 | `MAX_SLOTS` | | `1` | Number of time slots shown for NOAH and NEXA (up to 9) |
-| `MAX_BAT` | | `auto` | Number of battery packs shown in Home Assistant. `auto` uses the battery count reported by the device, set a number (e.g. `1`) to override |
+| `MAX_BAT` | | `auto` | Number of battery packs shown in Home Assistant. `auto` uses the battery count reported by the device; while GroBro runs it only ever grows, so a disconnected battery keeps its entities. Set a number (e.g. `1`) to override, which also removes the entities of batteries above it |
 | `FILTER_DATA_GLITCHES` | | `false` | Set to `true` to suppress energy counters dropping after a device reconnects |
 | `KEEP_BATTERY_POSITION` | | `false` | Set to `true` to log a warning when a NOAH battery moves to a different position in the stack |
 | `PUBLISH_SENSORS_RETAINED` | | `false` | Set to `true` to publish sensor states with the MQTT retain flag, so Home Assistant gets the last state right after its own restart instead of showing "unknown" until the device sends new data |
