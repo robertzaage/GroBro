@@ -5,19 +5,33 @@
 + Devices behind a ShineWiFi-X datalogger (`VWQ` serial) are now identified by the serial of their inverter. Single-phase inverters get the TL-XH map instead of the MOD map, so their entities change. Home Assistant may keep entities of the old map as unavailable, remove them once after updating (#251)
 + XH2 battery voltage, current, SOC, charge and discharge power and lifetime battery energy are now read from the first battery (BDC1). Before, the values of the second battery were used (#251)
 + The NEXA work mode value `2` is now shown as `Smart Mode` instead of `Grid First`, matching the slot modes. Automations comparing the old state need to be updated (#251)
++ The TL-XH BMS status is now shown as text (e.g. `Charging`, `Idle`) instead of a number. Automations comparing the old number need to be updated
 + The NEXA `Default Smart Mode Enabled` switch was replaced by a `Default Mode` select (Load First, Battery First, Smart Mode). Register 321 is the default work mode, the switch could only set Battery First (#251)
 
 ### New Features
++ GroBro now republishes its devices and their last values when Home Assistant restarts, and marks all devices as unavailable when GroBro itself goes offline
++ Added a combined `Status` sensor showing the inverter status together with the derating reason and fault code, e.g. `Normal – Grid voltage high`
 + Devices behind dataloggers GroBro doesn't know yet are now identified by the serial of their inverter. This adds experimental support for MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3 and WIT inverters
 + Added experimental support for SPH and SPA storage inverters, including priority, charge and discharge settings and time slots for Grid First, Battery First and Load First
 + Added battery controls for TL-XH and MOD inverters: charge and discharge rate, stop SOC, AC charge, 9 time slots and peak shaving. These write directly to the battery settings of your inverter and are not verified on real devices yet, please test them carefully
 + Added export limit controls for TL-XH, MOD and SPH inverters
 + MOD inverters now expose grid import and export, load, per PV energy, battery values and the inverter on/off switch and power limit
++ If the inverter serial is unknown too, GroBro asks the device for its device type code as second signal
++ Added NEXA controls for AC couple, always on and export limitation, and the NEXA fault words as diagnostic sensors
++ SPF devices now expose export to grid, PV2 energy, generator energy, power and voltage, battery charge energy and the total charge and discharge current
++ SPH devices now expose battery current, capacity, cycle count, state of health and cell voltages as well as derating mode and fault code
++ Added an AFCI (arc fault detection) status sensor for NEO, TL-XH and MOD inverters
++ Added `AUTO_TIME_SYNC` option (default: off). When enabled, GroBro synchronizes the clock of your devices at 00:00 and 12:00
++ Added Spanish, French and Dutch translations of the add-on configuration
 + Firmware, serials, Wi-Fi signal and the device type are now diagnostic entities, MQTT and interval settings are configuration entities (#212)
 + `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through (#249)
 + Reworked README and documentation, added a list of supported devices and a hint for dataloggers that only work with EMQX (#213, #220)
 
 ### Bug Fixes
++ Fixed Home Assistant deleting and recreating every GroBro device after a GroBro restart, which could reset renamed entities and other customizations
++ Fixed SPF status 1 showing `(No Use)` and added the missing status 13-30. Derating modes are now shown as readable text and include 17-21
++ Fixed SPF AC input power showing huge values instead of negative ones
++ Fixed the missing description of the time zone option in the German add-on UI
 + Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities (#249)
 + Fixed XH2 and MOD output power and phase currents showing huge values instead of negative ones
 
