@@ -534,6 +534,42 @@ class TestClientDiscovery:
         assert payloads[0] == ""
         assert payloads[1] != ""
 
+    def test_discovery_uses_bridge_availability(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        ha_client._Client__publish_device_discovery(device_id)
+        payload = next(
+            json.loads(call.args[1])
+            for call in ha_client._client.publish.call_args_list
+            if call.args[0] == f"homeassistant/device/{device_id}/config" and call.args[1]
+        )
+        topics = [entry["t"] for entry in payload["avty"]]
+        assert topics == [f"homeassistant/grobro/{device_id}/availability", "homeassistant/grobro/bridge/availability"]
+        assert payload["avty_mode"] == "all"
+
+    def test_last_will_and_online_message(self, ha_client):
+        ha_client._client.will_set.assert_called_once_with("homeassistant/grobro/bridge/availability", "offline", retain=True)
+        ha_client._client.publish.reset_mock()
+        ha_client._Client__on_connect(None, None, None, 0, None)
+        ha_client._client.publish.assert_any_call("homeassistant/grobro/bridge/availability", "online", retain=True)
+
+    def test_ha_restart_republishes_discovery_and_states(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        device_id = "QMN000ABC1D2E3FG"
+        ha_client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload={"Ppv": 100}))
+        ha_client._client.publish.reset_mock()
+
+        ha_client._client.on_message(None, None, _msg("homeassistant/status", b"online"))
+
+        topics = [call.args[0] for call in ha_client._client.publish.call_args_list]
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == f"homeassistant/device/{device_id}/config"]
+        assert f"homeassistant/grobro/{device_id}/state" in topics
+        assert payloads and "" not in payloads
+
+    def test_ha_offline_status_is_ignored(self, ha_client):
+        ha_client._client.publish.reset_mock()
+        ha_client._client.on_message(None, None, _msg("homeassistant/status", b"offline"))
+        ha_client._client.publish.assert_not_called()
+
     def test_discovery_skip_unchanged_payload(self, ha_client):
         ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
         first_calls = len(ha_client._client.publish.call_args_list)
@@ -1037,7 +1073,8 @@ class TestEdgeCases:
                 topics = {call.args[0] for call in mock.subscribe.call_args_list}
                 assert "homeassistant/number/grobro/+/+/set" in topics
                 assert "homeassistant/button/grobro/+/+/read" in topics
-                assert len(topics) == 12
+                assert "homeassistant/status" in topics
+                assert len(topics) == 13
 
     def test_on_reconnect_resubscribes_command_topics(self):
         # A broker restart drops subscriptions (clean session); they must be
@@ -1049,7 +1086,7 @@ class TestEdgeCases:
                 mock.subscribe.reset_mock()
                 c._Client__on_connect(mock, None, None, 0, None)
                 c._Client__on_connect(mock, None, None, 0, None)
-                assert mock.subscribe.call_count == 24
+                assert mock.subscribe.call_count == 26
 
     def test_slot_name_parse_error(self, ha_client):
         msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")

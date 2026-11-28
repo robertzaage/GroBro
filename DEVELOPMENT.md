@@ -670,7 +670,11 @@ homeassistant/device/<device_id>/config
     "sw_version": "1.0.0",
     "hw_version": "V1.0"
   },
-  "avty_t": "homeassistant/grobro/QMN000ABC1D2E3FG/availability",
+  "avty": [
+    { "t": "homeassistant/grobro/QMN000ABC1D2E3FG/availability" },
+    { "t": "homeassistant/grobro/bridge/availability" }
+  ],
+  "avty_mode": "all",
   "o": { "name": "grobro", "url": "https://github.com/robertzaage/GroBro" },
   "cmps": {
     "grobro_QMN000ABC1D2E3FG_Ppv": {
@@ -732,6 +736,17 @@ the glitch). The dict is in-memory only and resets on restart.
 The `__migrate_entity_discovery` method publishes `{"migrate_discovery": True}` for legacy
 entity-based discovery topics, causing Home Assistant to delete the old entities after a
 version upgrade. This is called once per device on each discovery publication.
+
+### 5.7 Availability and Home Assistant restarts
+
+Every device has two availability topics combined with `avty_mode: all`: its own
+`<base>/grobro/<device_id>/availability` (device timeout) and `<base>/grobro/bridge/availability`
+for GroBro itself. GroBro publishes `online` on connect and registers `offline` as MQTT last will,
+so all entities become unavailable when GroBro stops or loses its connection.
+
+GroBro subscribes to Home Assistant's birth topic `<base>/status`. On `online` it republishes the
+discovery of all known devices (without clearing it) and the last state of every device, so
+entities don't stay unknown until the next device message.
 
 ---
 

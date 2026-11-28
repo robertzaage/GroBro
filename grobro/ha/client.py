@@ -24,6 +24,10 @@ from grobro.model.modbus_function import (
 )
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
+# Availability of GroBro itself, set to offline by the broker if GroBro disconnects
+BRIDGE_AVAILABILITY_TOPIC = f"{HA_BASE_TOPIC}/grobro/bridge/availability"
+# Home Assistant announces restarts on this topic (birth message)
+HA_STATUS_TOPIC = f"{HA_BASE_TOPIC}/status"
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
 AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
@@ -235,6 +239,8 @@ class Client:
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
         mqtt_config.configure_tls(self._client)
+        self._client.will_set(BRIDGE_AVAILABILITY_TOPIC, "offline", retain=True)
+        self._last_states: dict[str, str] = {}
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
         # Subscriptions are (re)established in __on_connect so they survive
@@ -368,7 +374,9 @@ class Client:
 
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
-        self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
+        state_str = json.dumps(payload, separators=(",", ":"))
+        self._last_states[topic] = state_str
+        self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
 
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
@@ -385,6 +393,8 @@ class Client:
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
+        self._client.publish(BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
+        self._client.subscribe(HA_STATUS_TOPIC)
         self.__subscribe_commands()
 
     def __subscribe_commands(self):
@@ -394,6 +404,10 @@ class Client:
                 self._client.subscribe(topic)
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
+        if msg.topic == HA_STATUS_TOPIC:
+            if msg.payload.decode(errors="ignore").strip() == "online":
+                self.__republish_after_ha_restart()
+            return
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
         if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "select", "config"}:
             return
@@ -543,6 +557,16 @@ class Client:
                 self.on_config_command(device_id, register_no, value)
             return
 
+    def __republish_after_ha_restart(self):
+        """Home Assistant restarted: send discovery and the last states again."""
+        LOG.info("Home Assistant came online, republishing discovery and states")
+        for device_id in list(self._discovery_cache):
+            # Republish without clearing, so Home Assistant keeps the device
+            self._discovery_payload_cache.pop(device_id, None)
+            self.__publish_device_discovery(device_id)
+        for topic, state_str in list(self._last_states.items()):
+            self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+
     def __pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
         """Combine a new field value with the last known values of the other fields in the same register."""
         reg = known_registers.holding_registers[cmd_name]
@@ -638,7 +662,11 @@ class Client:
         # prepare discovery payload
         payload: dict = {
             "dev": self.__device_info_from_config(device_id),
-            "avty_t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
+            "avty": [
+                {"t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability"},
+                {"t": BRIDGE_AVAILABILITY_TOPIC},
+            ],
+            "avty_mode": "all",
             "o": {"name": "grobro", "url": "https://github.com/robertzaage/GroBro"},
             "cmps": {},
         }
