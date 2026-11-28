@@ -17,17 +17,19 @@ Join us at [#grobro:matrix.org](https://matrix.to/#/#grobro:matrix.org)
 
 ## Supported Devices
 
-| Device | Type | Serial prefix |
-|---|---|---|
-| NEO (e.g. NEO 800M-X, NEO 2000) | Balcony inverter | `QMN` |
-| NOAH 2000 | Balcony battery | `0PVP` |
-| NEXA 2000 | Balcony battery | `0HVR` |
-| SPF (Shine WiFi-X) | Off-grid inverter | `HAQ` |
-| TL-XH2 | Hybrid inverter | `ZGQ` |
-| ShineWiFi-X (e.g. MOD series) | Datalogger, the inverter is identified by its serial | `VWQ` |
-| ShineWeLink-X2 | Datalogger for LoRa inverters like the NEO 1000M-X | `RAQ` / `PTQ` |
+| Device | Type | Serial prefix | Values | Controls |
+|---|---|---|---|---|
+| NEO (e.g. NEO 800M-X, NEO 2000) | Balcony inverter | `QMN` | ✅ | ✅ |
+| NOAH 2000 | Balcony battery | `0PVP` | ✅ | ✅, smart meter readings 🧪 |
+| NEXA 2000 | Balcony battery | `0HVR` | ✅ | ✅, weekdays and smart meter readings 🧪 |
+| SPF (Shine WiFi-X) | Off-grid inverter | `HAQ` | ✅ | 🧪 |
+| TL-XH2 | Hybrid inverter | `ZGQ` | ✅, battery values 🧪 | 🧪 |
+| ShineWiFi-X (e.g. MOD series) | Datalogger, the inverter is identified by its serial | `VWQ` | 🧪 | 🧪 |
+| ShineWeLink-X2 | Datalogger for LoRa inverters like the NEO 1000M-X | `RAQ` / `PTQ` | ✅ | ✅ |
 
-Devices behind other dataloggers are identified by the serial of their inverter. This experimental support covers MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3, WIT and the SPH/SPA storage inverters. Please open an issue with a message dump if your device shows wrong values.
+✅ confirmed by users, 🧪 experimental: based on the Growatt protocol documents, not confirmed on a real device yet. If you own one of these devices, please tell us in an issue whether the values and controls work.
+
+Devices behind other dataloggers are identified by the serial of their inverter. This experimental support covers MIN/MIC TL-X, MIN TL-XH, MOD/MID TL3-XH, MOD TL3-HU, MAX TL3, WIT and the SPH/SPA storage inverters. If your device shows wrong values, please open an issue with a [support bundle](HOME_ASSISTANT.md#support-bundle).
 
 ## Features
 - Local-only setup, your devices don't need the Growatt Cloud
@@ -40,6 +42,8 @@ Devices behind other dataloggers are identified by the serial of their inverter.
 - Devices come back right after a Home Assistant restart and are marked unavailable when GroBro goes offline
 - Optional automatic clock sync of your devices
 - Publishes smart meter readings (e.g. EcoTracker, Shelly) reported by NOAH and NEXA to MQTT
+- Pass the readings of any meter in Home Assistant to NOAH and NEXA to use their Smart Mode without a Growatt smart meter (experimental)
+- A GroBro device in Home Assistant shows the broker connection, the devices GroBro sees and decoding errors, and creates an anonymized support bundle
 - Optional TLS certificate verification for the MQTT connections
 - Runs as Home Assistant add-on or as standalone container, configurable via environment variables
 
@@ -86,7 +90,7 @@ docker run --rm \
 Growatt NEO, NOAH and NEXA devices rely on a TLS-enabled Mosquitto broker to send their packages.
 The full trust chain must be present, including the root certificate. [View the Certificates Guide](https://github.com/robertzaage/GroBro/blob/main/CERTIFICATES.md) for setup instructions.
 
-For diagnostic steps, see [MQTT and network troubleshooting](TROUBLESHOOTING.md).
+For diagnostic steps, see [MQTT and network troubleshooting](TROUBLESHOOTING.md). The Energy dashboard setup, smart meter readings and the support bundle are explained in [Using GroBro in Home Assistant](HOME_ASSISTANT.md).
 
 ## Contributions
 Questions? Issues? PRs welcome!

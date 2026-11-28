@@ -41,10 +41,12 @@ In this case use [EMQX](https://github.com/emqx/emqx) as source broker on the TL
 
 ## Discovery and telemetry
 
-Once both bridge logins work, verify a real device connects to the source broker, publishes messages, and GroBro decodes them. Then check MQTT discovery and sensor values in Home Assistant. The `DEVICE_TIMEOUT` option enables offline tracking when greater than zero; tune it to the reporting interval. Do not interpret unavailable power as measured zero unless the device actually reports it.
+Once both bridge logins work, verify a real device connects to the source broker, publishes messages, and GroBro decodes them. The GroBro device in Home Assistant shows the source broker connection and lists every device it received messages from, with its decoding errors. Then check MQTT discovery and sensor values in Home Assistant. The `DEVICE_TIMEOUT` option enables offline tracking when greater than zero; tune it to the reporting interval. Do not interpret unavailable power as measured zero unless the device actually reports it.
 
 If a device is absent from the Growatt portal, check account/installer association and ask the seller or manufacturer for supported datalogger configuration access. Do not redirect the original cloud hostname to a broker with a different certificate or disable device certificate validation. Change one device at a time, retain a rollback path and verify whether the manufacturer's app still works.
 
 ## What to include in a support request
+
+For problems with values or controls of a device, press `Create Support Bundle` on the GroBro device in Home Assistant and attach the file, see [Support bundle](HOME_ASSISTANT.md#support-bundle). It contains the last messages of your devices with masked serials. For connection problems the bundle doesn't help:
 
 Provide GroBro version/image digest, device model and firmware (if known), relevant redacted logs, source/target connectivity outcomes, certificate issuer and chain, and whether the device was online. Remove passwords, tokens, private keys, public IPs, serial numbers and personal hostnames. Describe whether the failure occurs at transport, TLS, MQTT authentication, decoding or discovery.

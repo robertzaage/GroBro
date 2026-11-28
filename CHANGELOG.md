@@ -2,6 +2,15 @@
 + The `Status` sensor now shows readable fault texts for SPH and SPA inverters and fault and warning texts for SPF devices, e.g. `Fault – PV isolation low (26)`
 + SPF devices now get the combined `Status` sensor too
 + Devices behind a datalogger now show the serial of their inverter in Home Assistant, detected inverters show their exact family (e.g. `MOD TL3-XH`) as model
++ Added a GroBro device to Home Assistant. It shows the GroBro version, the connection to the device broker, the devices GroBro receives data from with their detected type and last message, and decoding errors. Your Growatt devices are shown as connected through it
++ Added a `Create Support Bundle` button to the GroBro device. It writes an anonymized file with the last messages and values of your devices to the `support` folder of the config folder, ready to attach to an issue. Serials are masked and messages with network settings are left out
++ NOAH and NEXA can now use the readings of any meter in Home Assistant for their `Smart Mode` through the new `Smart Meter Reading` control, so no Growatt smart meter is needed. This is experimental, see the [guide](HOME_ASSISTANT.md#smart-meter-readings-for-noah-and-nexa) before using it
++ NEXA time slots can now be limited to weekdays with one switch per day. With all days off the slot is active every day. This is experimental
++ NEXA devices now expose the alarm and protection state of each battery pack, the battery faults and the smart plug connection and power
++ Added experimental SPF controls for output priority, charge priority, max charge current, AC charge current and the buzzer
++ SPH and SPA devices now expose the backup output (EPS) frequency, voltage, current, power and load
++ Sensors are now shown with the precision the device reports, e.g. `230.1 V` instead of `230.10000001 V`
++ Added a guide for the Energy dashboard, the smart meter readings and the support bundle, and the supported devices list now shows which values and controls are confirmed and which are experimental
 
 ### Bug Fixes
 + Fixed `GROWATT_CLOUD=True` (capitalized) not forwarding anything in the container image

@@ -92,6 +92,10 @@ broker, and the inverter communicates with the logger wirelessly. This means:
 | Value cache | `grobro/ha/value_cache.py` | `KEEP_LAST_VALUES` and the persisted battery count |
 | HA commands | `grobro/ha/commands.py` | Commands from HA, packed registers, config read sequencing, time sync |
 | Firmware | `grobro/ha/firmware.py` | NOAH/NEXA firmware version composed like the ShinePhone app shows it |
+| GroBro device | `grobro/ha/bridge.py` | The GroBro device in HA: version, broker connection, seen devices, support bundle button |
+| Statistics | `grobro/stats.py` | `BridgeStats`, shared by both clients: messages, decoding errors, last seen, recorded frames |
+| Support bundle | `grobro/support.py` | Frame recorder, anonymizer and the support bundle file |
+| Version | `grobro/version.py` | GroBro version read from `config.yaml` |
 | Registers | `grobro/model/*.json` + `growatt_registers.py` | Device register maps loaded from JSON at import time |
 | Codes | `grobro/model/growatt_codes.py` | Fault and warning texts for the status sensor |
 | Models | `grobro/model/*.py` | Pydantic models for device config, modbus messages, MQTT config |
@@ -716,14 +720,15 @@ homeassistant/device/<device_id>/config
     "model": "NEO-series (MIN-XH)",
     "serial_number": "QMN000ABC1D2E3FG",
     "sw_version": "1.0.0",
-    "hw_version": "V1.0"
+    "hw_version": "V1.0",
+    "via_device": "grobro_bridge"
   },
   "avty": [
     { "t": "homeassistant/grobro/QMN000ABC1D2E3FG/availability" },
     { "t": "homeassistant/grobro/bridge/availability" }
   ],
   "avty_mode": "all",
-  "o": { "name": "grobro", "url": "https://github.com/robertzaage/GroBro" },
+  "o": { "name": "grobro", "sw": "3.1.0", "url": "https://github.com/robertzaage/GroBro" },
   "cmps": {
     "grobro_QMN000ABC1D2E3FG_Ppv": {
       "platform": "sensor",
@@ -733,7 +738,8 @@ homeassistant/device/<device_id>/config
       "value_template": "{{ value_json['Ppv'] }}",
       "device_class": "power",
       "unit_of_measurement": "W",
-      "state_class": "measurement"
+      "state_class": "measurement",
+      "suggested_display_precision": 1
     },
     "grobro_QMN000ABC1D2E3FG_serial": {
       "platform": "sensor",
@@ -764,6 +770,10 @@ homeassistant/device/<device_id>/config
 | Switch | *boolean registers* | On/off toggles mapped to 1/0 values |
 | Sensor | `serial`, `type`, `fw_version` | Device SN, device type and combined firmware version (diagnostic) |
 | Binary sensor | `online` | Only with `DEVICE_TIMEOUT > 0` and `AVAILABILITY_SENSOR=true` (diagnostic) |
+| Number / Button | `meter_reading` | NOAH and NEXA only: smart meter reading from HA and withdrawing it, see 5.9 |
+
+Sensors with a unit get `suggested_display_precision` from their scaling (`display_precision()`),
+e.g. 1 for a multiplier of 0.1, so HA doesn't show floating point noise like `230.10000001`.
 
 ### 5.4 Command register iteration
 
@@ -781,7 +791,7 @@ the glitch). The dict is in-memory only and resets on restart.
 
 ### 5.6 Entity migration
 
-The `__migrate_entity_discovery` method publishes `{"migrate_discovery": True}` for legacy
+The `_migrate_entity_discovery` method publishes `{"migrate_discovery": True}` for legacy
 entity-based discovery topics, causing Home Assistant to delete the old entities after a
 version upgrade. This is called once per device on each discovery publication.
 
@@ -805,6 +815,33 @@ per register map. Only add tables from the official Growatt protocol documents t
 without a known text are shown as `Code <n>`. NEO, TL-XH and MOD fault main codes (3105) have no
 documented table yet.
 
+### 5.9 Smart meter readings (NOAH, NEXA)
+
+The `Smart Meter Reading` number writes holding registers 310-312 with one `0x10` write
+(`make_meter_reading_command`), the way the Growatt Cloud does (fixture
+`NoahPresetMultiple_310-312.bin`): 310 holds the magnitude of an export, 311 of an import, 312 is 1
+for a valid reading. All zero withdraws it (`Clear Smart Meter Reading`). The commands are handled
+before the holding register lookup in `_handle_command`, they have no state topic and no read-back.
+The device drops a reading after about 120 s and reports in input register 6 whether it holds one.
+GroBro never repeats a reading by itself: only the sender of the measurement knows it is current.
+
+### 5.10 The GroBro device and the support bundle
+
+`BridgeMixin` publishes the discovery of the GroBro device (`<base>/device/grobro_bridge/config`,
+suffixed with `MQTT_CLIENT_SUFFIX`) on connect and after HA restarts, and its state every
+60 seconds to `<base>/grobro/grobro_bridge/state` (counts) and `.../devices` (attributes per
+device). The numbers come from the `BridgeStats` both clients share (wired in `ha_bridge.py`).
+Every Growatt device references it as `via_device`.
+
+The grobro client records the last 12 register frames of every device (also unknown ones) before
+identifying it. Config messages are never recorded. The `Create Support Bundle` button
+(`<base>/button/grobro/grobro_bridge/support_bundle/set`) builds a JSON file in
+`<CONFIG_DIR>/support` with the safe options (`SAFE_SETTINGS`), the last states, holding values and
+frames per device. `Anonymizer` masks device ids, inverter serials, serials in the frame headers and
+string values containing digits (battery serials) with same-length values, so the frames keep
+their layout. When adding options or values that may contain secrets or identifiers, check they
+are not part of the bundle.
+
 ---
 
 ## 6. Testing
@@ -824,6 +861,9 @@ tests/
 ├── test_nexa_registers.py          # NEXA register definitions and scaling
 ├── test_spf_registers.py           # SPF register definitions
 ├── test_settings.py                # Option parsing
+├── test_bridge.py                  # GroBro device, statistics, discovery polish
+├── test_meter_reading.py           # Smart meter readings for NOAH and NEXA
+├── test_support.py                 # Support bundle and anonymization
 ├── test_snapshots.py               # Snapshots of all MQTT output per device family
 ├── snapshots/                      # The recorded snapshots
 └── model/
@@ -930,7 +970,7 @@ to a temporary directory per test.
 
 | Workflow | File | Trigger | Action |
 |----------|------|---------|--------|
-| Tests | `tests.yml` | Push/PR to `main` | Matrix across Python 3.11–3.13, ruff lint, pytest with coverage, upload to Codecov |
+| Tests | `tests.yml` | Push/PR to `main` and `release/**` | Matrix across Python 3.11–3.13, ruff lint, pytest with coverage, upload to Codecov |
 | Docker build | `docker-build.yml` | CI pass on `main` + release publish | Multi-arch build (`linux/amd64`, `linux/arm64`, `linux/arm/v7`), push to GHCR |
 | GHCR cleanup | `ghcr-cleanup.yml` | Daily at 20:40 UTC | Remove old untagged images |
 

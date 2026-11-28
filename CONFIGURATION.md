@@ -241,6 +241,9 @@ To keep Modbus traffic clean and reduce unnecessary bus load, configure the stat
 *   Let your Home Assistant automation continuously update **only** `slot1_power` (Reg 257) based on your local smart meter readings.
 *   NEXA only: Values above 800W require the `Power+` switch (Reg 325) to be enabled, otherwise the device rejects them.
 
+**Alternative: Smart Mode with your own meter (experimental):**
+Instead of calculating the output yourself, you can pass the readings of your meter to the device and let its `Smart Mode` follow your grid connection, see [Smart meter readings for NOAH and NEXA](HOME_ASSISTANT.md#smart-meter-readings-for-noah-and-nexa). Setting `slot1_power` yourself is more precise, the Smart Mode is simpler to set up.
+
 ### 3. Important Safety Warning Regarding AC Charging (Nexa 2000)
 Currently, dynamic adjustment of AC charging power (up to 700W) is handled entirely internally by the MCU via a closed-loop algorithm based on grid conditions. **There is no exposed Modbus register for third-party control over the AC charging limit.** 
 

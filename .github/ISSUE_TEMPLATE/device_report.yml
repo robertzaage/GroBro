@@ -1,0 +1,39 @@
+name: Device report
+description: Wrong values, controls that don't work, or confirming that an experimental device works
+body:
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Model and datalogger, e.g. MOD 10KTL3-XH with ShineWiFi-X
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: GroBro version
+      description: Shown as `Version` on the GroBro device in Home Assistant
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What do you report?
+      options:
+        - Wrong or missing values
+        - A control doesn't work
+        - Values and controls work (confirmation)
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Which values or controls, what GroBro shows and what the display or the ShinePhone app shows
+    validations:
+      required: true
+  - type: textarea
+    id: bundle
+    attributes:
+      label: Support bundle
+      description: Press `Create Support Bundle` on the GroBro device in Home Assistant and attach the file from the `support` folder of the GroBro config folder. Serials are masked, please check the file before attaching it.
