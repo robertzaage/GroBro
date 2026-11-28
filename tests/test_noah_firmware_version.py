@@ -155,7 +155,7 @@ def test_firmware_update_republishes_discovery_without_clearing():
 
 def test_other_devices_keep_the_firmware_parts_template():
     client = _client()
-    client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+    client._publish_device_discovery("QMN000ABC1D2E3FG")
     discovery = json.loads(_discovery_publishes(client, "QMN000ABC1D2E3FG")[-1])
     assert all("fw_version" not in c.get("value_template", "") or "fw_version_part" in c["value_template"]
                for c in discovery["cmps"].values())

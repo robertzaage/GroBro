@@ -101,8 +101,8 @@ class Client:
             self._client.username_pw_set(grobro_mqtt.username, grobro_mqtt.password)
         grobro_mqtt.configure_tls(self._client)
         self._client.connect(grobro_mqtt.host, grobro_mqtt.port, 60)
-        self._client.on_message = self.__on_message
-        self._client.on_connect = self.__on_connect
+        self._client.on_message = self._on_message
+        self._client.on_connect = self._on_connect
         self._forward_mqtt_config = forward_mqtt
         self._ptq_for_raq: dict[str, str] = {}
 
@@ -202,11 +202,11 @@ class Client:
             properties=MQTT_PROP_FORWARD_HA,
         )
 
-    def __on_connect(self, client, userdata, flags, reason_code, properties):
+    def _on_connect(self, client, userdata, flags, reason_code, properties):
       LOG.info(f"Connected to GroBro MQTT server with result code {reason_code}")
       self._client.subscribe("c/#")      
 
-    def __on_message(self, client, userdata, msg: MQTTMessage):
+    def _on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
         forwarded_for = get_property(msg, "forwarded-for")
         if forwarded_for and forwarded_for in ["ha", "growatt"]:
@@ -239,7 +239,7 @@ class Client:
                                 )
                                 return
 
-                        forward_client = self.__connect_to_growatt_server(device_id)
+                        forward_client = self._connect_to_growatt_server(device_id)
                         forward_client.publish(
                             msg.topic,
                             payload=msg.payload,
@@ -408,7 +408,7 @@ class Client:
                         )
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
-                    self.__request_device_type_code(modbus_device_id)
+                    self._request_device_type_code(modbus_device_id)
                     return
 
                 if modbus_message.function in (
@@ -465,7 +465,7 @@ class Client:
         except Exception as e:
             LOG.error(f"Processing message: {e}")
 
-    def __request_device_type_code(self, device_id: str):
+    def _request_device_type_code(self, device_id: str):
         """Ask an unknown device once for its device type code (holding register 43)."""
         if device_id in self._type_code_requested:
             return
@@ -480,7 +480,7 @@ class Client:
             )
         )
 
-    def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
+    def _on_message_forward_client(self, client, userdata, msg: MQTTMessage):
         LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
         if settings.DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
@@ -512,7 +512,7 @@ class Client:
             LOG.error(f"Forwarding message: {e}")
 
     # Setup Growatt MQTT broker for forwarding messages
-    def __connect_to_growatt_server(self, client_id):
+    def _connect_to_growatt_server(self, client_id):
         if f"forward_client_{client_id}" not in self._forward_clients:
             LOG.info(
                 "Connecting to Growatt broker at '%s:%s', subscribed to '+/%s'",
@@ -526,7 +526,7 @@ class Client:
             )
             client.tls_set(cert_reqs=ssl.CERT_NONE)
             client.tls_insecure_set(True)
-            client.on_message = self.__on_message_forward_client
+            client.on_message = self._on_message_forward_client
             client.connect(
                 self._forward_mqtt_config.host,
                 self._forward_mqtt_config.port,

@@ -429,7 +429,7 @@ class TestClientDeviceInfo:
     def test_device_info_from_cache(self, ha_client):
         cfg = DeviceConfig(serial_number="QMN000ABC1D2E3FG", device_type="55", sw_version="v1.0")
         ha_client._config_cache["QMN000ABC1D2E3FG"] = cfg
-        info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
+        info = ha_client._device_info_from_config("QMN000ABC1D2E3FG")
         assert info["identifiers"] == ["QMN000ABC1D2E3FG"]
         assert info["model"] == "NEO-series"
         assert info["sw_version"] == "v1.0"
@@ -437,48 +437,48 @@ class TestClientDeviceInfo:
     def test_device_info_fallback_file(self, ha_client):
         with patch("grobro.model.device_config.DeviceConfig.from_file") as from_file:
             from_file.return_value = DeviceConfig(serial_number="QMN000ABC1D2E3FG", device_type="55")
-            info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
+            info = ha_client._device_info_from_config("QMN000ABC1D2E3FG")
             assert info["model"] == "NEO-series"
 
     def test_device_info_fallback_minimal(self, ha_client):
         with patch("grobro.model.device_config.DeviceConfig.from_file", return_value=None):
-            info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
+            info = ha_client._device_info_from_config("QMN000ABC1D2E3FG")
             assert info["model"] == "NEO-series"
 
     def test_device_info_with_mac(self, ha_client):
         cfg = DeviceConfig(serial_number="QMN000ABC1D2E3FG", mac_address="aa:bb:cc:dd:ee:ff")
         ha_client._config_cache["QMN000ABC1D2E3FG"] = cfg
-        info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
+        info = ha_client._device_info_from_config("QMN000ABC1D2E3FG")
         assert info["connections"] == [["mac", "aa:bb:cc:dd:ee:ff"]]
 
     def test_device_info_with_masked_mac(self, ha_client):
         cfg = DeviceConfig(serial_number="0PVP0000TEST0001", mac_address="aa:bb:cc:dd:ee:xx")
         ha_client._config_cache["0PVP0000TEST0001"] = cfg
-        info = ha_client._Client__device_info_from_config("0PVP0000TEST0001")
+        info = ha_client._device_info_from_config("0PVP0000TEST0001")
         assert "connections" not in info
 
     def test_device_info_with_hw_version(self, ha_client):
         cfg = DeviceConfig(serial_number="0PVP0000TEST0001", hw_version="2.0")
         ha_client._config_cache["0PVP0000TEST0001"] = cfg
-        info = ha_client._Client__device_info_from_config("0PVP0000TEST0001")
+        info = ha_client._device_info_from_config("0PVP0000TEST0001")
         assert info["hw_version"] == "2.0"
 
     def test_device_info_with_model_id(self, ha_client):
         cfg = DeviceConfig(serial_number="QMN000ABC1D2E3FG", model_id="MIN-XH")
         ha_client._config_cache["QMN000ABC1D2E3FG"] = cfg
-        info = ha_client._Client__device_info_from_config("QMN000ABC1D2E3FG")
+        info = ha_client._device_info_from_config("QMN000ABC1D2E3FG")
         assert "MIN-XH" in info["model"]
 
 
 class TestClientDiscovery:
     def test_discovery_publishes(self, ha_client):
         ha_client._discovery_cache.append("QMN000ABC1D2E3FG")
-        ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+        ha_client._publish_device_discovery("QMN000ABC1D2E3FG")
         assert ha_client._client.publish.called
 
     def test_neo_wifi_signal_discovery_has_numeric_metadata(self, ha_client):
         device_id = "QMN000ABC1D2E3FG"
-        ha_client._Client__publish_device_discovery(device_id)
+        ha_client._publish_device_discovery(device_id)
 
         payload = next(
             json.loads(call.args[1])
@@ -492,7 +492,7 @@ class TestClientDiscovery:
 
     @pytest.mark.parametrize("device_id", ["QMN000ABC1D2E3FG", "0PVP0000TEST0001", "0HVR1234567890"])
     def test_discovery_splits_diagnostic_and_config_entities(self, ha_client, device_id):
-        ha_client._Client__publish_device_discovery(device_id)
+        ha_client._publish_device_discovery(device_id)
 
         payload = next(
             json.loads(call.args[1])
@@ -514,7 +514,7 @@ class TestClientDiscovery:
     def test_discovery_after_restart_is_not_cleared(self, ha_client):
         device_id = "QMN000ABC1D2E3FG"
         topic = f"homeassistant/device/{device_id}/config"
-        ha_client._Client__publish_device_discovery(device_id)
+        ha_client._publish_device_discovery(device_id)
         payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
         assert "" not in payloads
         assert len(payloads) == 1
@@ -523,14 +523,14 @@ class TestClientDiscovery:
         device_id = "QMN000ABC1D2E3FG"
         topic = f"homeassistant/device/{device_id}/config"
         ha_client._discovery_payload_cache[device_id] = "{}"
-        ha_client._Client__publish_device_discovery(device_id)
+        ha_client._publish_device_discovery(device_id)
         payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
         assert payloads[0] == ""
         assert payloads[1] != ""
 
     def test_discovery_uses_bridge_availability(self, ha_client):
         device_id = "QMN000ABC1D2E3FG"
-        ha_client._Client__publish_device_discovery(device_id)
+        ha_client._publish_device_discovery(device_id)
         payload = next(
             json.loads(call.args[1])
             for call in ha_client._client.publish.call_args_list
@@ -543,7 +543,7 @@ class TestClientDiscovery:
     def test_last_will_and_online_message(self, ha_client):
         ha_client._client.will_set.assert_called_once_with("homeassistant/grobro/bridge/availability", "offline", retain=True)
         ha_client._client.publish.reset_mock()
-        ha_client._Client__on_connect(None, None, None, 0, None)
+        ha_client._on_connect(None, None, None, 0, None)
         ha_client._client.publish.assert_any_call("homeassistant/grobro/bridge/availability", "online", retain=True)
 
     def test_ha_restart_republishes_discovery_and_states(self, ha_client):
@@ -565,18 +565,18 @@ class TestClientDiscovery:
         ha_client._client.publish.assert_not_called()
 
     def test_discovery_skip_unchanged_payload(self, ha_client):
-        ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+        ha_client._publish_device_discovery("QMN000ABC1D2E3FG")
         first_calls = len(ha_client._client.publish.call_args_list)
-        ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+        ha_client._publish_device_discovery("QMN000ABC1D2E3FG")
         assert len(ha_client._client.publish.call_args_list) > first_calls
 
     def test_discovery_unknown_device(self, ha_client):
-        ha_client._Client__publish_device_discovery("UNKNOWN")
+        ha_client._publish_device_discovery("UNKNOWN")
         # logs info, returns early
 
     def test_migrate_entity_discovery(self, ha_client):
         known = get_known_registers("QMN000ABC1D2E3FG")
-        ha_client._Client__migrate_entity_discovery("QMN000ABC1D2E3FG", known)
+        ha_client._migrate_entity_discovery("QMN000ABC1D2E3FG", known)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert any("Ppv/config" in t for t in topics)
         assert any("Fac/config" in t for t in topics)
@@ -587,42 +587,42 @@ class TestNeoPvCountDetection:
     def test_neo2000_detects_4_inputs_from_fixture(self, ha_client):
         payload = _load_payload("NeoInputRegister_NEO2000.bin")
         device_id = "QMN0ANONYMIZED01"
-        ha_client._Client__detect_neo_pv_count(device_id, payload)
+        ha_client._detect_neo_pv_count(device_id, payload)
         assert ha_client._neo_pv_count.get(device_id) == 4
 
     def test_non_neo_not_detected(self, ha_client):
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "0PVP0000TEST0001", {"Ppv": 500, "Ppv1": 250, "Ppv2": 250}
         )
         assert "0PVP0000TEST0001" not in ha_client._neo_pv_count
 
     def test_ptq_detected(self, ha_client):
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "PTQ0TEST1234567", {"Ppv": 600, "Ppv1": 150, "Ppv2": 150, "Ppv3": 150, "Ppv4": 150}
         )
         assert ha_client._neo_pv_count.get("PTQ0TEST1234567") == 4
 
     def test_zero_power_no_detection(self, ha_client):
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "QMN000TESTDEVICE1", {"Ppv": 0, "Ppv1": 0, "Ppv2": 0, "Ppv3": 0, "Ppv4": 0}
         )
         assert "QMN000TESTDEVICE1" not in ha_client._neo_pv_count
 
     def test_already_cached_returns_early(self, ha_client):
         ha_client._neo_pv_count["QMN000CACHED1"] = 2
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "QMN000CACHED1", {"Ppv": 999, "Ppv1": 100, "Ppv2": 100, "Ppv3": 400, "Ppv4": 400}
         )
         assert ha_client._neo_pv_count["QMN000CACHED1"] == 2
 
     def test_2_input_neo_detected(self, ha_client):
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "QMN000TEST2IN", {"Ppv": 500.0, "Ppv1": 250.0, "Ppv2": 250.0, "Ppv3": 0, "Ppv4": 0}
         )
         assert ha_client._neo_pv_count.get("QMN000TEST2IN") == 2
 
     def test_sum4_mismatch_no_detection(self, ha_client):
-        ha_client._Client__detect_neo_pv_count(
+        ha_client._detect_neo_pv_count(
             "QMN000MISMATCH", {"Ppv": 500.0, "Ppv1": 100.0, "Ppv2": 100.0, "Ppv3": 100.0, "Ppv4": 100.0}
         )
         assert "QMN000MISMATCH" not in ha_client._neo_pv_count
@@ -637,7 +637,7 @@ class TestNeoPvCountDiscovery:
 
     def test_pv3_pv4_included_when_count_4(self, ha_client):
         ha_client._neo_pv_count["QMN000TESTDISC1"] = 4
-        ha_client._Client__publish_device_discovery("QMN000TESTDISC1")
+        ha_client._publish_device_discovery("QMN000TESTDISC1")
         payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC1")
         assert payload is not None
         cmps = payload["cmps"]
@@ -649,7 +649,7 @@ class TestNeoPvCountDiscovery:
         assert "grobro_QMN000TESTDISC1_Ppv4" in cmps
 
     def test_pv3_pv4_excluded_when_no_count(self, ha_client):
-        ha_client._Client__publish_device_discovery("QMN000TESTDISC2")
+        ha_client._publish_device_discovery("QMN000TESTDISC2")
         payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC2")
         assert payload is not None
         cmps = payload["cmps"]
@@ -660,7 +660,7 @@ class TestNeoPvCountDiscovery:
 
     def test_pv3_pv4_excluded_when_count_2(self, ha_client):
         ha_client._neo_pv_count["QMN000TESTDISC3"] = 2
-        ha_client._Client__publish_device_discovery("QMN000TESTDISC3")
+        ha_client._publish_device_discovery("QMN000TESTDISC3")
         payload = self._get_discovery_payload(ha_client, "QMN000TESTDISC3")
         assert payload is not None
         cmps = payload["cmps"]
@@ -683,24 +683,24 @@ class TestNeoPvCountDiscovery:
 
 class TestClientAvailability:
     def test_publish_availability_online(self, ha_client):
-        ha_client._Client__publish_availability("QMN000ABC1D2E3FG", True)
+        ha_client._publish_availability("QMN000ABC1D2E3FG", True)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert any("availability" in t for t in topics)
 
     def test_publish_availability_offline_no_sensor(self, ha_client):
-        ha_client._Client__publish_availability("QMN000ABC1D2E3FG", False)
+        ha_client._publish_availability("QMN000ABC1D2E3FG", False)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert all("online" not in t for t in topics)
 
     @patch("grobro.settings.AVAILABILITY_SENSOR", True)
     def test_publish_availability_offline_with_sensor(self, ha_client):
-        ha_client._Client__publish_availability("QMN000ABC1D2E3FG", False)
+        ha_client._publish_availability("QMN000ABC1D2E3FG", False)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert any("online" in t for t in topics)
 
     @patch("grobro.settings.AVAILABILITY_SENSOR", True)
     def test_publish_availability_online_with_sensor(self, ha_client):
-        ha_client._Client__publish_availability("QMN000ABC1D2E3FG", True)
+        ha_client._publish_availability("QMN000ABC1D2E3FG", True)
         topics = [c[0][0] for c in ha_client._client.publish.call_args_list]
         assert any("availability" in t for t in topics)
         assert any("online" in t for t in topics)
@@ -709,18 +709,18 @@ class TestClientAvailability:
 class TestClientDeviceTimer:
     @patch("grobro.settings.DEVICE_TIMEOUT", 10)
     def test_device_timer(self, ha_client):
-        ha_client._Client__reset_device_timer("QMN000ABC1D2E3FG")
+        ha_client._reset_device_timer("QMN000ABC1D2E3FG")
         assert "QMN000ABC1D2E3FG" in ha_client._device_timers
-        ha_client._Client__reset_device_timer("QMN000ABC1D2E3FG")
+        ha_client._reset_device_timer("QMN000ABC1D2E3FG")
         assert "QMN000ABC1D2E3FG" in ha_client._device_timers
 
     def test_set_device_offline(self, ha_client):
-        ha_client._Client__publish_availability = MagicMock()
+        ha_client._publish_availability = MagicMock()
         with patch("grobro.settings.DEVICE_TIMEOUT", 10):
-            ha_client._Client__reset_device_timer("QMN000ABC1D2E3FG")
+            ha_client._reset_device_timer("QMN000ABC1D2E3FG")
             timer = ha_client._device_timers["QMN000ABC1D2E3FG"]
             timer.function(timer.args[0])
-            ha_client._Client__publish_availability.assert_called_once_with(
+            ha_client._publish_availability.assert_called_once_with(
                 "QMN000ABC1D2E3FG", False
             )
 
@@ -731,7 +731,7 @@ class TestClientConfigReadSequencing:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c.on_config_read = MagicMock()
-                c._Client__kickoff_next_config_read("QMN000ABC1D2E3FG")
+                c._kickoff_next_config_read("QMN000ABC1D2E3FG")
                 c.on_config_read.assert_not_called()
 
     def test_kickoff_with_queue(self):
@@ -742,7 +742,7 @@ class TestClientConfigReadSequencing:
                 c.on_config_read = MagicMock()
                 c._config_read_queues["QMN000ABC1D2E3FG"] = deque([1280, 2048])
                 with patch("grobro.ha.client.Timer"):
-                    c._Client__kickoff_next_config_read("QMN000ABC1D2E3FG")
+                    c._kickoff_next_config_read("QMN000ABC1D2E3FG")
                 c.on_config_read.assert_called_once_with("QMN000ABC1D2E3FG", 1280)
 
     def test_kickoff_skips_if_inflight(self):
@@ -753,7 +753,7 @@ class TestClientConfigReadSequencing:
                 c.on_config_read = MagicMock()
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 999
                 c._config_read_queues["QMN000ABC1D2E3FG"] = deque([1280])
-                c._Client__kickoff_next_config_read("QMN000ABC1D2E3FG")
+                c._kickoff_next_config_read("QMN000ABC1D2E3FG")
                 c.on_config_read.assert_not_called()
 
     def test_handle_config_read_response_publishes_to_target_broker(self):
@@ -784,7 +784,7 @@ class TestClientConfigReadSequencing:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
-                c._Client__config_read_timeout("QMN000ABC1D2E3FG", 1280)
+                c._config_read_timeout("QMN000ABC1D2E3FG", 1280)
                 assert "QMN000ABC1D2E3FG" not in c._config_read_inflight
 
     def test_config_read_timeout_wrong_register(self):
@@ -792,7 +792,7 @@ class TestClientConfigReadSequencing:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
-                c._Client__config_read_timeout("QMN000ABC1D2E3FG", 999)
+                c._config_read_timeout("QMN000ABC1D2E3FG", 999)
                 assert c._config_read_inflight["QMN000ABC1D2E3FG"] == 1280
 
 
@@ -859,7 +859,7 @@ class TestMaxBat:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 with patch("grobro.settings.MAX_BAT", 1):
                     c = Client(MQTTConfig(host="localhost", port=1883))
-                    c._Client__publish_device_discovery("0PVP0000TEST0001")
+                    c._publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
         assert discovery_calls, "No discovery calls found"
@@ -1070,8 +1070,8 @@ class TestEdgeCases:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 with patch("grobro.settings.DEVICE_TIMEOUT", 5):
                     c = Client(MQTTConfig(host="localhost", port=1883))
-                    c._Client__publish_device_discovery = MagicMock()
-                    c._Client__publish_availability = MagicMock()
+                    c._publish_device_discovery = MagicMock()
+                    c._publish_availability = MagicMock()
                     from grobro.model.growatt_registers import HomeAssistantInputRegister
                     state = HomeAssistantInputRegister(
                         device_id="QMN000ABC1D2E3FG",
@@ -1085,7 +1085,7 @@ class TestEdgeCases:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 caplog.set_level("DEBUG")
-                c._Client__on_connect(None, None, None, 0, None)
+                c._on_connect(None, None, None, 0, None)
                 assert "Connected to HA MQTT server" in caplog.text
 
     def test_on_connect_subscribes_command_topics(self):
@@ -1094,7 +1094,7 @@ class TestEdgeCases:
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 mock = mqtt_client.return_value
                 mock.subscribe.reset_mock()
-                c._Client__on_connect(mock, None, None, 0, None)
+                c._on_connect(mock, None, None, 0, None)
                 topics = {call.args[0] for call in mock.subscribe.call_args_list}
                 assert "homeassistant/number/grobro/+/+/set" in topics
                 assert "homeassistant/button/grobro/+/+/read" in topics
@@ -1109,8 +1109,8 @@ class TestEdgeCases:
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 mock = mqtt_client.return_value
                 mock.subscribe.reset_mock()
-                c._Client__on_connect(mock, None, None, 0, None)
-                c._Client__on_connect(mock, None, None, 0, None)
+                c._on_connect(mock, None, None, 0, None)
+                c._on_connect(mock, None, None, 0, None)
                 assert mock.subscribe.call_count == 26
 
     def test_slot_name_parse_error(self, ha_client):
@@ -1124,7 +1124,7 @@ class TestEdgeCases:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 with patch("grobro.model.device_config.DeviceConfig.from_file", return_value=None):
                     c = Client(MQTTConfig(host="localhost", port=1883))
-                    info = c._Client__device_info_from_config("NEW_DEVICE_ID")
+                    info = c._device_info_from_config("NEW_DEVICE_ID")
                     assert info["identifiers"] == ["NEW_DEVICE_ID"]
                     assert info["model"] == "UNKNOWN-series"
 
@@ -1132,7 +1132,7 @@ class TestEdgeCases:
         ha_client._config_read_queues.clear()
         ha_client._config_read_inflight.clear()
         ha_client._config_read_inflight["QMN000ABC1D2E3FG"] = 999
-        ha_client._Client__config_read_timeout("QMN000ABC1D2E3FG", 999)
+        ha_client._config_read_timeout("QMN000ABC1D2E3FG", 999)
         assert "QMN000ABC1D2E3FG" not in ha_client._config_read_inflight
 
     def test_discovery_online_entity_with_device_timeout(self):
@@ -1141,7 +1141,7 @@ class TestEdgeCases:
                 with patch("grobro.settings.DEVICE_TIMEOUT", 10):
                     with patch("grobro.settings.AVAILABILITY_SENSOR", True):
                         c = Client(MQTTConfig(host="localhost", port=1883))
-                        c._Client__publish_device_discovery("QMN000ABC1D2E3FG")
+                        c._publish_device_discovery("QMN000ABC1D2E3FG")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[0][1]]
         assert discovery_calls
@@ -1206,7 +1206,7 @@ class TestCombinedSerial:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 with patch("grobro.settings.MAX_BAT", 4):
                     c = Client(MQTTConfig(host="localhost", port=1883))
-                    c._Client__publish_device_discovery("0PVP0000TEST0001")
+                    c._publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[1]]
         assert discovery_calls
@@ -1461,7 +1461,7 @@ class TestValueCache:
         ha_client._client.publish.reset_mock()
         for retained in (False, True):
             with patch("grobro.settings.PUBLISH_SENSORS_RETAINED", retained):
-                ha_client._Client__on_connect(None, None, None, 0, None)
+                ha_client._on_connect(None, None, None, 0, None)
             state, retain = self._last_state(ha_client)
             # Live readings are outdated after a reconnect and left out
             assert state == {"tot_bat_soc_pct": 80}
@@ -1502,7 +1502,7 @@ class TestValueCache:
         restarted = Client(MQTTConfig(host="localhost", port=1883))
         assert restarted._value_cache[self.DEVICE] == {"tot_bat_soc_pct": 80}
         restarted._client.publish.reset_mock()
-        restarted._Client__on_connect(None, None, None, 0, None)
+        restarted._on_connect(None, None, None, 0, None)
         state, _ = self._last_state(restarted)
         assert state == {"tot_bat_soc_pct": 80}
 
@@ -1521,7 +1521,7 @@ class TestValueCache:
 
     def test_device_timeout_publishes_zeroed_live_values(self, ha_client):
         self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
-        ha_client._Client__publish_offline_values(self.DEVICE)
+        ha_client._publish_offline_values(self.DEVICE)
         state, _ = self._last_state(ha_client)
         assert state == {"out_power": 0, "tot_bat_soc_pct": 80}
         # A later Home Assistant restart must not bring back the live values
@@ -1612,11 +1612,11 @@ class TestKeepLastValuesDisabled:
         assert _MAX_BAT_CACHE[self.DEVICE] == 2
         assert not restarted._value_cache
         restarted._client.publish.reset_mock()
-        restarted._Client__on_connect(None, None, None, 0, None)
+        restarted._on_connect(None, None, None, 0, None)
         assert self._last_state(restarted) is None
 
     def test_device_timeout_publishes_nothing(self, ha_client):
         self._publish(ha_client, {"out_power": 120})
         ha_client._client.publish.reset_mock()
-        ha_client._Client__publish_offline_values(self.DEVICE)
+        ha_client._publish_offline_values(self.DEVICE)
         assert self._last_state(ha_client) is None

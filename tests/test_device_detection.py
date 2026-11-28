@@ -99,7 +99,7 @@ def test_detected_device_gets_discovery():
     regs.detect_device_by_inverter_serial("XYZ0000TEST0001", "PYL0TEST01")
     with patch("grobro.ha.client.mqtt.Client") as factory, patch("grobro.ha.client.os.listdir", return_value=[]):
         ha = HaClient(MQTTConfig(host="localhost", port=1883))
-        ha._Client__publish_device_discovery("XYZ0000TEST0001")
+        ha._publish_device_discovery("XYZ0000TEST0001")
 
     topics = [call.args[0] for call in factory.return_value.publish.call_args_list]
     assert "homeassistant/device/XYZ0000TEST0001/config" in topics

@@ -293,13 +293,13 @@ class Client:
         self._last_states: dict[str, str] = {}
         self._time_sync_timer: Optional[Timer] = None
         if settings.AUTO_TIME_SYNC:
-            self.__schedule_time_sync()
+            self._schedule_time_sync()
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
-        # Subscriptions are (re)established in __on_connect so they survive
+        # Subscriptions are (re)established in _on_connect so they survive
         # broker restarts and reconnects (clean session drops them).
-        self._client.on_message = self.__on_message
-        self._client.on_connect = self.__on_connect
+        self._client.on_message = self._on_message
+        self._client.on_connect = self._on_connect
 
         self._discovery_payload_cache: dict[str, str] = {}
         # Firmware versions of NOAH and NEXA devices, see compose_combined_firmware
@@ -359,7 +359,7 @@ class Client:
 
     def stop(self):
         for device_id in list(self._value_cache_dirty):
-            self.__save_value_cache(device_id)
+            self._save_value_cache(device_id)
         self._client.loop_stop()
         self._client.disconnect()
 
@@ -370,30 +370,30 @@ class Client:
         existing_config = model.DeviceConfig.from_file(config_path)
         if existing_config is None or existing_config != config:
             LOG.info(f"Saving updated config for {device_id}")
-            self.__save_config(config, config_path)
+            self._save_config(config, config_path)
         else:
             LOG.debug(f"No config change for {device_id}")
         self._config_cache[device_id] = config
 
         if device_id in self._discovery_cache:
             self._discovery_cache.remove(device_id)
-        self.__publish_device_discovery(device_id)
+        self._publish_device_discovery(device_id)
 
     # ------------------- Publishing -------------------
 
     def publish_input_register(self, state: HomeAssistantInputRegister):
         LOG.debug("HA: publish: %s", state)
-        state = self.__add_combined_firmware(state)
+        state = self._add_combined_firmware(state)
         prev_max_bat = _MAX_BAT_CACHE.get(state.device_id)
         effective_max_bat = _resolve_max_bat(state.device_id, state.payload)
         if _MAX_BAT_CACHE.get(state.device_id) != prev_max_bat:
             self._value_cache_dirty.add(state.device_id)
-        self.__detect_neo_pv_count(state.device_id, state.payload)
+        self._detect_neo_pv_count(state.device_id, state.payload)
         # discovery + availability
-        self.__publish_device_discovery(state.device_id, effective_max_bat)
-        self.__publish_availability(state.device_id, True)
+        self._publish_device_discovery(state.device_id, effective_max_bat)
+        self._publish_availability(state.device_id, True)
         if settings.DEVICE_TIMEOUT > 0:
-            self.__reset_device_timer(state.device_id)
+            self._reset_device_timer(state.device_id)
 
         # ENUM Mapping
         payload = dict(state.payload)
@@ -478,8 +478,8 @@ class Client:
             _LAST_BAT_SERIALS[state.device_id] = current_serials
 
         if settings.KEEP_LAST_VALUES:
-            self.__fill_in_last_values(state.device_id, known_registers, state.payload, payload, absent_keys, effective_max_bat)
-        self.__maybe_save_value_cache(state.device_id)
+            self._fill_in_last_values(state.device_id, known_registers, state.payload, payload, absent_keys, effective_max_bat)
+        self._maybe_save_value_cache(state.device_id)
 
         # State publish
         topic = f"{settings.HA_BASE_TOPIC}/grobro/{state.device_id}/state"
@@ -487,7 +487,7 @@ class Client:
         self._last_states[topic] = state_str
         self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
 
-    def __add_combined_firmware(self, state: HomeAssistantInputRegister) -> HomeAssistantInputRegister:
+    def _add_combined_firmware(self, state: HomeAssistantInputRegister) -> HomeAssistantInputRegister:
         """Add the firmware version of NOAH and NEXA devices, composed like the ShinePhone app shows it."""
         if not state.device_id.startswith(_COMBINED_FIRMWARE_PREFIXES):
             return state
@@ -502,7 +502,7 @@ class Client:
             self._discovery_payload_cache.pop(state.device_id, None)
         return HomeAssistantInputRegister(device_id=state.device_id, payload={**state.payload, "fw_version": firmware_version})
 
-    def __fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
+    def _fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
         """Keep HA entities from dropping to "unknown" when a value is missing
         from the payload (absent or None, e.g. a disconnected battery, or after
         a GroBro/HA restart), see OFFLINE_MISS_THRESHOLD."""
@@ -563,11 +563,11 @@ class Client:
 
     # ------------------- MQTT Callback -------------------
 
-    def __on_connect(self, client, userdata, flags, reason_code, properties):
+    def _on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
         self._client.publish(settings.BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
         self._client.subscribe(settings.HA_STATUS_TOPIC)
-        self.__subscribe_commands()
+        self._subscribe_commands()
         # Immediately republish the last known state-like values for every
         # device we have a cache for, so entities don't wait for the next
         # device poll (or stay "unknown") after GroBro or the broker connection
@@ -588,16 +588,16 @@ class Client:
             )
             LOG.info("Republished cached values for %s after (re)connect", device_id)
 
-    def __subscribe_commands(self):
+    def _subscribe_commands(self):
         for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
             for action in ["set", "read"]:
                 topic = f"{settings.HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
                 self._client.subscribe(topic)
 
-    def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
+    def _on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         if msg.topic == settings.HA_STATUS_TOPIC:
             if msg.payload.decode(errors="ignore").strip() == "online":
-                self.__republish_after_ha_restart()
+                self._republish_after_ha_restart()
             return
         parts = msg.topic.removeprefix(f"{settings.HA_BASE_TOPIC}/").split("/")
         if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "select", "config"}:
@@ -641,7 +641,7 @@ class Client:
                             q.append(cfg.growatt.register_no)
 
                     # give the datalogger time to answer modbus reads
-                    kickoff = Timer(3.0, self.__kickoff_next_config_read, args=(device_id,))
+                    kickoff = Timer(3.0, self._kickoff_next_config_read, args=(device_id,))
                     kickoff.daemon = True
                     kickoff.start()
 
@@ -690,7 +690,7 @@ class Client:
 
             # Packed registers hold several fields, keep the other fields unchanged
             if reg.growatt.data.bit_width is not None:
-                parsed_value = self.__pack_register_value(device_id, known_registers, cmd_name, parsed_value)
+                parsed_value = self._pack_register_value(device_id, known_registers, cmd_name, parsed_value)
                 if parsed_value is None:
                     return
 
@@ -746,7 +746,7 @@ class Client:
                 self.on_config_command(device_id, register_no, value)
             return
 
-    def __schedule_time_sync(self):
+    def _schedule_time_sync(self):
         from datetime import datetime, timedelta
 
         now = datetime.now()
@@ -770,19 +770,19 @@ class Client:
                 LOG.info("Synchronizing time of %s", device_id)
                 self.on_config_command(device_id, 31, value)
         if reschedule:
-            self.__schedule_time_sync()
+            self._schedule_time_sync()
 
-    def __republish_after_ha_restart(self):
+    def _republish_after_ha_restart(self):
         """Home Assistant restarted: send discovery and the last states again."""
         LOG.info("Home Assistant came online, republishing discovery and states")
         for device_id in list(self._discovery_cache):
             # Republish without clearing, so Home Assistant keeps the device
             self._discovery_payload_cache.pop(device_id, None)
-            self.__publish_device_discovery(device_id)
+            self._publish_device_discovery(device_id)
         for topic, state_str in list(self._last_states.items()):
             self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
 
-    def __pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
+    def _pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
         """Combine a new field value with the last known values of the other fields in the same register."""
         reg = known_registers.holding_registers[cmd_name]
         register_no = reg.growatt.position.register_no
@@ -817,20 +817,20 @@ class Client:
 
     # ------------------- Internals -------------------
 
-    def __save_config(self, config: model.DeviceConfig, path: str):
+    def _save_config(self, config: model.DeviceConfig, path: str):
         try:
             config.to_file(path)
         except OSError as e:
             LOG.warning("Failed to persist config %s: %s", path, e)
 
-    def __maybe_save_value_cache(self, device_id: str):
+    def _maybe_save_value_cache(self, device_id: str):
         if device_id not in self._value_cache_dirty:
             return
         saved_at = self._value_cache_saved_at.get(device_id)
         if saved_at is None or time.monotonic() - saved_at >= VALUE_CACHE_SAVE_INTERVAL:
-            self.__save_value_cache(device_id)
+            self._save_value_cache(device_id)
 
-    def __save_value_cache(self, device_id: str):
+    def _save_value_cache(self, device_id: str):
         path = os.path.join(settings.CONFIG_DIR, f"state_cache_{device_id}.json")
         tmp_path = f"{path}.tmp"
         self._value_cache_saved_at[device_id] = time.monotonic()
@@ -842,7 +842,7 @@ class Client:
         except Exception as e:
             LOG.warning("Failed to persist state cache for %s: %s", device_id, e)
 
-    def __publish_offline_values(self, device_id: str):
+    def _publish_offline_values(self, device_id: str):
         """Drop live readings of a timed-out device to 0 and publish the result."""
         device_value_cache = self._value_cache.get(device_id)
         if not device_value_cache:
@@ -854,16 +854,16 @@ class Client:
                 self._value_cache_dirty.add(device_id)
         topic = f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/state"
         state_str = json.dumps(device_value_cache, separators=(",", ":"))
-        # Also used when Home Assistant restarts, see __republish_after_ha_restart
+        # Also used when Home Assistant restarts, see _republish_after_ha_restart
         self._last_states[topic] = state_str
         self._client.publish(topic, state_str, retain=settings.PUBLISH_SENSORS_RETAINED)
-        self.__maybe_save_value_cache(device_id)
+        self._maybe_save_value_cache(device_id)
 
-    def __reset_device_timer(self, device_id: str):
+    def _reset_device_timer(self, device_id: str):
         def set_device_unavailable(d_id: str):
             LOG.warning("Device %s timed out. Mark it as unavailable.", d_id)
-            self.__publish_offline_values(d_id)
-            self.__publish_availability(d_id, False)
+            self._publish_offline_values(d_id)
+            self._publish_availability(d_id, False)
 
         if device_id in self._device_timers:
             self._device_timers[device_id].cancel()
@@ -873,7 +873,7 @@ class Client:
         self._device_timers[device_id] = timer
         timer.start()
 
-    def __publish_availability(self, device_id: str, online: bool):
+    def _publish_availability(self, device_id: str, online: bool):
         LOG.debug("Set device %s availability: %s", device_id, online)
         if (not online and not settings.AVAILABILITY_SENSOR) or online:
             self._client.publish(
@@ -888,7 +888,7 @@ class Client:
                 retain=settings.PUBLISH_SENSORS_RETAINED,
             )
 
-    def __detect_neo_pv_count(self, device_id: str, payload: dict) -> None:
+    def _detect_neo_pv_count(self, device_id: str, payload: dict) -> None:
         if not (device_id.startswith("QMN") or device_id.startswith("PTQ") or device_id.startswith("VWQ")):
             return
         if device_id in self._neo_pv_count:
@@ -909,7 +909,7 @@ class Client:
                 self._neo_pv_count[device_id] = 2
                 return
 
-    def __publish_device_discovery(self, device_id: str, effective_max_bat: int | None = None):
+    def _publish_device_discovery(self, device_id: str, effective_max_bat: int | None = None):
         known_registers = get_known_registers(device_id)
         if not known_registers:
             LOG.info("Unable to publish unknown device type: %s", device_id)
@@ -921,13 +921,13 @@ class Client:
         # them as orphans. Skipped while the count is only a guess.
         remove_extra_bats = _bat_count_known(device_id)
 
-        self.__migrate_entity_discovery(device_id, known_registers)
+        self._migrate_entity_discovery(device_id, known_registers)
 
         topic = f"{settings.HA_BASE_TOPIC}/device/{device_id}/config"
 
         # prepare discovery payload
         payload: dict = {
-            "dev": self.__device_info_from_config(device_id),
+            "dev": self._device_info_from_config(device_id),
             "avty": [
                 {"t": f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/availability"},
                 {"t": settings.BRIDGE_AVAILABILITY_TOPIC},
@@ -1160,7 +1160,7 @@ class Client:
         self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
         self._client.publish(f"{settings.HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
 
-    def __migrate_entity_discovery(self, device_id: str, known_registers: GroBroRegisters):
+    def _migrate_entity_discovery(self, device_id: str, known_registers: GroBroRegisters):
         old_entities = [("set_wirk", "number")]
         for e_name, e_type in old_entities:
             self._client.publish(
@@ -1187,7 +1187,7 @@ class Client:
                 retain=True,
             )
 
-    def __device_info_from_config(self, device_id: str):
+    def _device_info_from_config(self, device_id: str):
         # Find matching config
         config = self._config_cache.get(device_id)
         config_path = os.path.join(settings.CONFIG_DIR, f"config_{device_id}.json")
@@ -1201,7 +1201,7 @@ class Client:
         # Fallback 2: save minimal config if it was neither in cache nor on disk
         if not config:
             config = model.DeviceConfig(serial_number=device_id)
-            self.__save_config(config, config_path)
+            self._save_config(config, config_path)
             self._config_cache[device_id] = config
             LOG.info(f"Saved minimal config for new device: {config}")
 
@@ -1246,7 +1246,7 @@ class Client:
 
         return device_info
 
-    def __kickoff_next_config_read(self, device_id: str):
+    def _kickoff_next_config_read(self, device_id: str):
         with self._config_read_lock:
             # already waiting for a response
             if device_id in self._config_read_inflight:
@@ -1265,14 +1265,14 @@ class Client:
         # start 1 minute timeout
         timer = Timer(
             60,
-            self.__config_read_timeout,
+            self._config_read_timeout,
             args=(device_id, register_no),
         )
         timer.daemon = True
         self._config_read_timers[device_id] = timer
         timer.start()
 
-    def __config_read_timeout(self, device_id: str, register_no: int):
+    def _config_read_timeout(self, device_id: str, register_no: int):
         with self._config_read_lock:
             inflight = self._config_read_inflight.get(device_id)
             if inflight != register_no:
@@ -1288,7 +1288,7 @@ class Client:
             self._config_read_timers.pop(device_id, None)
 
         # continue with next queued register
-        self.__kickoff_next_config_read(device_id)
+        self._kickoff_next_config_read(device_id)
 
     def handle_config_read_response(self, device_id: str, register_no: int, value: str | int):
         topic = f"{settings.HA_BASE_TOPIC}/config/grobro/{device_id}/{register_no}/get"
@@ -1312,7 +1312,7 @@ class Client:
             self._config_read_inflight.pop(device_id, None)
 
         # continue with next queued read
-        self.__kickoff_next_config_read(device_id)
+        self._kickoff_next_config_read(device_id)
 
 
 # ------------------- Combined NOAH/NEXA firmware -------------------
