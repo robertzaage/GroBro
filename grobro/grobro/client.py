@@ -114,9 +114,7 @@ class Client:
 
         if grobro_mqtt.username and grobro_mqtt.password:
             self._client.username_pw_set(grobro_mqtt.username, grobro_mqtt.password)
-        if grobro_mqtt.use_tls:
-            self._client.tls_set(cert_reqs=ssl.CERT_NONE)
-            self._client.tls_insecure_set(True)
+        grobro_mqtt.configure_tls(self._client)
         self._client.connect(grobro_mqtt.host, grobro_mqtt.port, 60)
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect

@@ -102,12 +102,16 @@ docker run --detach \
 |----------------------|----------|-----------------------------------------------------------------------------|
 | `SOURCE_MQTT_HOST`   | ✅ Yes   | Hostname or IP of the source MQTT broker (for Growatt)                     |
 | `SOURCE_MQTT_PORT`   | ✅ Yes   | Port number of the source MQTT broker                                      |
-| `SOURCE_MQTT_TLS`    | ❌ No    | Set to `true` to enable TLS without certificate validation                 |
+| `SOURCE_MQTT_TLS` | No | Enable TLS. Certificate verification is opt-in (see below). |
+| `SOURCE_MQTT_TLS_VERIFY` | No | Set to `true` to require certificate and hostname verification (default: `false`). Requires TLS. |
+| `SOURCE_MQTT_CA_FILE` | No | Optional PEM CA bundle path inside the container. Requires TLS verification. |
 | `SOURCE_MQTT_USER`   | ❌ No    | Username for the source MQTT broker (if authentication is required)        |
 | `SOURCE_MQTT_PASS`   | ❌ No    | Password for the source MQTT broker                                        |
 | `TARGET_MQTT_HOST`   | ✅ Yes   | Hostname or IP of the target MQTT broker (for Home Assistant)              |
 | `TARGET_MQTT_PORT`   | ✅ Yes   | Port number of the target MQTT broker                                      |
-| `TARGET_MQTT_TLS`    | ❌ No    | Set to `true` to enable TLS without certificate validation                 |
+| `TARGET_MQTT_TLS` | No | Enable TLS. Certificate verification is opt-in (see below). |
+| `TARGET_MQTT_TLS_VERIFY` | No | Set to `true` to require certificate and hostname verification (default: `false`). Requires TLS. |
+| `TARGET_MQTT_CA_FILE` | No | Optional PEM CA bundle path inside the container. Requires TLS verification. |
 | `TARGET_MQTT_USER`   | ❌ No    | Username for the target MQTT broker (if authentication is required)        |
 | `TARGET_MQTT_PASS`   | ❌ No    | Password for the target MQTT broker                                        |
 | `MQTT_CLIENT_SUFFIX` | ❌ No    | Optional suffix appended to all MQTT client IDs (grobro-ha and grobro-grobro). Allows running multiple GroBro instances in parallel against the same MQTT broker (e.g. prod, test). |
@@ -122,6 +126,33 @@ docker run --detach \
 | `MAX_BAT`       | ❌ No    | Battery pack count in Home Assistant. Default `"auto"` detects from serial number presence. Set to a number (e.g. `1`) to override. |
 | `PUBLISH_SENSORS_RETAINED`     | ❌ No    | Set to `true` to publish sensor states with the MQTT retain flag enabled. Default is `false`.  |
 | `KEEP_BATTERY_POSITION` | ❌ No | Set to `true` to enable NOAH battery position change detection. When the inverter re-enumerates its battery stack and a battery moves to a different slot, a warning is logged. Default is `false`. |
+
+### Optional MQTT TLS verification (environment configuration)
+
+For Docker or standalone deployments, enable verification independently for the source and target brokers:
+
+```yaml
+# Docker Compose environment example
+environment:
+  SOURCE_MQTT_HOST: mqtt.example.com
+  SOURCE_MQTT_PORT: "7006"
+  SOURCE_MQTT_TLS: "true"
+  SOURCE_MQTT_TLS_VERIFY: "true"
+```
+
+Use a hostname matching the broker certificate. When no CA file is specified,
+Python uses the container's default trusted CA store. For a private CA, mount its
+PEM trust bundle read-only and set `SOURCE_MQTT_CA_FILE` to the path inside the
+container. The target broker has the equivalent `TARGET_` options. Verification
+and CA settings are independent and are not inherited from the source broker.
+A CA file replaces the default trust store for that connection.
+
+Verification is disabled by default for compatibility. When enabled, an invalid
+certificate, hostname mismatch or unreadable CA file fails the connection/setup;
+there is no automatic insecure fallback. Verification with TLS disabled, or a CA
+file without verification, is rejected. The Growatt cloud forwarding connection
+and inverter-to-broker TLS behavior are unchanged. These new options are not yet
+exposed through the Home Assistant add-on configuration UI.
 
 # Example Setup with DuckDNS and HA-MQTT
 
