@@ -16,6 +16,7 @@ import pytest
 from paho.mqtt.client import MQTTMessage
 
 from grobro import grobro, ha
+from grobro.ha.discovery import iter_command_registers
 from grobro.model import growatt_registers as regs
 from grobro.model.growatt_registers import (
     HomeAssistantHoldingRegisterInput,
@@ -178,7 +179,7 @@ def test_family_snapshot(name, device_id, inverter_serial):
         hc.publish_holding_register_input(HomeAssistantHoldingRegisterInput(device_id=device_id, payload=holding))
 
         # Commands from Home Assistant
-        for cmd in ha.client.iter_command_registers(known):
+        for cmd in iter_command_registers(known):
             topic = f"homeassistant/{cmd['topic_root']}/grobro/{device_id}/{cmd['cmd_id']}/set"
             if cmd["is_config"] and cmd["cmd_id"] == "31":
                 continue  # time sync uses the current time

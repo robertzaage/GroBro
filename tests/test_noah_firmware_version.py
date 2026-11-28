@@ -5,12 +5,8 @@ import json
 from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.model.mqtt_config import MQTTConfig
 from grobro.settings import HA_BASE_TOPIC
-from grobro.ha.client import (
-    Client,
-    _compact_datalogger_version,
-    _firmware_part_names,
-    compose_combined_firmware,
-)
+from grobro.ha.client import Client
+from grobro.ha.firmware import _compact_datalogger_version, _firmware_part_names, compose_combined_firmware
 
 
 def test_compose_noah_firmware_like_shinephone():

@@ -6,21 +6,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 from paho.mqtt.client import MQTTMessage
 
-from grobro.ha.client import (
-    Client,
-    get_known_registers,
-    get_device_type_name,
-    map_enum_value,
-    make_modbus_command,
-    iter_command_registers,
-    _get_bat_number,
-    _detect_bat_count,
-    _resolve_max_bat,
-    _MAX_BAT_CACHE,
-    _LAST_BAT_SERIALS,
-    _offline_behavior,
-    OFFLINE_MISS_THRESHOLD,
-)
+from grobro.ha.client import Client
+from grobro.model.growatt_registers import get_known_registers, get_device_type_name
+from grobro.ha.state import map_enum_value, _get_bat_number, _detect_bat_count, _resolve_max_bat, _MAX_BAT_CACHE, _LAST_BAT_SERIALS
+from grobro.ha.commands import make_modbus_command
+from grobro.ha.discovery import iter_command_registers
+from grobro.ha.value_cache import _offline_behavior, OFFLINE_MISS_THRESHOLD
 from grobro.model.modbus_message import GrowattModbusFunction, GrowattModbusMessage
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
 from grobro.model.mqtt_config import MQTTConfig
@@ -373,7 +364,7 @@ class TestClientOnMessage:
 
     def test_button_read_all(self, ha_client):
         msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")
-        with patch("grobro.ha.client.Timer") as mock_timer:
+        with patch("grobro.ha.commands.Timer") as mock_timer:
             timer_instance = MagicMock()
             mock_timer.return_value = timer_instance
             ha_client._client.on_message(None, None, msg)
@@ -741,7 +732,7 @@ class TestClientConfigReadSequencing:
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c.on_config_read = MagicMock()
                 c._config_read_queues["QMN000ABC1D2E3FG"] = deque([1280, 2048])
-                with patch("grobro.ha.client.Timer"):
+                with patch("grobro.ha.commands.Timer"):
                     c._kickoff_next_config_read("QMN000ABC1D2E3FG")
                 c.on_config_read.assert_called_once_with("QMN000ABC1D2E3FG", 1280)
 
@@ -761,7 +752,7 @@ class TestClientConfigReadSequencing:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
-                with patch("grobro.ha.client.Timer"):
+                with patch("grobro.ha.commands.Timer"):
                     c.handle_config_read_response("QMN000ABC1D2E3FG", 1280, -55)
                 c._client.publish.assert_called_once_with(
                     "homeassistant/config/grobro/QMN000ABC1D2E3FG/1280/get",
@@ -775,7 +766,7 @@ class TestClientConfigReadSequencing:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
                 c = Client(MQTTConfig(host="localhost", port=1883))
                 c._config_read_inflight["QMN000ABC1D2E3FG"] = 1280
-                with patch("grobro.ha.client.Timer"):
+                with patch("grobro.ha.commands.Timer"):
                     c.handle_config_read_response("QMN000ABC1D2E3FG", 999, -55)
                 assert c._config_read_inflight["QMN000ABC1D2E3FG"] == 1280
 
@@ -799,7 +790,7 @@ class TestClientConfigReadSequencing:
 class TestClientNoahOnMessage:
     def test_button_read_all_noah(self, ha_client):
         msg = _msg("homeassistant/button/grobro/0PVP0000TEST0001/read_all/read")
-        with patch("grobro.ha.client.Timer") as mock_timer:
+        with patch("grobro.ha.commands.Timer") as mock_timer:
             timer_instance = MagicMock()
             mock_timer.return_value = timer_instance
             ha_client._client.on_message(None, None, msg)
@@ -1049,7 +1040,7 @@ class TestMaxBat:
 
 class TestEdgeCases:
     def test_map_enum_bitfield(self):
-        from grobro.ha.client import map_enum_value
+        from grobro.ha.state import map_enum_value
         reg = MagicMock()
         reg.growatt.data.data_type = "ENUM"
         reg.growatt.data.enum_options.enum_type = "BITFIELD"
@@ -1299,7 +1290,7 @@ class TestStatusSummary:
         ],
     )
     def test_status_summary(self, payload, expected):
-        from grobro.ha.client import _status_summary
+        from grobro.ha.state import _status_summary
         assert _status_summary(payload) == expected
 
     def test_status_summary_is_published_and_discovered(self, ha_client):
@@ -1317,7 +1308,7 @@ class TestStatusSummary:
 
 class TestFaultAndWarningTexts:
     def test_sph_fault_text(self):
-        from grobro.ha.client import _status_summary
+        from grobro.ha.state import _status_summary
         from grobro.model.growatt_registers import KNOWN_SPH_REGISTERS
         payload = {"Inverter_Status": "Fault", "Fault_code": 26}
         assert _status_summary(payload, KNOWN_SPH_REGISTERS) == "Fault – PV isolation low (26)"
@@ -1325,7 +1316,7 @@ class TestFaultAndWarningTexts:
         assert _status_summary(payload, KNOWN_SPH_REGISTERS) == "Fault – Error 104 (5)"
 
     def test_spf_fault_and_warning_texts(self):
-        from grobro.ha.client import _status_summary
+        from grobro.ha.state import _status_summary
         from grobro.model.growatt_registers import KNOWN_SPF_REGISTERS
         payload = {"System_Status": "Fault", "Fault_code": 7}
         assert _status_summary(payload, KNOWN_SPF_REGISTERS) == "Fault – Overload (7)"
@@ -1334,7 +1325,7 @@ class TestFaultAndWarningTexts:
         assert _status_summary(payload, KNOWN_SPF_REGISTERS) == "Standby – Fan lock, Battery disconnected, Host lost"
 
     def test_unknown_codes_and_families_show_the_raw_code(self):
-        from grobro.ha.client import _status_summary
+        from grobro.ha.state import _status_summary
         from grobro.model.growatt_registers import KNOWN_SPF_REGISTERS, KNOWN_XH2_REGISTERS
         assert _status_summary({"System_Status": "Fault", "Fault_code": 99}, KNOWN_SPF_REGISTERS) == "Fault – Code 99"
         assert _status_summary({"Inverter_Status": "Fault", "Fault_code": 26}, KNOWN_XH2_REGISTERS) == "Fault – Code 26"
@@ -1405,7 +1396,7 @@ class TestAutoTimeSync:
         ha_client._discovery_cache.clear()
 
     def test_time_sync_is_scheduled_only_when_enabled(self, mock_mqtt):
-        with patch("grobro.ha.client.os.listdir", return_value=[]), patch("grobro.ha.client.Timer") as timer:
+        with patch("grobro.ha.client.os.listdir", return_value=[]), patch("grobro.ha.commands.Timer") as timer:
             with patch("grobro.settings.AUTO_TIME_SYNC", False):
                 Client(MQTTConfig(host="localhost", port=1883))
             timer.assert_not_called()
