@@ -35,6 +35,7 @@ Devices behind other dataloggers are identified by the serial of their inverter.
 - Home Assistant MQTT auto-discovery, sensors are split into measurements, diagnostics and configuration
 - Control your devices from Home Assistant, e.g. output power, charge and discharge limits, time slots, export limit and the inverter power switch. Battery controls for TL-XH, MOD and SPH inverters are experimental
 - Controls keep their last confirmed value after a Home Assistant restart
+- Optionally keeps the last known values of disconnected batteries and restores them after a GroBro restart
 - Publishes smart meter readings (e.g. EcoTracker, Shelly) reported by NOAH and NEXA to MQTT
 - Optional TLS certificate verification for the MQTT connections
 - Runs as Home Assistant add-on or as standalone container, configurable via environment variables
@@ -63,6 +64,7 @@ docker run --rm \
   -e SOURCE_MQTT_TLS=true \
   -e TARGET_MQTT_HOST=<target-mqtt-host> \
   -e TARGET_MQTT_PORT=<target-mqtt-port> \
+  -v ./grobro-config:/config \
   ghcr.io/robertzaage/grobro:latest
 ```
 
