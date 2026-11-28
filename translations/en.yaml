@@ -34,7 +34,7 @@ configuration:
     description: Base MQTT topic used for Home Assistant auto-discovery and sensor states
   REGISTER_FILTER:
     name: REGISTER_FILTER
-    description: Comma-separated list of serial:alias pairs (e.g. 123456789:NOAH,987654321:NEO800). Allows specifying which register set to apply per device. Defaults to inverter register map if not set.
+    description: No longer used, devices are detected automatically.
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
     description: Set to True to redirect messages to and from the Growatt Server. Default is False
@@ -49,7 +49,7 @@ configuration:
     description: Dumps every received messages into $DUMP_DIR for later in-depth inspection.
   MAX_SLOTS:
     name: MAX_SLOTS
-    description: How many time slots to show in Home Assistant for battery scheduling (NOAH only, max 9). Default is 1.
+    description: How many time slots to show in Home Assistant for battery scheduling (NOAH, NEXA, TL-XH and MOD, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
     description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect the count from the device, or a number to override, which also removes the entities of batteries above it.

@@ -1,0 +1,79 @@
+configuration:
+  SOURCE_MQTT_HOST:
+    name: SOURCE_MQTT_HOST
+    description: "Nombre de host o IP del broker MQTT de origen (para Growatt)"
+  SOURCE_MQTT_PORT:
+    name: SOURCE_MQTT_PORT
+    description: "Puerto del broker MQTT de origen"
+  SOURCE_MQTT_TLS:
+    name: SOURCE_MQTT_TLS
+    description: "Activar para usar TLS sin validación del certificado"
+  SOURCE_MQTT_USER:
+    name: SOURCE_MQTT_USER
+    description: "Usuario del broker MQTT de origen (si se requiere autenticación)"
+  SOURCE_MQTT_PASS:
+    name: SOURCE_MQTT_PASS
+    description: "Contraseña del broker MQTT de origen"
+  TARGET_MQTT_HOST:
+    name: TARGET_MQTT_HOST
+    description: "Nombre de host o IP del broker MQTT de destino (para Home Assistant)"
+  TARGET_MQTT_PORT:
+    name: TARGET_MQTT_PORT
+    description: "Puerto del broker MQTT de destino"
+  TARGET_MQTT_TLS:
+    name: TARGET_MQTT_TLS
+    description: "Activar para usar TLS sin validación del certificado"
+  TARGET_MQTT_USER:
+    name: TARGET_MQTT_USER
+    description: "Usuario del broker MQTT de destino (si se requiere autenticación)"
+  TARGET_MQTT_PASS:
+    name: TARGET_MQTT_PASS
+    description: "Contraseña del broker MQTT de destino"
+  HA_BASE_TOPIC:
+    name: HA_BASE_TOPIC
+    description: "Topic MQTT base para el autodescubrimiento de Home Assistant y los estados de los sensores"
+  REGISTER_FILTER:
+    name: REGISTER_FILTER
+    description: "Ya no se utiliza, los dispositivos se detectan automáticamente."
+  GROWATT_CLOUD:
+    name: GROWATT_CLOUD
+    description: "Activar para reenviar los mensajes desde y hacia la nube de Growatt. Por defecto desactivado"
+  GROWATT_CLOUD_CONFIG_FILTER:
+    name: GROWATT_CLOUD_CONFIG_FILTER
+    description: "Activar para no reenviar mensajes de configuración. Protege el datalogger de cambios remotos iniciados por la nube de Growatt. Por defecto desactivado"
+  LOG_LEVEL:
+    name: LOG_LEVEL
+    description: "Nivel de registro: ERROR, INFO o DEBUG. Por defecto ERROR."
+  DUMP_MESSAGES:
+    name: DUMP_MESSAGES
+    description: "Guarda todos los mensajes recibidos en $DUMP_DIR para un análisis detallado posterior."
+  MAX_SLOTS:
+    name: MAX_SLOTS
+    description: "Cuántas franjas horarias mostrar en Home Assistant para la programación de la batería (NOAH, NEXA, TL-XH y MOD, máx. 9). Por defecto 1."
+  MAX_BAT:
+    name: MAX_BAT
+    description: "Cuántos paquetes de baterías mostrar en Home Assistant. \"auto\" (por defecto) detecta la cantidad del dispositivo, un número la fija y elimina las entidades de las baterías por encima."
+  DUMP_DIR:
+    name: DUMP_DIR
+    description: "Directorio para los mensajes guardados. Por defecto /share/GroBro/dump. En el complemento debe empezar con /share"
+  DEVICE_TIMEOUT:
+    name: DEVICE_TIMEOUT
+    description: "Tiempo de espera en segundos para la comunicación con el dispositivo. Por defecto 0 (desactivado). Recomendado 300 o más."
+  AVAILABILITY_SENSOR:
+    name: AVAILABILITY_SENSOR
+    description: "Mostrar la disponibilidad solo como un sensor online dedicado, en lugar de marcar el dispositivo y todas sus entidades como no disponibles tras el tiempo de espera."
+  FILTER_DATA_GLITCHES:
+    name: FILTER_DATA_GLITCHES
+    description: "Evita saltos en los sensores total_increasing (contadores de energía, etc.) cuando un dispositivo vuelve a conectarse. Por defecto desactivado."
+  TZ:
+    name: Zona horaria
+    description: "Zona horaria local, para que los registros y eventos tengan la hora correcta."
+  KEEP_BATTERY_POSITION:
+    name: KEEP_BATTERY_POSITION
+    description: "GroBro sigue los números de serie de las baterías NOAH y registra un aviso si una batería cambia de posición. Por defecto desactivado."
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: "Publica los estados de los sensores como mensajes MQTT retenidos, así se restauran también tras reiniciar el broker MQTT o GroBro. Los reinicios de Home Assistant se gestionan sin esta opción. Por defecto desactivado."
+  AUTO_TIME_SYNC:
+    name: AUTO_TIME_SYNC
+    description: "GroBro sincroniza la hora de tus dispositivos a las 00:00 y a las 12:00. Por defecto desactivado."
