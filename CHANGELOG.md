@@ -2,7 +2,7 @@
 
 ### Breaking Changes
 + The MOD register map was rebuilt on the standard 3000 register layout shared with MIN and TL-XH inverters. Most MOD values were read from wrong registers before, so their values change. The `Temperature` sensor was removed, use `Temp1` instead (#213)
-+ Devices behind a ShineWiFi-X datalogger (`VWQ` serial) are now identified by the serial of their inverter. Single-phase inverters get the TL-XH map instead of the MOD map, so their entities change (#251)
++ Devices behind a ShineWiFi-X datalogger (`VWQ` serial) are now identified by the serial of their inverter. Single-phase inverters get the TL-XH map instead of the MOD map, so their entities change. Home Assistant may keep entities of the old map as unavailable, remove them once after updating (#251)
 + XH2 battery voltage, current, SOC, charge and discharge power and lifetime battery energy are now read from the first battery (BDC1). Before, the values of the second battery were used (#251)
 + The NEXA work mode value `2` is now shown as `Smart Mode` instead of `Grid First`, matching the slot modes. Automations comparing the old state need to be updated (#251)
 + The NEXA `Default Smart Mode Enabled` switch was replaced by a `Default Mode` select (Load First, Battery First, Smart Mode). Register 321 is the default work mode, the switch could only set Battery First (#251)
