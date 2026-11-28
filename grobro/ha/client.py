@@ -287,18 +287,18 @@ class Client:
     on_config_read_response: Callable[[str, int], None] | None = None
 
     _client: mqtt.Client
-    _config_cache: dict[str, model.DeviceConfig] = {}
-    _discovery_cache: list[str] = []
-    _device_timers: dict[str, Timer] = {}
-    _last_energy_values: dict[tuple[str, str], float] = {}
-
-    # --- Config read sequencing ---
-    _config_read_queues: dict[str, deque[int]] = {}
-    _config_read_inflight: dict[str, int] = {}
-    _config_read_timers: dict[str, Timer] = {}
-    _config_read_lock = Lock()
 
     def __init__(self, mqtt_config: model.MQTTConfig):
+        self._config_cache: dict[str, model.DeviceConfig] = {}
+        self._discovery_cache: list[str] = []
+        self._device_timers: dict[str, Timer] = {}
+        self._last_energy_values: dict[tuple[str, str], float] = {}
+        # Config read sequencing
+        self._config_read_queues: dict[str, deque[int]] = {}
+        self._config_read_inflight: dict[str, int] = {}
+        self._config_read_timers: dict[str, Timer] = {}
+        self._config_read_lock = Lock()
+
         # Setup target MQTT client for publishing
         LOG.info(f"Connecting to HA broker at '{mqtt_config.host}:{mqtt_config.port}'")
 
@@ -647,11 +647,9 @@ class Client:
                             q.append(cfg.growatt.register_no)
 
                     # give the datalogger time to answer modbus reads
-                    Timer(
-                        3.0,
-                        self.__kickoff_next_config_read,
-                        args=(device_id,),
-                    ).start()
+                    kickoff = Timer(3.0, self.__kickoff_next_config_read, args=(device_id,))
+                    kickoff.daemon = True
+                    kickoff.start()
 
                 return
 
@@ -877,6 +875,7 @@ class Client:
             self._device_timers[device_id].cancel()
 
         timer = Timer(DEVICE_TIMEOUT, set_device_unavailable, args=[device_id])
+        timer.daemon = True
         self._device_timers[device_id] = timer
         timer.start()
 
@@ -1267,6 +1266,7 @@ class Client:
             self.__config_read_timeout,
             args=(device_id, register_no),
         )
+        timer.daemon = True
         self._config_read_timers[device_id] = timer
         timer.start()
 

@@ -726,12 +726,6 @@ class TestClientDeviceTimer:
 
 
 class TestClientConfigReadSequencing:
-    @pytest.fixture(autouse=True)
-    def _reset_shared_state(self):
-        Client._config_read_queues.clear()
-        Client._config_read_inflight.clear()
-        Client._config_read_timers.clear()
-
     def test_kickoff_inflight(self):
         with patch("grobro.ha.client.mqtt.Client"):
             with patch("grobro.ha.client.os.listdir", return_value=[]):

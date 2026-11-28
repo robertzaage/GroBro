@@ -100,9 +100,9 @@ class Client:
 
     _client: mqtt.Client
     _forward_mqtt_config: model.MQTTConfig
-    _forward_clients = {}
 
     def __init__(self, grobro_mqtt: MQTTConfig, forward_mqtt: MQTTConfig):
+        self._forward_clients = {}
         LOG.info(
             f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
         )

@@ -1,0 +1,1916 @@
+{
+"commands": [],
+"config_commands": [
+[
+"HAQ000SNAP00001",
+4,
+"1"
+],
+[
+"HAQ000SNAP00001",
+17,
+"1"
+],
+[
+"HAQ000SNAP00001",
+18,
+"1"
+],
+[
+"HAQ000SNAP00001",
+19,
+"1"
+]
+],
+"ha_publishes": [
+[
+"homeassistant/number/grobro/HAQ000SNAP00001_set_wirk/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_System_Status/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_SOC/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Bus_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_to_DC_Conv_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Load_Percentage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter1_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter2_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Input_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Device_Type_Code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_Battery_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Watts/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_MPPT_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Time_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Charge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Discharge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/device/HAQ000SNAP00001/config",
+"@45d975cc8182",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/serial",
+"HAQ000SNAP00001",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/type",
+"SPF",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/availability",
+"online",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/state",
+"@3a2f0e9c6310",
+false
+],
+[
+"homeassistant/number/grobro/HAQ000SNAP00001_set_wirk/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_System_Status/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_SOC/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Bus_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_to_DC_Conv_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Load_Percentage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter1_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter2_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Input_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Device_Type_Code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_Battery_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Watts/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_MPPT_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Time_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Charge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Discharge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/serial",
+"HAQ000SNAP00001",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/type",
+"SPF",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/availability",
+"online",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/state",
+"{\"System_Status\":\"PV & Grid Supporting Loads\",\"Status_Summary\":\"PV & Grid Supporting Loads\"}",
+false
+],
+[
+"homeassistant/number/grobro/HAQ000SNAP00001_set_wirk/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_System_Status/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV1_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_SOC/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Bus_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Out_Freq/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_Out_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_DC_to_DC_Conv_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Load_Percentage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter1_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_BuckConverter2_Temp/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Input_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_In_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Device_Type_Code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Export_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_PV2_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Charger_Battery_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_AC_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_Watts/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Discharge_VA/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Inverter_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_MPPT_Fan_Speed/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_code/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Fault_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Warning_value/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Time_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Charge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Total_Discharge_Current/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Output_Discharge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Energy_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Power/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Generator_Voltage/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Today/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/HAQ000SNAP00001_Battery_Charge_Total/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/device/HAQ000SNAP00001/config",
+"@45d975cc8182",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/serial",
+"HAQ000SNAP00001",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/type",
+"SPF",
+true
+],
+[
+"homeassistant/grobro/HAQ000SNAP00001/state",
+"{\"System_Status\":\"PV & Grid Supporting Loads\",\"Status_Summary\":\"PV & Grid Supporting Loads\"}",
+false
+]
+],
+"payloads": {
+"@3a2f0e9c6310": {
+"AC_Charge_Power": 63.5,
+"AC_Charge_Today": 19.5,
+"AC_Charge_Total": 26.5,
+"AC_Charger_Battery_Current": 61.5,
+"AC_Charger_VA": 70.5,
+"AC_Discharge_Power": 68.5,
+"AC_Discharge_Today": 47.5,
+"AC_Discharge_Total": 54.5,
+"AC_Discharge_VA": 75.5,
+"AC_In_Freq": 105.5,
+"AC_In_VA": 76.5,
+"AC_In_Voltage": 98.5,
+"AC_Input_Power": 69.5,
+"AC_Out_Freq": 6.5,
+"AC_Out_Voltage": 112.5,
+"Battery_Charge_Today": 95.5,
+"Battery_Charge_Total": 102.5,
+"Battery_Discharge_Today": 33.5,
+"Battery_Discharge_Total": 40.5,
+"Battery_Discharge_VA": 89.5,
+"Battery_Discharge_Watts": 82.5,
+"Battery_Power": 96.5,
+"Battery_SOC": 84,
+"Battery_Voltage": 77.5,
+"BuckConverter1_Temp": 41.5,
+"BuckConverter2_Temp": 48.5,
+"Bus_Voltage": 91.5,
+"DC_Out_Voltage": 13.5,
+"DC_to_DC_Conv_Temp": 27.5,
+"Device_Type_Code": 83,
+"Export_Today": 90.5,
+"Export_Total": 97.5,
+"Fault_code": 4,
+"Fault_value": 18,
+"Generator_Energy_Today": 67.5,
+"Generator_Energy_Total": 74.5,
+"Generator_Power": 81.5,
+"Generator_Voltage": 88.5,
+"Inverter_Current": 62.5,
+"Inverter_Fan_Speed": 103.5,
+"Inverter_Temp": 20.5,
+"Load_Percentage": 34.5,
+"MPPT_Fan_Speed": 110.5,
+"Output_Current": 55.5,
+"Output_Discharge_Today": 53.5,
+"Output_Discharge_Total": 60.5,
+"Output_Power": 49.5,
+"Output_VA": 56.5,
+"PV1_Current": 35.5,
+"PV1_Power": 21.5,
+"PV1_Voltage": 7.5,
+"PV2_Current": 42.5,
+"PV2_Energy_Today": 5.5,
+"PV2_Energy_Total": 12.5,
+"PV2_Power": 28.5,
+"PV2_Voltage": 14.5,
+"PV_Energy_Today": 104.5,
+"PV_Energy_Total": 111.5,
+"Status_Summary": "Standby – Battery voltage low (4) – Fan lock, Battery overcharged, Overload, Parallel version different, Host lost",
+"System_Status": "Standby",
+"Time_Total": "S053",
+"Total_Charge_Current": 39.5,
+"Total_Discharge_Current": 46.5,
+"Warning_code": 11,
+"Warning_value": 25
+},
+"@45d975cc8182": {
+"avty": [
+{
+"t": "homeassistant/grobro/HAQ000SNAP00001/availability"
+},
+{
+"t": "homeassistant/grobro/bridge/availability"
+}
+],
+"avty_mode": "all",
+"cmps": {
+"grobro_HAQ000SNAP00001_AC_Charge_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "AC charge power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Charge_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['AC_Charge_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Charge_Today": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "AC charge energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Charge_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['AC_Charge_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Charge_Total": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "AC charge total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Charge_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['AC_Charge_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Charger_Battery_Current": {
+"device_class": "current",
+"icon": "mdi:current-ac",
+"name": "AC charger battery current",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Charger_Battery_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['AC_Charger_Battery_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Charger_VA": {
+"device_class": "apparent_power",
+"icon": "mdi:flash",
+"name": "AC charge apparent power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Charger_VA",
+"unit_of_measurement": "VA",
+"value_template": "{{ value_json['AC_Charger_VA'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Discharge_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "AC discharge power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Discharge_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['AC_Discharge_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Discharge_Today": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "AC discharge today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Discharge_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['AC_Discharge_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Discharge_Total": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "AC discharge total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Discharge_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['AC_Discharge_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Discharge_VA": {
+"device_class": "apparent_power",
+"icon": "mdi:flash",
+"name": "AC discharge apparent power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Discharge_VA",
+"unit_of_measurement": "VA",
+"value_template": "{{ value_json['AC_Discharge_VA'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_In_Freq": {
+"device_class": "frequency",
+"icon": "mdi:sine-wave",
+"name": "AC input frequency",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_In_Freq",
+"unit_of_measurement": "Hz",
+"value_template": "{{ value_json['AC_In_Freq'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_In_VA": {
+"device_class": "apparent_power",
+"icon": "mdi:flash",
+"name": "AC input apparent power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_In_VA",
+"unit_of_measurement": "VA",
+"value_template": "{{ value_json['AC_In_VA'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_In_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "AC input voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_In_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['AC_In_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Input_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "AC input power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Input_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['AC_Input_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Out_Freq": {
+"device_class": "frequency",
+"icon": "mdi:sine-wave",
+"name": "AC output frequency",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Out_Freq",
+"unit_of_measurement": "Hz",
+"value_template": "{{ value_json['AC_Out_Freq'] }}"
+},
+"grobro_HAQ000SNAP00001_AC_Out_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "AC output voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_AC_Out_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['AC_Out_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Charge_Today": {
+"device_class": "energy",
+"icon": "mdi:battery-arrow-up",
+"name": "Battery charge energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Charge_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Battery_Charge_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Charge_Total": {
+"device_class": "energy",
+"icon": "mdi:battery-arrow-up",
+"name": "Battery charge energy total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Charge_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Battery_Charge_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Discharge_Today": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "Battery discharge today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Discharge_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Battery_Discharge_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Discharge_Total": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "Battery discharge total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Discharge_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Battery_Discharge_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Discharge_VA": {
+"device_class": "apparent_power",
+"icon": "mdi:flash",
+"name": "Battery discharge apparent power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Discharge_VA",
+"unit_of_measurement": "VA",
+"value_template": "{{ value_json['Battery_Discharge_VA'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Discharge_Watts": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "Battery discharge watt",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Discharge_Watts",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['Battery_Discharge_Watts'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "Battery power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['Battery_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_SOC": {
+"device_class": "battery",
+"icon": "mdi:battery",
+"name": "Battery SOC",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_SOC",
+"unit_of_measurement": "%",
+"value_template": "{{ value_json['Battery_SOC'] }}"
+},
+"grobro_HAQ000SNAP00001_Battery_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "Battery voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Battery_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['Battery_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_BuckConverter1_Temp": {
+"device_class": "temperature",
+"icon": "mdi:thermometer",
+"name": "Buck1 temperature",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_BuckConverter1_Temp",
+"unit_of_measurement": "°C",
+"value_template": "{{ value_json['BuckConverter1_Temp'] }}"
+},
+"grobro_HAQ000SNAP00001_BuckConverter2_Temp": {
+"device_class": "temperature",
+"icon": "mdi:thermometer",
+"name": "Buck2 temperature",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_BuckConverter2_Temp",
+"unit_of_measurement": "°C",
+"value_template": "{{ value_json['BuckConverter2_Temp'] }}"
+},
+"grobro_HAQ000SNAP00001_Bus_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "Bus voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Bus_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['Bus_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_DC_Out_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "DC output voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_DC_Out_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['DC_Out_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_DC_to_DC_Conv_Temp": {
+"device_class": "temperature",
+"icon": "mdi:thermometer",
+"name": "DC-DC temperature",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_DC_to_DC_Conv_Temp",
+"unit_of_measurement": "°C",
+"value_template": "{{ value_json['DC_to_DC_Conv_Temp'] }}"
+},
+"grobro_HAQ000SNAP00001_Device_Type_Code": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:chip",
+"name": "Device type code",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Device_Type_Code",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['Device_Type_Code'] }}"
+},
+"grobro_HAQ000SNAP00001_Export_Today": {
+"device_class": "energy",
+"icon": "mdi:transmission-tower-export",
+"name": "Export to grid today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Export_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Export_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_Export_Total": {
+"device_class": "energy",
+"icon": "mdi:transmission-tower-export",
+"name": "Export to grid total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Export_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Export_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Generator_Energy_Today": {
+"device_class": "energy",
+"icon": "mdi:engine",
+"name": "Generator energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Generator_Energy_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Generator_Energy_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_Generator_Energy_Total": {
+"device_class": "energy",
+"icon": "mdi:engine",
+"name": "Generator energy total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Generator_Energy_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Generator_Energy_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Generator_Power": {
+"device_class": "power",
+"icon": "mdi:engine",
+"name": "Generator power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Generator_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['Generator_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_Generator_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:engine",
+"name": "Generator voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Generator_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['Generator_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_Inverter_Current": {
+"device_class": "current",
+"icon": "mdi:current-ac",
+"name": "Inverter current ",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Inverter_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['Inverter_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_Inverter_Fan_Speed": {
+"device_class": null,
+"icon": "mdi:percent",
+"name": "Fan speed of inverter",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Inverter_Fan_Speed",
+"unit_of_measurement": "%",
+"value_template": "{{ value_json['Inverter_Fan_Speed'] }}"
+},
+"grobro_HAQ000SNAP00001_Inverter_Temp": {
+"device_class": "temperature",
+"icon": "mdi:thermometer",
+"name": "Inverter temperature",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Inverter_Temp",
+"unit_of_measurement": "°C",
+"value_template": "{{ value_json['Inverter_Temp'] }}"
+},
+"grobro_HAQ000SNAP00001_Load_Percentage": {
+"device_class": null,
+"icon": "mdi:percent",
+"name": "Load percentage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Load_Percentage",
+"unit_of_measurement": "%",
+"value_template": "{{ value_json['Load_Percentage'] }}"
+},
+"grobro_HAQ000SNAP00001_MPPT_Fan_Speed": {
+"device_class": null,
+"icon": "mdi:percent",
+"name": "Fan speed of MPPT charger",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_MPPT_Fan_Speed",
+"unit_of_measurement": "%",
+"value_template": "{{ value_json['MPPT_Fan_Speed'] }}"
+},
+"grobro_HAQ000SNAP00001_Output_Current": {
+"device_class": "current",
+"icon": "mdi:current-ac",
+"name": "Output current ",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Output_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['Output_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_Output_Discharge_Today": {
+"device_class": "energy",
+"icon": "mdi:home-lightning-bolt",
+"name": "Output discharge energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Output_Discharge_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Output_Discharge_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_Output_Discharge_Total": {
+"device_class": "energy",
+"icon": "mdi:home-lightning-bolt",
+"name": "Output discharge energy total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Output_Discharge_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['Output_Discharge_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Output_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "Output active power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Output_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['Output_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_Output_VA": {
+"device_class": "apparent_power",
+"icon": "mdi:flash",
+"name": "Output apparent power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Output_VA",
+"unit_of_measurement": "VA",
+"value_template": "{{ value_json['Output_VA'] }}"
+},
+"grobro_HAQ000SNAP00001_PV1_Current": {
+"device_class": "current",
+"icon": "mdi:current-ac",
+"name": "PV1 current ",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV1_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['PV1_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_PV1_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "PV1 power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV1_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['PV1_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_PV1_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "PV1 voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV1_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['PV1_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_PV2_Current": {
+"device_class": "current",
+"icon": "mdi:current-ac",
+"name": "PV2 current",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV2_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['PV2_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_PV2_Energy_Today": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "PV2 energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV2_Energy_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['PV2_Energy_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_PV2_Energy_Total": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "PV2 energy total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV2_Energy_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['PV2_Energy_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_PV2_Power": {
+"device_class": "power",
+"icon": "mdi:flash",
+"name": "PV2 power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV2_Power",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['PV2_Power'] }}"
+},
+"grobro_HAQ000SNAP00001_PV2_Voltage": {
+"device_class": "voltage",
+"icon": "mdi:sine-wave",
+"name": "PV2 voltage",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV2_Voltage",
+"unit_of_measurement": "V",
+"value_template": "{{ value_json['PV2_Voltage'] }}"
+},
+"grobro_HAQ000SNAP00001_PV_Energy_Today": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "PV1 energy today",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV_Energy_Today",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['PV_Energy_Today'] }}"
+},
+"grobro_HAQ000SNAP00001_PV_Energy_Total": {
+"device_class": "energy",
+"icon": "mdi:solar-power",
+"name": "PV1 energy total",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_PV_Energy_Total",
+"unit_of_measurement": "kWh",
+"value_template": "{{ value_json['PV_Energy_Total'] }}"
+},
+"grobro_HAQ000SNAP00001_Status_Summary": {
+"icon": "mdi:information-outline",
+"name": "Status",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Status_Summary",
+"value_template": "{{ value_json['Status_Summary'] | default('unknown') }}"
+},
+"grobro_HAQ000SNAP00001_System_Status": {
+"device_class": null,
+"icon": "mdi:alert-circle",
+"name": "System status",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_System_Status",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['System_Status'] }}"
+},
+"grobro_HAQ000SNAP00001_Total_Charge_Current": {
+"device_class": "current",
+"icon": "mdi:flash",
+"name": "Total charge current",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Total_Charge_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['Total_Charge_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_Total_Discharge_Current": {
+"device_class": "current",
+"icon": "mdi:flash",
+"name": "Total discharge current",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/state",
+"unique_id": "grobro_HAQ000SNAP00001_Total_Discharge_Current",
+"unit_of_measurement": "A",
+"value_template": "{{ value_json['Total_Discharge_Current'] }}"
+},
+"grobro_HAQ000SNAP00001_cmd_data_interval": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/4/set",
+"entity_category": "config",
+"max": 60,
+"min": 0,
+"name": "Update Interval",
+"platform": "number",
+"publish": true,
+"state_topic": "homeassistant/config/grobro/HAQ000SNAP00001/4/get",
+"step": 1,
+"type": "number",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_data_interval",
+"unit_of_measurement": "min"
+},
+"grobro_HAQ000SNAP00001_cmd_mqtt_broker": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/19/set",
+"entity_category": "config",
+"icon": "mdi:server-network",
+"name": "MQTT Broker",
+"platform": "text",
+"publish": true,
+"state_topic": "homeassistant/config/grobro/HAQ000SNAP00001/19/get",
+"type": "text",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_mqtt_broker"
+},
+"grobro_HAQ000SNAP00001_cmd_mqtt_ip": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/17/set",
+"entity_category": "config",
+"icon": "mdi:ip-network",
+"name": "MQTT IP",
+"platform": "text",
+"publish": true,
+"state_topic": "homeassistant/config/grobro/HAQ000SNAP00001/17/get",
+"type": "text",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_mqtt_ip"
+},
+"grobro_HAQ000SNAP00001_cmd_mqtt_port": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/18/set",
+"entity_category": "config",
+"max": 65535,
+"min": 1,
+"name": "MQTT Port",
+"platform": "number",
+"publish": true,
+"state_topic": "homeassistant/config/grobro/HAQ000SNAP00001/18/get",
+"type": "number",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_mqtt_port"
+},
+"grobro_HAQ000SNAP00001_cmd_read_all": {
+"command_topic": "homeassistant/button/grobro/HAQ000SNAP00001/read_all/read",
+"name": "Read All Values",
+"platform": "button",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_read_all"
+},
+"grobro_HAQ000SNAP00001_cmd_system_time": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/31/set",
+"entity_category": "config",
+"icon": "mdi:clock-outline",
+"name": "System Time",
+"platform": "text",
+"publish": true,
+"state_topic": "homeassistant/config/grobro/HAQ000SNAP00001/31/get",
+"type": "text",
+"unique_id": "grobro_HAQ000SNAP00001_cmd_system_time"
+},
+"grobro_HAQ000SNAP00001_restart_datalogger": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/32/set",
+"icon": "mdi:restart",
+"name": "Restart Datalogger",
+"payload_press": "1",
+"platform": "button",
+"unique_id": "grobro_HAQ000SNAP00001_restart_datalogger"
+},
+"grobro_HAQ000SNAP00001_serial": {
+"entity_category": "diagnostic",
+"icon": "mdi:identifier",
+"name": "Device SN",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/serial",
+"unique_id": "grobro_HAQ000SNAP00001_serial"
+},
+"grobro_HAQ000SNAP00001_sync_time": {
+"command_topic": "homeassistant/config/grobro/HAQ000SNAP00001/31/set",
+"icon": "mdi:clock-outline",
+"name": "Sync Time",
+"platform": "button",
+"unique_id": "grobro_HAQ000SNAP00001_sync_time"
+},
+"grobro_HAQ000SNAP00001_type": {
+"entity_category": "diagnostic",
+"icon": "mdi:chip",
+"name": "Device Type",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/HAQ000SNAP00001/type",
+"unique_id": "grobro_HAQ000SNAP00001_type"
+}
+},
+"dev": {
+"identifiers": [
+"HAQ000SNAP00001"
+],
+"manufacturer": "Growatt",
+"model": "SPF-series",
+"name": "Growatt HAQ000SNAP00001",
+"serial_number": "HAQ000SNAP00001"
+},
+"o": {
+"name": "grobro",
+"url": "https://github.com/robertzaage/GroBro"
+}
+}
+}
+}
