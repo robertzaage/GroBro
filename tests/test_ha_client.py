@@ -303,6 +303,7 @@ class TestClientPublishInput:
         "device_id, absent_key, present_key",
         [
             ("0PVP0000TEST0001", "bat2_temp", "bat1_temp"),
+            ("0PVP0000TEST0001", "pv2_temp", "pv1_temp"),
             ("0HVR1234567890", "battery1Temp", "pv1Temp"),
         ],
     )
