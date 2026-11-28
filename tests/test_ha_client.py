@@ -408,6 +408,13 @@ class TestClientOnMessage:
         write_call = ha_client.on_command.call_args_list[0][0][0]
         assert write_call.value == 0
 
+    def test_switch_set_power_plus_nexa(self, ha_client):
+        msg = _msg("homeassistant/switch/grobro/0HVR1234567890/power_plus/set", b"ON")
+        ha_client._client.on_message(None, None, msg)
+        write_call = ha_client.on_command.call_args_list[0][0][0]
+        assert write_call.register_no == 325
+        assert write_call.value == 1
+
     def test_config_set_sync_time(self, ha_client):
         msg = _msg("homeassistant/config/grobro/QMN000ABC1D2E3FG/31/set", b"")
         ha_client._client.on_message(None, None, msg)

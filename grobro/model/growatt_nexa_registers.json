@@ -162,6 +162,24 @@
         "step": 1
       }
     },
+    "power_plus": {
+      "growatt": {
+        "position": {
+          "register_no": 325,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Power+",
+        "type": "switch",
+        "icon": "mdi:flash"
+      }
+    },
     "grid_power_allowed": {
       "growatt": {
         "position": {

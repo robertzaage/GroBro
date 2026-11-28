@@ -51,3 +51,8 @@ def test_nexa_heater_is_pack_bitmask_in_register_14(raw, expected):
     assert reg.growatt.position.register_no == 14
     assert reg.growatt.data.parse(struct.pack("!H", raw)) == expected
 
+
+def test_nexa_power_plus_switch():
+    reg = KNOWN_NEXA_REGISTERS.holding_registers["power_plus"]
+    assert reg.growatt.position.register_no == 325
+    assert reg.homeassistant.type == "switch"
