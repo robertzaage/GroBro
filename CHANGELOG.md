@@ -1,3 +1,15 @@
+## v2.8.3
+
+### New Features
++ NEXA devices now expose smart meter connection and power, off-grid mode, off-grid voltage, battery current, inverter temperature and the daily battery charge, battery discharge and AC output energy
+
+### Bug Fixes
++ Fixed NEXA on-grid power, off-grid current and power, grid current and inverter voltages using wrong scaling. The former `Register No 110`, `111`, `112`, `114` and `117` sensors now have proper names and units, existing entities are kept
++ NEXA energy counters are now read as 32 bit values, so they no longer wrap around at 6553.5 kWh
++ Fixed SPF apparent power and battery discharge power only reading the upper half of their 32 bit values
++ Fixed NEO and XH2 BMS battery current showing huge values instead of negative ones
++ Fixed the NOAH and NEXA update interval being shown in minutes although the device uses seconds (#248)
+
 ## v2.8.2
 
 ### New Features
