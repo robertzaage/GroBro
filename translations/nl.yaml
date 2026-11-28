@@ -74,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: "GroBro synchroniseert de tijd van je apparaten om 00:00 en 12:00. Standaard uitgeschakeld."
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: "Indien ingeschakeld behouden waarden die in de apparaatgegevens ontbreken (bijv. bij een losgekoppelde batterij) hun laatst bekende waarde in plaats van \"onbekend\" te tonen, en statuswaarden zoals SoC en status worden na een herstart hersteld. Live-metingen zoals vermogen vallen terug naar 0 als het apparaat niets meer meldt en worden na een herstart niet hersteld. Ontbrekende temperatuursensoren tonen \"onbekend\". Standaard uitgeschakeld."

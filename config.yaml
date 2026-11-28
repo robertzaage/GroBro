@@ -44,6 +44,7 @@ options:
   KEEP_BATTERY_POSITION: false
   PUBLISH_SENSORS_RETAINED: false
   AUTO_TIME_SYNC: false
+  KEEP_LAST_VALUES: false
 
 schema:
   SOURCE_MQTT_HOST: str
@@ -71,3 +72,4 @@ schema:
   KEEP_BATTERY_POSITION: bool
   PUBLISH_SENSORS_RETAINED: bool
   AUTO_TIME_SYNC: bool
+  KEEP_LAST_VALUES: bool

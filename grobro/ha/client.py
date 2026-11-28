@@ -42,6 +42,9 @@ FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "tr
 KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
 AUTO_TIME_SYNC = os.getenv("AUTO_TIME_SYNC", "False").lower() == "true"
 TIME_SYNC_HOURS = (0, 12)
+# Opt-in: fill in values missing from a payload from the last known ones and
+# restore them after a restart, see _offline_behavior.
+KEEP_LAST_VALUES = os.getenv("KEEP_LAST_VALUES", "False").lower() == "true"
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
@@ -51,11 +54,13 @@ _LAST_BAT_SERIALS: dict[str, dict[int, str]] = {}
 # The HA add-on maps this via addon_config; plain Docker needs a volume.
 CONFIG_DIR = os.getenv("CONFIG_DIR", "/config")
 
-# Offline handling of sensor values: a value missing from a payload keeps its last known reading for brief gaps.
-# Once it has been missing from OFFLINE_MISS_THRESHOLD consecutive payloads
-# (or the device timed out), live readings (power, current, voltage,
-# frequency) drop to 0 while state-like values (SoC, temperature, status,
-# serials) keep their last known value.
+# Offline handling of sensor values (KEEP_LAST_VALUES): a value missing from a
+# payload keeps its last known reading for brief gaps. Once it has been missing
+# from OFFLINE_MISS_THRESHOLD consecutive payloads (or the device timed out),
+# live readings (power, current, voltage, frequency) drop to 0 while
+# state-like values (SoC, temperature, status, serials) keep their last known
+# value. Live readings are never restored after a restart, so the history
+# shows a gap instead of a dip to 0.
 OFFLINE_MISS_THRESHOLD = 3
 _ZERO_WHEN_OFFLINE_DEVICE_CLASSES = {"power", "apparent_power", "reactive_power", "current", "voltage", "frequency"}
 _ZERO_WHEN_OFFLINE_UNITS = {"W", "kW", "VA", "var", "A", "mA", "ma", "V", "Hz"}
@@ -349,13 +354,16 @@ class Client:
                     continue
                 if isinstance(data.get("max_bat"), int):
                     _MAX_BAT_CACHE[device_id] = data["max_bat"]
-                # The device may have gone offline while GroBro was down, so
-                # live readings start at 0 rather than at a stale value.
+                if not KEEP_LAST_VALUES:
+                    continue
+                # Live readings are not restored: they were only valid at the
+                # time they were saved, and restoring them (or 0) would show
+                # up as a wrong value or a dip in the history.
                 known_registers = get_known_registers(device_id)
-                for key in cached:
-                    if _offline_behavior(known_registers, key) == "zero":
-                        cached[key] = 0
-                self._value_cache[device_id] = cached
+                self._value_cache[device_id] = {
+                    key: value for key, value in cached.items()
+                    if _offline_behavior(known_registers, key) == "hold"
+                }
                 LOG.info("Loaded cached sensor values for %s from disk", device_id)
 
     # ------------------- Lifecycle -------------------
@@ -404,7 +412,9 @@ class Client:
         payload = dict(state.payload)
         known_registers = get_known_registers(state.device_id)
 
-        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C
+        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C.
+        # They are published as unknown and never filled in from the cache.
+        absent_keys: set[str] = set()
         if known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
@@ -414,6 +424,7 @@ class Client:
                     continue
                 if isinstance(value, (int, float)) and value == -273.1:
                     payload[key] = None
+                    absent_keys.add(key)
 
         for key in list(payload.keys()):
             bat_num = _get_bat_number(key)
@@ -479,42 +490,8 @@ class Client:
                             )
             _LAST_BAT_SERIALS[state.device_id] = current_serials
 
-        # Batteries beyond the currently reported count (e.g. disconnected
-        # ones) still show up as 0 / empty registers: treat those as missing
-        # so their entities keep the last known value.
-        if _has_bat_info(state.payload):
-            reported_bat_cnt = _detect_bat_count(state.payload)
-            for key in list(payload):
-                bat_num = _get_bat_number(key)
-                if bat_num is not None and bat_num > reported_bat_cnt:
-                    payload[key] = None
-
-        # Keep HA entities from dropping to "unknown" when a value is missing
-        # from the payload (absent or None, e.g. a disconnected battery, or
-        # after a GroBro/HA restart), see OFFLINE_MISS_THRESHOLD.
-        device_value_cache = self._value_cache.setdefault(state.device_id, {})
-        miss_counts = self._value_miss_counts.setdefault(state.device_id, {})
-        for key in set(payload) | set(device_value_cache):
-            behavior = _offline_behavior(known_registers, key)
-            if behavior is None:
-                continue
-            bat_num = _get_bat_number(key)
-            if bat_num is not None and bat_num > effective_max_bat:
-                continue
-            value = payload.get(key)
-            if value is not None:
-                miss_counts.pop(key, None)
-                if device_value_cache.get(key) != value:
-                    device_value_cache[key] = value
-                    self._value_cache_dirty.add(state.device_id)
-                continue
-            if key not in device_value_cache:
-                continue
-            miss_counts[key] = miss_counts.get(key, 0) + 1
-            if behavior == "zero" and miss_counts[key] >= OFFLINE_MISS_THRESHOLD and device_value_cache[key] != 0:
-                device_value_cache[key] = 0
-                self._value_cache_dirty.add(state.device_id)
-            payload[key] = device_value_cache[key]
+        if KEEP_LAST_VALUES:
+            self.__fill_in_last_values(state.device_id, known_registers, state.payload, payload, absent_keys, effective_max_bat)
         self.__maybe_save_value_cache(state.device_id)
 
         # State publish
@@ -522,6 +499,54 @@ class Client:
         state_str = json.dumps(payload, separators=(",", ":"))
         self._last_states[topic] = state_str
         self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+
+    def __fill_in_last_values(self, device_id: str, known_registers, raw_payload: dict, payload: dict, absent_keys: set[str], effective_max_bat: int):
+        """Keep HA entities from dropping to "unknown" when a value is missing
+        from the payload (absent or None, e.g. a disconnected battery, or after
+        a GroBro/HA restart), see OFFLINE_MISS_THRESHOLD."""
+        # Batteries beyond the currently reported count (e.g. disconnected
+        # ones) still show up as 0 / empty registers: treat those as missing
+        # so their SoC and serial keep the last known value. Their
+        # temperatures are absent sensors and become unknown.
+        if _has_bat_info(raw_payload):
+            reported_bat_cnt = _detect_bat_count(raw_payload)
+            for key in list(payload):
+                bat_num = _get_bat_number(key)
+                if bat_num is not None and bat_num > reported_bat_cnt:
+                    payload[key] = None
+                    reg = known_registers.input_registers.get(key) if known_registers else None
+                    if reg and reg.homeassistant.device_class == "temperature":
+                        absent_keys.add(key)
+
+        device_value_cache = self._value_cache.setdefault(device_id, {})
+        miss_counts = self._value_miss_counts.setdefault(device_id, {})
+        for key in set(payload) | set(device_value_cache):
+            behavior = _offline_behavior(known_registers, key)
+            if behavior is None:
+                continue
+            bat_num = _get_bat_number(key)
+            if bat_num is not None and bat_num > effective_max_bat:
+                continue
+            if key in absent_keys:
+                miss_counts.pop(key, None)
+                if device_value_cache.pop(key, None) is not None:
+                    self._value_cache_dirty.add(device_id)
+                payload[key] = None
+                continue
+            value = payload.get(key)
+            if value is not None:
+                miss_counts.pop(key, None)
+                if device_value_cache.get(key) != value:
+                    device_value_cache[key] = value
+                    self._value_cache_dirty.add(device_id)
+                continue
+            if key not in device_value_cache:
+                continue
+            miss_counts[key] = miss_counts.get(key, 0) + 1
+            if behavior == "zero" and miss_counts[key] >= OFFLINE_MISS_THRESHOLD and device_value_cache[key] != 0:
+                device_value_cache[key] = 0
+                self._value_cache_dirty.add(device_id)
+            payload[key] = device_value_cache[key]
 
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
@@ -541,10 +566,16 @@ class Client:
         self._client.publish(BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
         self._client.subscribe(HA_STATUS_TOPIC)
         self.__subscribe_commands()
-        # Immediately republish the last known values for every device we
-        # have a cache for, so entities don't wait for the next device poll
-        # (or stay "unknown") after GroBro or the broker connection restarts.
-        for device_id, cached_payload in list(self._value_cache.items()):
+        # Immediately republish the last known state-like values for every
+        # device we have a cache for, so entities don't wait for the next
+        # device poll (or stay "unknown") after GroBro or the broker connection
+        # restarts. Live readings are left out, they'd be outdated by now.
+        for device_id, device_value_cache in list(self._value_cache.items()):
+            known_registers = get_known_registers(device_id)
+            cached_payload = {
+                key: value for key, value in device_value_cache.items()
+                if _offline_behavior(known_registers, key) == "hold"
+            }
             if not cached_payload:
                 continue
             topic = f"{HA_BASE_TOPIC}/grobro/{device_id}/state"

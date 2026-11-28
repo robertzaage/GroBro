@@ -52,7 +52,7 @@ configuration:
     description: How many time slots to show in Home Assistant for battery scheduling (NOAH, NEXA, TL-XH and MOD, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
-    description: How many battery packs to display in Home Assistant. With "auto" (default) the count is detected from the device and only ever grows, so a disconnected battery keeps its entities and last known values. Set a number to override; entities of batteries above it are removed.
+    description: How many battery packs to display in Home Assistant. With "auto" (default) the count is detected from the device and only ever grows, so a disconnected battery keeps its entities (and its last known values with KEEP_LAST_VALUES). Set a number to override; entities of batteries above it are removed.
   DEVICE_TIMEOUT:
     name: DEVICE_TIMEOUT
     description: Set the timeout in seconds for the device communication. Default is 0 (disabled). Recommendation 300+ seconds.
@@ -74,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: When enabled, GroBro synchronizes the clock of your devices at 00:00 and 12:00. Default is false.
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: When enabled, values missing from a device's data (e.g. a disconnected battery) keep their last known value instead of showing "unknown", and state-like values such as SoC and status are restored after a restart. Live readings like power drop to 0 when the device stops reporting and are not restored after a restart. Absent temperature sensors show "unknown". Default is false.

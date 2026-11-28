@@ -74,3 +74,6 @@ configuration:
   AUTO_TIME_SYNC:
     name: AUTO_TIME_SYNC
     description: "GroBro sincroniza la hora de tus dispositivos a las 00:00 y a las 12:00. Por defecto desactivado."
+  KEEP_LAST_VALUES:
+    name: KEEP_LAST_VALUES
+    description: "Si está activado, los valores que faltan en los datos del dispositivo (p. ej. con una batería desconectada) conservan su último valor conocido en lugar de mostrar \"desconocido\", y los valores de estado como el SoC y el estado se restauran tras un reinicio. Las lecturas en vivo como la potencia bajan a 0 cuando el dispositivo deja de informar y no se restauran tras un reinicio. Los sensores de temperatura ausentes muestran \"desconocido\". Desactivado por defecto."

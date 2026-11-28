@@ -135,16 +135,17 @@ The container is configured via environment variables. The Home Assistant add-on
 | `DEVICE_TIMEOUT` | | `0` | Seconds without data until a device is considered offline. `0` disables availability tracking, `300` or more is recommended |
 | `AVAILABILITY_SENSOR` | | `false` | Requires `DEVICE_TIMEOUT`. Set to `true` to get a dedicated `Online` sensor instead of marking all entities as unavailable |
 | `MAX_SLOTS` | | `1` | Number of time slots shown for NOAH and NEXA (up to 9) |
-| `MAX_BAT` | | `auto` | Number of battery packs shown in Home Assistant. `auto` uses the battery count reported by the device; it only ever grows and is persisted, so a disconnected battery keeps its entities and last known values. Set a number (e.g. `1`) to override, which also removes the entities of batteries above it |
+| `MAX_BAT` | | `auto` | Number of battery packs shown in Home Assistant. `auto` uses the battery count reported by the device; it only ever grows and is persisted, so a disconnected battery keeps its entities (and its last known values with `KEEP_LAST_VALUES`). Set a number (e.g. `1`) to override, which also removes the entities of batteries above it |
 | `FILTER_DATA_GLITCHES` | | `false` | Set to `true` to suppress energy counters dropping after a device reconnects |
 | `KEEP_BATTERY_POSITION` | | `false` | Set to `true` to log a warning when a NOAH battery moves to a different position in the stack |
-| `PUBLISH_SENSORS_RETAINED` | | `false` | Set to `true` to publish sensor states with the MQTT retain flag, so Home Assistant gets the last state right after its own restart instead of showing "unknown" until the device sends new data. Values missing from a device's data (e.g. a disconnected battery) are kept by GroBro independently of this option |
+| `PUBLISH_SENSORS_RETAINED` | | `false` | Set to `true` to publish sensor states with the MQTT retain flag, so Home Assistant gets the last state right after its own restart instead of showing "unknown" until the device sends new data. A retained message is overwritten as soon as an incomplete payload is published, so this alone does not keep values missing from a device's data, see `KEEP_LAST_VALUES` |
+| `KEEP_LAST_VALUES` | | `false` | Set to `true` to keep the last known value of a sensor that is missing from a device's data (e.g. a disconnected battery) instead of showing "unknown". State-like values (SoC, battery voltages, status) are also restored after a restart. Live readings (power, current, voltage, frequency, load) drop to 0 after 3 messages without them or on `DEVICE_TIMEOUT`, and are not restored after a restart. Absent temperature sensors show "unknown". Energy counters are never affected |
 | `AUTO_TIME_SYNC` | | `false` | Set to `true` to synchronize the clock of your devices at 00:00 and 12:00 |
 | `TZ` | | | Time zone (e.g. `Europe/Berlin`) used by the `Sync Time` button and `AUTO_TIME_SYNC` |
 | `LOG_LEVEL` | | `ERROR` | `ERROR`, `INFO` or `DEBUG` |
 | `DUMP_MESSAGES` | | `false` | Set to `true` to save every received message to `/config/dump` for in-depth inspection |
 
-GroBro persists the device config cache, the last known sensor values and, if `DUMP_MESSAGES` is enabled, message dumps under `/config`. The Home Assistant add-on mounts this automatically; when running the plain Docker image, mount a volume to `/config` (e.g. `--volume ./grobro-config:/config`) so this data survives a container restart.
+GroBro persists the device config cache, the battery count, the last known sensor values (with `KEEP_LAST_VALUES`) and, if `DUMP_MESSAGES` is enabled, message dumps under `/config`. The Home Assistant add-on mounts this automatically; when running the plain Docker image, mount a volume to `/config` (e.g. `--volume ./grobro-config:/config`) so this data survives a container restart.
 
 ## Optional MQTT TLS verification
 

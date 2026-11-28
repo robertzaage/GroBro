@@ -151,10 +151,12 @@ is not in the cache, `__device_info_from_config` falls back to loading from file
 creating a minimal config with just the serial number. Config files are written via
 `DeviceConfig.to_file()` and read via `DeviceConfig.from_file()`.
 
-The same `/config` directory also holds `state_cache_{device_id}.json` files with the value
-to publish per input register while it is missing from a payload (absent or `None`, e.g. a
-disconnected battery no longer reporting `bat*` registers), so Home Assistant entities don't
-drop to "unknown":
+The same `/config` directory also holds `state_cache_{device_id}.json` files with the
+persisted battery count (`max_bat`, see [3.4](#34-_get_bat_number-and-max_bat)) and, with
+`KEEP_LAST_VALUES` enabled, the value to publish per input register while it is missing from
+a payload (absent or `None`, e.g. a disconnected battery no longer reporting `bat*`
+registers), so Home Assistant entities don't drop to "unknown". Without the option, payloads
+are published as received:
 
 - A missing value keeps its last known reading for brief gaps.
 - After `OFFLINE_MISS_THRESHOLD` (3) consecutive payloads without it, or when the device hits
@@ -166,8 +168,13 @@ drop to "unknown":
   `homeassistant` block. Battery and cell voltages (and the BMS CV setpoint) use `"hold"`,
   since a battery keeps its voltage like its SoC when the device stops reporting (e.g. at
   the discharge limit); load/output percentages and fan speeds use `"zero"`.
+- Absent temperature sensors (raw 0 K, decoded as -273.1 °C) and the temperatures of
+  batteries beyond the reported `bat_cnt` are published as `None` and removed from the cache,
+  so they never show an old value.
 - The file is written at most every `VALUE_CACHE_SAVE_INTERVAL` (300 s) per device and on
-  shutdown, atomically via a `.tmp` file. On startup, live readings are loaded as `0`.
+  shutdown, atomically via a `.tmp` file. On startup and in the republish on MQTT (re)connect,
+  only `"hold"` values are restored; live readings stay unknown until the device reports
+  again, so the history shows a gap instead of a dip to `0`.
 
 ### Three-broker topology
 
@@ -601,9 +608,10 @@ in both `publish_input_register` and `__publish_device_discovery`.
 
 In `"auto"` mode, `_resolve_max_bat()` keeps the highest count seen per device in
 `_MAX_BAT_CACHE`, persisted as `max_bat` in `state_cache_{device_id}.json`. The count
-only ever grows: a disconnected battery keeps its entities, and its values (which the
-NOAH still reports as `0` / empty registers beyond `bat_cnt`) are treated as missing, so
-they keep their last known value. Payloads without battery info (no `bat_cnt`, no serial
+only ever grows: a disconnected battery keeps its entities. With `KEEP_LAST_VALUES`, its
+values (which the NOAH still reports as `0` / empty registers beyond `bat_cnt`) are treated
+as missing, so SoC and serial keep their last known value, while its temperatures become
+unknown. Payloads without battery info (no `bat_cnt`, no serial
 parts) don't change the count. Before the first payload, a device whose count can be
 detected (NOAH) without a persisted count assumes a single battery; other devices
 (e.g. NEXA) fall back to `4`.
@@ -965,6 +973,7 @@ but not `TARGET_MQTT_HOST`, TARGET inherits from SOURCE.
 | `DEVICE_TIMEOUT` | `0` | Seconds after which a device is considered offline (`0` = disabled) |
 | `AVAILABILITY_SENSOR` | `False` | When `True`, exposes a dedicated online binary sensor; when `False`, marks all entities unavailable |
 | `PUBLISH_SENSORS_RETAINED` | `False` | Publish sensor states with MQTT retain flag |
+| `KEEP_LAST_VALUES` | `False` | Fill in values missing from a payload from the value cache and restore state-like values after a restart, see [Config persistence](#config-persistence) |
 | `MAX_SLOTS` | `1` | Maximum number of battery time slots for scheduling |
 | `MAX_BAT` | `"auto"` | Battery pack count in HA. `"auto"` detects from `bat_cnt` / `bat{N}_ser_part_1` and only ever grows; set to a number to override (removes entities of batteries above it). |
 | `KEEP_BATTERY_POSITION` | `False` | Log a warning when a NOAH battery moves to a different stack position |

@@ -909,19 +909,32 @@ class TestMaxBat:
         assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
         assert cmps["grobro_0PVP0000TEST0001_bat3_temp"] == {"platform": "sensor"}
 
-    def test_disconnected_battery_keeps_entities_and_values(self, ha_client):
+    def _last_noah_state(self, client):
+        for entry in reversed(client._client.publish.call_args_list):
+            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
+                return json.loads(entry.args[1])
+        return None
+
+    def test_disconnected_battery_keeps_entities_and_values(self, ha_client, monkeypatch):
+        monkeypatch.setattr("grobro.ha.client.KEEP_LAST_VALUES", True)
         self._publish_noah(ha_client, bat_cnt=2, bat_2_soc_pct=55, bat2_temp=21.0)
         self._publish_noah(ha_client, bat_cnt=1)  # bat_2_soc_pct=0, bat2_temp=-273.1
-        state = None
-        for entry in reversed(ha_client._client.publish.call_args_list):
-            if entry.args[0] == "homeassistant/grobro/0PVP0000TEST0001/state":
-                state = json.loads(entry.args[1])
-                break
+        state = self._last_noah_state(ha_client)
         assert state["bat_2_soc_pct"] == 55
-        assert state["bat2_temp"] == 21.0
+        # Its temperature sensor is absent now and must not show an old value
+        assert state["bat2_temp"] is None
         assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 2
         cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
         assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+
+    def test_disconnected_battery_without_keep_last_values(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=2, bat_2_soc_pct=55, bat2_temp=21.0)
+        self._publish_noah(ha_client, bat_cnt=1, bat_2_soc_pct=0)
+        state = self._last_noah_state(ha_client)
+        # Published as reported by the device, entities are kept
+        assert state["bat_2_soc_pct"] == 0
+        assert state["bat2_temp"] is None
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 2
 
     def test_detected_count_removes_extra_battery_entities(self, ha_client):
         self._publish_noah(ha_client)
@@ -1333,6 +1346,10 @@ class TestValueCache:
     DEVICE = "0PVP0000TEST0001"
     TOPIC = f"homeassistant/grobro/{DEVICE}/state"
 
+    @pytest.fixture(autouse=True)
+    def _keep_last_values(self, monkeypatch):
+        monkeypatch.setattr("grobro.ha.client.KEEP_LAST_VALUES", True)
+
     def _last_state(self, client):
         for entry in reversed(client._client.publish.call_args_list):
             if entry.args[0] == self.TOPIC:
@@ -1368,12 +1385,13 @@ class TestValueCache:
         assert restarted._value_cache[self.DEVICE]["tot_bat_soc_pct"] == 80
 
     def test_on_connect_republishes_cache_honoring_retain_flag(self, ha_client):
-        self._publish(ha_client, {"tot_bat_soc_pct": 80})
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
         ha_client._client.publish.reset_mock()
         for retained in (False, True):
             with patch("grobro.ha.client.PUBLISH_SENSORS_RETAINED", retained):
                 ha_client._Client__on_connect(None, None, None, 0, None)
             state, retain = self._last_state(ha_client)
+            # Live readings are outdated after a reconnect and left out
             assert state == {"tot_bat_soc_pct": 80}
             assert retain is retained
 
@@ -1405,10 +1423,29 @@ class TestValueCache:
         state, _ = self._last_state(ha_client)
         assert state["out_power"] == 90
 
-    def test_reload_zeroes_live_values(self, ha_client, mock_mqtt):
+    def test_reload_drops_live_values(self, ha_client, mock_mqtt):
+        """Restoring live readings (even as 0) would create dips in the history."""
         self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        ha_client.stop()
         restarted = Client(MQTTConfig(host="localhost", port=1883))
-        assert restarted._value_cache[self.DEVICE] == {"out_power": 0, "tot_bat_soc_pct": 80}
+        assert restarted._value_cache[self.DEVICE] == {"tot_bat_soc_pct": 80}
+        restarted._client.publish.reset_mock()
+        restarted._Client__on_connect(None, None, None, 0, None)
+        state, _ = self._last_state(restarted)
+        assert state == {"tot_bat_soc_pct": 80}
+
+    def test_absent_temperature_not_filled_in(self, ha_client):
+        self._publish(ha_client, {"bat1_temp": 21.0, "tot_bat_soc_pct": 80})
+        self._publish(ha_client, {"bat1_temp": -273.1})
+        state, _ = self._last_state(ha_client)
+        assert state["bat1_temp"] is None
+        assert state["tot_bat_soc_pct"] == 80
+        assert "bat1_temp" not in ha_client._value_cache[self.DEVICE]
+        # Brief gaps of a present sensor are still filled in
+        self._publish(ha_client, {"bat1_temp": 22.0})
+        self._publish(ha_client, {})
+        state, _ = self._last_state(ha_client)
+        assert state["bat1_temp"] == 22.0
 
     def test_device_timeout_publishes_zeroed_live_values(self, ha_client):
         self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
@@ -1465,3 +1502,49 @@ class TestValueCache:
         c.set_config(self.DEVICE, DeviceConfig(serial_number=self.DEVICE))
         c.publish_input_register(HomeAssistantInputRegister(device_id=self.DEVICE, payload={"out_power": 1}))
         assert self.DEVICE in c._config_cache
+
+
+class TestKeepLastValuesDisabled:
+    DEVICE = "0PVP0000TEST0001"
+    TOPIC = f"homeassistant/grobro/{DEVICE}/state"
+
+    def _publish(self, client, payload):
+        state = HomeAssistantInputRegister(device_id=self.DEVICE)
+        state.payload.update(payload)
+        client.publish_input_register(state)
+
+    def _last_state(self, client):
+        for entry in reversed(client._client.publish.call_args_list):
+            if entry.args[0] == self.TOPIC:
+                return json.loads(entry.args[1])
+        return None
+
+    def test_default_is_disabled(self):
+        from grobro.ha.client import KEEP_LAST_VALUES
+        assert KEEP_LAST_VALUES is False
+
+    def test_missing_values_not_filled_in(self, ha_client):
+        self._publish(ha_client, {"out_power": 120, "tot_bat_soc_pct": 80})
+        self._publish(ha_client, {"out_power": 130})
+        assert self._last_state(ha_client) == {"out_power": 130}
+        assert not ha_client._value_cache.get(self.DEVICE)
+
+    def test_nothing_restored_or_republished(self, ha_client, mock_mqtt, _tmp_config_dir):
+        self._publish(ha_client, {"bat_cnt": 2, "tot_bat_soc_pct": 80})
+        ha_client.stop()
+        data = json.loads((_tmp_config_dir / f"state_cache_{self.DEVICE}.json").read_text())
+        assert data == {"values": {}, "max_bat": 2}
+        _MAX_BAT_CACHE.clear()
+        restarted = Client(MQTTConfig(host="localhost", port=1883))
+        # The battery count is still restored, values are not
+        assert _MAX_BAT_CACHE[self.DEVICE] == 2
+        assert not restarted._value_cache
+        restarted._client.publish.reset_mock()
+        restarted._Client__on_connect(None, None, None, 0, None)
+        assert self._last_state(restarted) is None
+
+    def test_device_timeout_publishes_nothing(self, ha_client):
+        self._publish(ha_client, {"out_power": 120})
+        ha_client._client.publish.reset_mock()
+        ha_client._Client__publish_offline_values(self.DEVICE)
+        assert self._last_state(ha_client) is None
