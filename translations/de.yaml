@@ -34,7 +34,7 @@ configuration:
     description: Basis-MQTT-Topic für Home Assistant Auto-Discovery und Sensor-Status
   REGISTER_FILTER:
     name: REGISTER_FILTER
-    description: Kommagetrennte Liste von Serial:Alias-Paaren (z.B. 123456789:NOAH,987654321:NEO800). Ermöglicht die Angabe, welcher Registersatz pro Gerät angewendet werden soll. Standardmäßig wird die Wechselrichter-Registerkarte verwendet, wenn nicht gesetzt.
+    description: Wird nicht mehr verwendet, Geräte werden automatisch erkannt.
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
     description: Auf True setzen, um Nachrichten zum und vom Growatt-Server umzuleiten. Standard ist False
@@ -49,10 +49,10 @@ configuration:
     description: Speichert jede empfangene Nachricht in $DUMP_DIR für eine spätere detaillierte Analyse.
   MAX_SLOTS:
     name: MAX_SLOTS
-    description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (nur NOAH, max 9). Standard ist 1.
+    description: Wie viele Zeitfenster in Home Assistant für die Batterieplanung angezeigt werden sollen (NOAH, NEXA, TL-XH und MOD, max 9). Standard ist 1.
   MAX_BAT:
     name: MAX_BAT
-    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung anhand der Seriennummern, oder eine Zahl für manuelle Einstellung.
+    description: Wie viele Batteriemodule in Home Assistant angezeigt werden sollen. Setze auf "auto" (Standard) für automatische Erkennung, oder eine Zahl für manuelle Einstellung. Entitäten von Batterien oberhalb dieser Zahl werden dann entfernt.
   DUMP_DIR:
     name: DUMP_DIR
     description: Verzeichnis zum Speichern abgefangener Nachrichten. Standard ist /share/GroBro/dump. Im Addon muss es mit /share beginnen.
@@ -67,7 +67,13 @@ configuration:
     description: Wenn aktiviert, werden Sprünge in total_increasing-Sensoren (Energiezähler, etc.) unterdrückt, nachdem ein Gerät wieder online geht. Standard ist deaktiviert.
   TZ:
     name: Zeitzone
-    sescription: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.
+    description: Ändern der lokalen Zeitzone, um sicherzustellen, dass alle Anwendungsprotokolle und Systemereignisse mit korrekten lokalen Zeitstempeln aufgezeichnet werden.
   KEEP_BATTERY_POSITION:
     name: KEEP_BATTERY_POSITION
     description: Wenn aktiviert, überwacht GroBro die Seriennummern der NOAH-Batterien über Positionswechsel und protokolliert eine Warnung, wenn eine Batterie in einen anderen Steckplatz wechselt. Standard ist deaktiviert.
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: Wenn aktiviert, werden Sensorzustände als retained MQTT-Nachrichten veröffentlicht, sodass sie auch nach einem Neustart des MQTT-Brokers oder von GroBro wiederhergestellt werden. Neustarts von Home Assistant werden auch ohne diese Option abgefangen, GroBro sendet dann die letzten Zustände erneut. Standard ist deaktiviert.
+  AUTO_TIME_SYNC:
+    name: AUTO_TIME_SYNC
+    description: Wenn aktiviert, synchronisiert GroBro die Uhrzeit deiner Geräte um 00:00 und 12:00 Uhr. Standard ist deaktiviert.

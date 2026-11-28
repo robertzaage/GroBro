@@ -299,30 +299,29 @@ class TestClientPublishInput:
         assert published.get("Ppv") == 525.1
         assert published.get("Inverter_Status") == "NormalStatus"
 
-    def test_publish_input_register_bat_temp_filter(self, ha_client):
+    @pytest.mark.parametrize(
+        "device_id, absent_key, present_key",
+        [
+            ("0PVP0000TEST0001", "bat2_temp", "bat1_temp"),
+            ("0PVP0000TEST0001", "pv2_temp", "pv1_temp"),
+            ("0HVR1234567890", "battery1Temp", "pv1Temp"),
+        ],
+    )
+    def test_publish_input_register_absent_temp_filter(self, ha_client, device_id, absent_key, present_key):
         from grobro.model.growatt_registers import HomeAssistantInputRegister
-        from grobro.model.growatt_registers import KNOWN_NEO_REGISTERS
-        bat_keys = [k for k in KNOWN_NEO_REGISTERS.input_registers.keys()
-                     if k.startswith("bat") and k.endswith("_temp")]
-        if not bat_keys:
-            pytest.skip("No batX_temp registers in NEO definition")
-        payload = {k: -273.1 for k in bat_keys}
-        payload["Ppv"] = 100
         state = HomeAssistantInputRegister(
-            device_id="QMN000ABC1D2E3FG",
-            payload=payload,
+            device_id=device_id,
+            payload={absent_key: -273.1, present_key: 21.5},
         )
         ha_client.publish_input_register(state)
         published = None
         for call_args in ha_client._client.publish.call_args_list:
-            topic = call_args[0][0]
-            if "state" in topic:
+            if call_args[0][0] == f"homeassistant/grobro/{device_id}/state":
                 published = json.loads(call_args[0][1])
                 break
         assert published is not None
-        for k in bat_keys:
-            assert published.get(k) is None
-        assert published.get("Ppv") == 100
+        assert published[absent_key] is None
+        assert published[present_key] == 21.5
 
 
 class TestClientHoldingInput:
@@ -409,6 +408,13 @@ class TestClientOnMessage:
         write_call = ha_client.on_command.call_args_list[0][0][0]
         assert write_call.value == 0
 
+    def test_switch_set_power_plus_nexa(self, ha_client):
+        msg = _msg("homeassistant/switch/grobro/0HVR1234567890/power_plus/set", b"ON")
+        ha_client._client.on_message(None, None, msg)
+        write_call = ha_client.on_command.call_args_list[0][0][0]
+        assert write_call.register_no == 325
+        assert write_call.value == 1
+
     def test_config_set_sync_time(self, ha_client):
         msg = _msg("homeassistant/config/grobro/QMN000ABC1D2E3FG/31/set", b"")
         ha_client._client.on_message(None, None, msg)
@@ -489,6 +495,80 @@ class TestClientDiscovery:
         component = payload["cmps"][f"grobro_{device_id}_cmd_wifi_signal_strength"]
         assert component["device_class"] == "signal_strength"
         assert component["state_class"] == "measurement"
+
+    @pytest.mark.parametrize("device_id", ["QMN000ABC1D2E3FG", "0PVP0000TEST0001", "0HVR1234567890"])
+    def test_discovery_splits_diagnostic_and_config_entities(self, ha_client, device_id):
+        ha_client._Client__publish_device_discovery(device_id)
+
+        payload = next(
+            json.loads(call.args[1])
+            for call in ha_client._client.publish.call_args_list
+            if call.args[0] == f"homeassistant/device/{device_id}/config" and call.args[1]
+        )
+        cmps = payload["cmps"]
+
+        assert cmps[f"grobro_{device_id}_serial"]["entity_category"] == "diagnostic"
+        assert cmps[f"grobro_{device_id}_type"]["entity_category"] == "diagnostic"
+        assert cmps[f"grobro_{device_id}_cmd_data_interval"]["entity_category"] == "config"
+        assert cmps[f"grobro_{device_id}_cmd_mqtt_port"]["entity_category"] == "config"
+        assert cmps[f"grobro_{device_id}_cmd_wifi_signal_strength"]["entity_category"] == "diagnostic"
+        # Measurements and controls stay in their regular sections
+        for uid, cmp in cmps.items():
+            if cmp.get("device_class") in ("power", "energy") or "_cmd_slot" in uid:
+                assert "entity_category" not in cmp, uid
+
+    def test_discovery_after_restart_is_not_cleared(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        topic = f"homeassistant/device/{device_id}/config"
+        ha_client._Client__publish_device_discovery(device_id)
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
+        assert "" not in payloads
+        assert len(payloads) == 1
+
+    def test_changed_discovery_is_cleared_first(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        topic = f"homeassistant/device/{device_id}/config"
+        ha_client._discovery_payload_cache[device_id] = "{}"
+        ha_client._Client__publish_device_discovery(device_id)
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == topic]
+        assert payloads[0] == ""
+        assert payloads[1] != ""
+
+    def test_discovery_uses_bridge_availability(self, ha_client):
+        device_id = "QMN000ABC1D2E3FG"
+        ha_client._Client__publish_device_discovery(device_id)
+        payload = next(
+            json.loads(call.args[1])
+            for call in ha_client._client.publish.call_args_list
+            if call.args[0] == f"homeassistant/device/{device_id}/config" and call.args[1]
+        )
+        topics = [entry["t"] for entry in payload["avty"]]
+        assert topics == [f"homeassistant/grobro/{device_id}/availability", "homeassistant/grobro/bridge/availability"]
+        assert payload["avty_mode"] == "all"
+
+    def test_last_will_and_online_message(self, ha_client):
+        ha_client._client.will_set.assert_called_once_with("homeassistant/grobro/bridge/availability", "offline", retain=True)
+        ha_client._client.publish.reset_mock()
+        ha_client._Client__on_connect(None, None, None, 0, None)
+        ha_client._client.publish.assert_any_call("homeassistant/grobro/bridge/availability", "online", retain=True)
+
+    def test_ha_restart_republishes_discovery_and_states(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        device_id = "QMN000ABC1D2E3FG"
+        ha_client.publish_input_register(HomeAssistantInputRegister(device_id=device_id, payload={"Ppv": 100}))
+        ha_client._client.publish.reset_mock()
+
+        ha_client._client.on_message(None, None, _msg("homeassistant/status", b"online"))
+
+        topics = [call.args[0] for call in ha_client._client.publish.call_args_list]
+        payloads = [call.args[1] for call in ha_client._client.publish.call_args_list if call.args[0] == f"homeassistant/device/{device_id}/config"]
+        assert f"homeassistant/grobro/{device_id}/state" in topics
+        assert payloads and "" not in payloads
+
+    def test_ha_offline_status_is_ignored(self, ha_client):
+        ha_client._client.publish.reset_mock()
+        ha_client._client.on_message(None, None, _msg("homeassistant/status", b"offline"))
+        ha_client._client.publish.assert_not_called()
 
     def test_discovery_skip_unchanged_payload(self, ha_client):
         ha_client._Client__publish_device_discovery("QMN000ABC1D2E3FG")
@@ -797,7 +877,9 @@ class TestMaxBat:
         assert discovery_calls, "No discovery calls found"
         payload = json.loads(discovery_calls[-1][0][1])
         cmps = payload.get("cmps", {})
-        cmp_names = [v["name"] for v in cmps.values()]
+        cmp_names = [v["name"] for v in cmps.values() if "name" in v]
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"] == {"platform": "sensor"}
+        assert cmps["grobro_0PVP0000TEST0001_bat4_serial"] == {"platform": "sensor"}
         assert any("Bat1" in n for n in cmp_names)
         assert any("Battery 1" in n for n in cmp_names)
         assert not any("Bat2" in n for n in cmp_names)
@@ -805,6 +887,50 @@ class TestMaxBat:
         assert not any("Bat4" in n for n in cmp_names)
         assert not any("Battery 2" in n for n in cmp_names)
         assert any("Battery Count" in n for n in cmp_names)
+
+    def _discovery_cmps(self, client, device_id):
+        calls = [c for c in client._client.publish.call_args_list
+                 if c.args[0] == f"homeassistant/device/{device_id}/config" and c.args[1]]
+        return json.loads(calls[-1].args[1])["cmps"]
+
+    def _publish_noah(self, client, **overrides):
+        state = HomeAssistantInputRegister(device_id="0PVP0000TEST0001")
+        state.payload.update(_load_payload("NoahReadInputRegisters_0-124.bin"))
+        state.payload.update(overrides)
+        client.publish_input_register(state)
+
+    def test_unknown_count_assumes_single_battery_without_removal(self, ha_client):
+        ha_client.set_config("0PVP0000TEST0001", DeviceConfig(serial_number="0PVP0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert "grobro_0PVP0000TEST0001_bat1_temp" in cmps
+        assert not any("bat2" in uid or "bat_2" in uid for uid in cmps)
+
+    def test_detected_count_removes_extra_battery_entities(self, ha_client):
+        self._publish_noah(ha_client)
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        for uid in ("bat2_temp", "bat_3_soc_pct", "bat4_serial"):
+            assert cmps[f"grobro_0PVP0000TEST0001_{uid}"] == {"platform": "sensor"}
+        assert "grobro_0PVP0000TEST0001_bat2_ser_part_1" not in cmps
+
+    def test_disconnected_battery_keeps_entities(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=2)
+        self._publish_noah(ha_client, bat_cnt=1)
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 2
+        cmps = self._discovery_cmps(ha_client, "0PVP0000TEST0001")
+        assert cmps["grobro_0PVP0000TEST0001_bat2_temp"]["name"]
+        assert cmps["grobro_0PVP0000TEST0001_bat3_temp"] == {"platform": "sensor"}
+
+    def test_payload_without_bat_info_keeps_known_count(self, ha_client):
+        self._publish_noah(ha_client, bat_cnt=1)
+        ha_client.publish_input_register(
+            HomeAssistantInputRegister(device_id="0PVP0000TEST0001", payload={"out_power": 5})
+        )
+        assert _MAX_BAT_CACHE["0PVP0000TEST0001"] == 1
+
+    def test_undetectable_count_keeps_default_4(self, ha_client):
+        ha_client.set_config("0HVR0000TEST0001", DeviceConfig(serial_number="0HVR0000TEST0001"))
+        cmps = self._discovery_cmps(ha_client, "0HVR0000TEST0001")
+        assert cmps["grobro_0HVR0000TEST0001_battery4Soc"]["name"]
 
     def test_max_bat_default(self):
         from grobro.ha.client import MAX_BAT
@@ -937,6 +1063,31 @@ class TestEdgeCases:
                 c._Client__on_connect(None, None, None, 0, None)
                 assert "Connected to HA MQTT server" in caplog.text
 
+    def test_on_connect_subscribes_command_topics(self):
+        with patch("grobro.ha.client.mqtt.Client") as mqtt_client:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                mock = mqtt_client.return_value
+                mock.subscribe.reset_mock()
+                c._Client__on_connect(mock, None, None, 0, None)
+                topics = {call.args[0] for call in mock.subscribe.call_args_list}
+                assert "homeassistant/number/grobro/+/+/set" in topics
+                assert "homeassistant/button/grobro/+/+/read" in topics
+                assert "homeassistant/status" in topics
+                assert len(topics) == 13
+
+    def test_on_reconnect_resubscribes_command_topics(self):
+        # A broker restart drops subscriptions (clean session); they must be
+        # restored on every (re)connect, otherwise HA controls stop working.
+        with patch("grobro.ha.client.mqtt.Client") as mqtt_client:
+            with patch("grobro.ha.client.os.listdir", return_value=[]):
+                c = Client(MQTTConfig(host="localhost", port=1883))
+                mock = mqtt_client.return_value
+                mock.subscribe.reset_mock()
+                c._Client__on_connect(mock, None, None, 0, None)
+                c._Client__on_connect(mock, None, None, 0, None)
+                assert mock.subscribe.call_count == 26
+
     def test_slot_name_parse_error(self, ha_client):
         msg = _msg("homeassistant/button/grobro/QMN000ABC1D2E3FG/read_all/read")
         with patch("grobro.ha.client.MAX_SLOTS", 1):
@@ -1028,8 +1179,9 @@ class TestCombinedSerial:
     def test_discovery_excludes_ser_part_includes_combined(self):
         with patch("grobro.ha.client.mqtt.Client") as mc:
             with patch("grobro.ha.client.os.listdir", return_value=[]):
-                c = Client(MQTTConfig(host="localhost", port=1883))
-                c._Client__publish_device_discovery("0PVP0000TEST0001")
+                with patch("grobro.ha.client.MAX_BAT", 4):
+                    c = Client(MQTTConfig(host="localhost", port=1883))
+                    c._Client__publish_device_discovery("0PVP0000TEST0001")
         discovery_calls = [c for c in mc.return_value.publish.call_args_list
                            if "device" in c[0][0] and "config" in c[0][0] and c[1]]
         assert discovery_calls
@@ -1108,3 +1260,54 @@ class TestBatteryPositionWatch:
 
         assert "moved" not in caplog.text
         assert "re-enumeration" not in caplog.text
+
+
+class TestStatusSummary:
+    @pytest.mark.parametrize(
+        "payload, expected",
+        [
+            ({"Inverter_Status": "NormalStatus", "Derating_Mode": "No derating", "Fault_code": 0}, "Normal"),
+            ({"Inverter_Status": "NormalStatus", "Derating_Mode": "Over-frequency"}, "Normal – Over-frequency"),
+            ({"Inverter_Status": "Fault", "Fault_code": 117}, "Fault – Code 117"),
+            ({"Inverter_Status": "unknown"}, None),
+            ({"Ppv": 100}, None),
+        ],
+    )
+    def test_status_summary(self, payload, expected):
+        from grobro.ha.client import _status_summary
+        assert _status_summary(payload) == expected
+
+    def test_status_summary_is_published_and_discovered(self, ha_client):
+        from grobro.model.growatt_registers import HomeAssistantInputRegister
+        device_id = "ZGQ0000TEST0001"
+        ha_client.publish_input_register(HomeAssistantInputRegister(
+            device_id=device_id, payload={"Inverter_Status": "NormalStatus", "Derating_Mode": "Grid voltage high"},
+        ))
+        published = {call.args[0]: call.args[1] for call in ha_client._client.publish.call_args_list}
+        state = json.loads(published[f"homeassistant/grobro/{device_id}/state"])
+        discovery = json.loads(published[f"homeassistant/device/{device_id}/config"])
+        assert state["Status_Summary"] == "Normal – Grid voltage high"
+        assert f"grobro_{device_id}_Status_Summary" in discovery["cmps"]
+
+
+class TestAutoTimeSync:
+    def test_sync_time_of_all_devices(self, ha_client):
+        ha_client._discovery_cache.clear()
+        ha_client._discovery_cache.extend(["QMN000ABC1D2E3FG", "UNKNOWN0001"])
+        ha_client.sync_time_of_all_devices()
+        ha_client.on_config_command.assert_called_once()
+        device_id, register_no, value = ha_client.on_config_command.call_args.args
+        assert (device_id, register_no) == ("QMN000ABC1D2E3FG", 31)
+        assert len(value) == 19
+        ha_client._discovery_cache.clear()
+
+    def test_time_sync_is_scheduled_only_when_enabled(self, mock_mqtt):
+        with patch("grobro.ha.client.os.listdir", return_value=[]), patch("grobro.ha.client.Timer") as timer:
+            with patch("grobro.ha.client.AUTO_TIME_SYNC", False):
+                Client(MQTTConfig(host="localhost", port=1883))
+            timer.assert_not_called()
+            with patch("grobro.ha.client.AUTO_TIME_SYNC", True):
+                Client(MQTTConfig(host="localhost", port=1883))
+            delay = timer.call_args.args[0]
+            assert 0 < delay <= 12 * 3600
+            timer.return_value.start.assert_called_once()

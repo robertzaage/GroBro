@@ -34,7 +34,7 @@ configuration:
     description: Base MQTT topic used for Home Assistant auto-discovery and sensor states
   REGISTER_FILTER:
     name: REGISTER_FILTER
-    description: Comma-separated list of serial:alias pairs (e.g. 123456789:NOAH,987654321:NEO800). Allows specifying which register set to apply per device. Defaults to inverter register map if not set.
+    description: No longer used, devices are detected automatically.
   GROWATT_CLOUD:
     name: GROWATT_CLOUD
     description: Set to True to redirect messages to and from the Growatt Server. Default is False
@@ -49,10 +49,10 @@ configuration:
     description: Dumps every received messages into $DUMP_DIR for later in-depth inspection.
   MAX_SLOTS:
     name: MAX_SLOTS
-    description: How many time slots to show in Home Assistant for battery scheduling (NOAH only, max 9). Default is 1.
+    description: How many time slots to show in Home Assistant for battery scheduling (NOAH, NEXA, TL-XH and MOD, max 9). Default is 1.
   MAX_BAT:
     name: MAX_BAT
-    description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect automatically from serial numbers, or a number to override.
+    description: How many battery packs to display in Home Assistant. Set to "auto" (default) to detect the count from the device, or a number to override, which also removes the entities of batteries above it.
   DUMP_DIR:
     name: DUMP_DIR
     description: Directory to store dumped messages. Default is /share/GroBro/dump. In Addon it has to start with /share
@@ -71,3 +71,9 @@ configuration:
   KEEP_BATTERY_POSITION:
     name: KEEP_BATTERY_POSITION
     description: When enabled, GroBro tracks NOAH battery serial numbers across position changes and logs a warning if a battery moves to a different slot. Default is false.
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: When enabled, sensor states are published as MQTT retained messages, so they are also restored after a restart of the MQTT broker or GroBro. Restarts of Home Assistant are handled without this option, GroBro republishes the last states then. Default is false.
+  AUTO_TIME_SYNC:
+    name: AUTO_TIME_SYNC
+    description: When enabled, GroBro synchronizes the clock of your devices at 00:00 and 12:00. Default is false.

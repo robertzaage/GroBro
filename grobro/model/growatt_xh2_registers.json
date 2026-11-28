@@ -14,7 +14,8 @@
         "unit_of_measurement": "min",
         "min": 0,
         "max": 60,
-        "step": 1
+        "step": 1,
+        "entity_category": "config"
       }
     },
     "mqtt_ip": {
@@ -28,7 +29,8 @@
         "publish": true,
         "name": "MQTT IP",
         "type": "text",
-        "icon": "mdi:ip-network"
+        "icon": "mdi:ip-network",
+        "entity_category": "config"
       }
     },
     "mqtt_port": {
@@ -43,7 +45,8 @@
         "name": "MQTT Port",
         "type": "number",
         "min": 1,
-        "max": 65535
+        "max": 65535,
+        "entity_category": "config"
       }
     },
     "mqtt_broker": {
@@ -57,7 +60,8 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
-        "icon": "mdi:server-network"
+        "icon": "mdi:server-network",
+        "entity_category": "config"
       }
     },
     "system_time": {
@@ -71,11 +75,30 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     }
   },
   "holding_registers": {
+    "inverter_power": {
+      "growatt": {
+        "position": {
+          "register_no": 0,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Inverter Power",
+        "type": "switch",
+        "icon": "mdi:power"
+      }
+    },
     "output_power_limit": {
       "growatt": {
         "position": {
@@ -97,6 +120,1138 @@
         "min": 0,
         "max": 100,
         "step": 1
+      }
+    },
+    "discharge_rate": {
+      "growatt": {
+        "position": {
+          "register_no": 3036,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Discharge Rate",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "discharge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3037,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Discharge Stop SOC",
+        "type": "number",
+        "min": 10,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "charge_rate": {
+      "growatt": {
+        "position": {
+          "register_no": 3047,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Rate",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "charge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3048,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Stop SOC",
+        "type": "number",
+        "min": 11,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "ac_charge": {
+      "growatt": {
+        "position": {
+          "register_no": 3049,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "AC Charge",
+        "type": "switch",
+        "icon": "mdi:transmission-tower-import"
+      }
+    },
+    "on_grid_discharge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3067,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "On-grid Discharge Stop SOC",
+        "type": "number",
+        "min": 10,
+        "max": 100,
+        "unit_of_measurement": "%",
+        "step": 1
+      }
+    },
+    "export_limit_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 122,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Disabled",
+              "1": "Meter 1",
+              "2": "Meter 2",
+              "3": "CT Clamp"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limit Mode",
+        "type": "select",
+        "options": {
+          "0": "Disabled",
+          "1": "Meter 1",
+          "2": "Meter 2",
+          "3": "CT Clamp"
+        }
+      }
+    },
+    "export_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 123,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "SIGNED_FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Export Limit",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": -100,
+        "max": 100,
+        "step": 0.1
+      }
+    },
+    "peak_shaving": {
+      "growatt": {
+        "position": {
+          "register_no": 3306,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Peak Shaving",
+        "type": "switch"
+      }
+    },
+    "peak_shaving_import_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 3307,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Peak Shaving Import Limit",
+        "type": "number",
+        "unit_of_measurement": "kW",
+        "min": 0,
+        "max": 100,
+        "step": 0.1
+      }
+    },
+    "peak_shaving_export_limit": {
+      "growatt": {
+        "position": {
+          "register_no": 3308,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Peak Shaving Export Limit",
+        "type": "number",
+        "unit_of_measurement": "kW",
+        "min": 0,
+        "max": 100,
+        "step": 0.1
+      }
+    },
+    "peak_shaving_reserved_soc_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3309,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Peak Shaving Reserved SOC Enabled",
+        "type": "switch"
+      }
+    },
+    "peak_shaving_reserved_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3310,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Peak Shaving Reserved SOC",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    },
+    "grid_charge_max_power": {
+      "growatt": {
+        "position": {
+          "register_no": 3311,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Grid Charge Max Power",
+        "type": "number",
+        "unit_of_measurement": "kW",
+        "min": 0,
+        "max": 100,
+        "step": 0.1
+      }
+    },
+    "grid_charge_stop_soc": {
+      "growatt": {
+        "position": {
+          "register_no": 3312,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Grid Charge Stop SOC",
+        "type": "number",
+        "unit_of_measurement": "%",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    },
+    "slot1_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3038,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot1_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3038,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot1_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3038,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot1_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3039,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot2_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3040,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot2_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3040,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot2_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3040,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot2_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3041,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot3_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3042,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot3_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3042,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot3_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3042,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot3_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3043,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot4_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3044,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot4_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3044,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot4_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3044,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot4_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3045,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot5_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3050,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot5_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3050,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot5_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3050,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot5_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3051,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot6_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3052,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot6_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3052,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot6_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3052,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot6_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3053,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot7_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3054,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot7_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3054,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot7_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3054,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot7_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3055,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot8_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3056,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot8_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3056,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot8_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3056,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot8_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3057,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
+      }
+    },
+    "slot9_enabled": {
+      "growatt": {
+        "position": {
+          "register_no": 3058,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 15,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Enabled",
+        "type": "switch"
+      }
+    },
+    "slot9_mode": {
+      "growatt": {
+        "position": {
+          "register_no": 3058,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "bit_shift": 13,
+          "bit_width": 2,
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Load First",
+              "1": "Battery First",
+              "2": "Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Mode",
+        "type": "select",
+        "options": {
+          "0": "Load First",
+          "1": "Battery First",
+          "2": "Grid First"
+        }
+      }
+    },
+    "slot9_start_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3058,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM",
+          "bit_shift": 0,
+          "bit_width": 13
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Start Time",
+        "type": "time",
+        "icon": "mdi:clock-start"
+      }
+    },
+    "slot9_end_time": {
+      "growatt": {
+        "position": {
+          "register_no": 3059,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "TIME_HHMM"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 End Time",
+        "type": "time",
+        "icon": "mdi:clock-end"
       }
     }
   },
@@ -478,7 +1633,7 @@
           "size": 4
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -550,7 +1705,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -622,7 +1777,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -694,7 +1849,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -1269,23 +2424,28 @@
           "enum_options": {
             "enum_type": "INT_MAP",
             "values": {
-              "0": "cNOTDerate",
-              "1": "cPVHighDerate",
-              "2": "cPowerConstantDerate",
-              "3": "cGridVHighDerate",
-              "4": "cFreqHighDerate",
-              "5": "cDcSoureModeDerate",
-              "6": "cInvTemprDerate",
-              "7": "cActivePowerOrder",
-              "8": "cLoadSpeedProcess",
-              "9": "cOverBackbyTime",
-              "10": "cInternalTemprDerate",
-              "11": "cOutTemprDerate",
-              "12": "cLineImpeCalcDerate",
-              "13": "cParallelAntiBackflowDerate",
-              "14": "cLocalAntiBackflowDerate",
-              "15": "cBdcLoadPriDerate",
-              "16": "cChkCTErrDerate"
+              "0": "No derating",
+              "1": "Bus voltage high",
+              "2": "Aging fixed power",
+              "3": "Grid voltage high",
+              "4": "Over-frequency",
+              "5": "Single DC source mode",
+              "6": "Inverter module over-temperature",
+              "7": "Output limited by user setting",
+              "8": "Load speed process",
+              "9": "Over back by time",
+              "10": "Internal over-temperature",
+              "11": "External over-temperature",
+              "12": "Wire impedance",
+              "13": "Parallel inverter export limit",
+              "14": "Single inverter export limit",
+              "15": "Load first mode",
+              "16": "CT installation issue",
+              "17": "Zero current mode",
+              "18": "Boost module over-temperature",
+              "19": "Zero power mode",
+              "20": "Under-frequency",
+              "21": "Bus bar current limit"
             }
           }
         }
@@ -1988,7 +3148,7 @@
     "Edischr_total": {
       "growatt": {
         "position": {
-          "register_no": 3205,
+          "register_no": 3127,
           "offset": 0,
           "size": 4
         },
@@ -2036,7 +3196,7 @@
     "Echr_total": {
       "growatt": {
         "position": {
-          "register_no": 3207,
+          "register_no": 3131,
           "offset": 0,
           "size": 4
         },
@@ -2561,7 +3721,7 @@
     "Vbat": {
       "growatt": {
         "position": {
-          "register_no": 3192,
+          "register_no": 3169,
           "offset": 0,
           "size": 2
         },
@@ -2585,12 +3745,12 @@
     "Ibat": {
       "growatt": {
         "position": {
-          "register_no": 3193,
+          "register_no": 3170,
           "offset": 0,
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -2609,7 +3769,7 @@
     "SOC": {
       "growatt": {
         "position": {
-          "register_no": 3194,
+          "register_no": 3171,
           "offset": 0,
           "size": 2
         },
@@ -2777,7 +3937,7 @@
     "Pdischr": {
       "growatt": {
         "position": {
-          "register_no": 3201,
+          "register_no": 3178,
           "offset": 0,
           "size": 4
         },
@@ -2801,7 +3961,7 @@
     "Pchr": {
       "growatt": {
         "position": {
-          "register_no": 3203,
+          "register_no": 3180,
           "offset": 0,
           "size": 4
         },
@@ -2908,10 +4068,19 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
-          "float_options": {
-            "delta": 0.0,
-            "multiplier": 1.0
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Dormant",
+              "1": "Charging",
+              "2": "Discharging",
+              "3": "Idle",
+              "4": "Standby",
+              "5": "Soft start",
+              "6": "Fault",
+              "7": "Update"
+            }
           }
         }
       },
@@ -3021,7 +4190,7 @@
           "size": 2
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.01
@@ -3310,6 +4479,34 @@
         "publish": false,
         "state_class": "measurement",
         "icon": "mdi:information-outline"
+      }
+    },
+    "AFCI_Status": {
+      "growatt": {
+        "position": {
+          "register_no": 3112,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Waiting",
+              "1": "Self-check",
+              "2": "Arc detection",
+              "3": "Fault",
+              "4": "Update"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "AFCI status",
+        "publish": true,
+        "icon": "mdi:flash-alert",
+        "entity_category": "diagnostic"
       }
     }
   }

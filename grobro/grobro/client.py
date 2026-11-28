@@ -27,12 +27,14 @@ from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.model.growatt_registers import (
+    DEVICE_TYPE_CODE_REGISTERS,
+    GENERIC_DATALOGGER_PREFIXES,
+    GrowattRegisterPosition,
     KNOWN_NEO_REGISTERS,
-    KNOWN_NOAH_REGISTERS,
-    KNOWN_NEXA_REGISTERS,
-    KNOWN_SPF_REGISTERS,
-    KNOWN_XH2_REGISTERS,
-    KNOWN_MOD_REGISTERS,
+    detect_device_by_inverter_serial,
+    detect_device_by_type_code,
+    get_device_type_name,
+    get_known_registers,
 )
 
 
@@ -105,6 +107,7 @@ class Client:
         )
         client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
         client_id = f"grobro-grobro{('-' + client_id_suffix) if client_id_suffix else ''}"
+        self._type_code_requested: set[str] = set()
 
         self._client = mqtt.Client(
             client_id=client_id,
@@ -114,9 +117,7 @@ class Client:
 
         if grobro_mqtt.username and grobro_mqtt.password:
             self._client.username_pw_set(grobro_mqtt.username, grobro_mqtt.password)
-        if grobro_mqtt.use_tls:
-            self._client.tls_set(cert_reqs=ssl.CERT_NONE)
-            self._client.tls_insecure_set(True)
+        grobro_mqtt.configure_tls(self._client)
         self._client.connect(grobro_mqtt.host, grobro_mqtt.port, 60)
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
@@ -310,27 +311,7 @@ class Client:
 
                 # Cast value for HA number entities (INT config registers)
                 try:
-                    known_registers = None
-                    if cfg["device_id"].startswith("QMN"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    elif cfg["device_id"].startswith("0PVP"):
-                        known_registers = KNOWN_NOAH_REGISTERS
-                    elif cfg["device_id"].startswith("0HVR"):
-                        known_registers = KNOWN_NEXA_REGISTERS
-                    elif cfg["device_id"].startswith("HAQ"):
-                        known_registers = KNOWN_SPF_REGISTERS
-                    # TODO: ShineWeLink Datalogger
-                    elif cfg["device_id"].startswith("RAQ"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    # NEO 1000M-X LoRa (encapsulated)
-                    elif cfg["device_id"].startswith("PTQ"):
-                        known_registers = KNOWN_NEO_REGISTERS
-                    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
-                    elif cfg["device_id"].startswith("ZGQ"):
-                        known_registers = KNOWN_XH2_REGISTERS
-                    # MOD-series 3-phase inverters
-                    elif cfg["device_id"].startswith("VWQ"):
-                        known_registers = KNOWN_MOD_REGISTERS
+                    known_registers = get_known_registers(cfg["device_id"])
                     if known_registers:
                         for reg in known_registers.config_registers.values():
                             if reg.growatt.register_no == cfg["register_no"]:
@@ -411,29 +392,39 @@ class Client:
             LOG.debug("Received Modbus response: %s", modbus_message)
 
             if modbus_message:
-                known_registers = None
                 ptq_device_id = self._ptq_for_raq.get(device_id)
                 modbus_device_id = ptq_device_id or device_id
-                if modbus_device_id.startswith("QMN"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                elif modbus_device_id.startswith("0PVP"):
-                    known_registers = KNOWN_NOAH_REGISTERS
-                elif modbus_device_id.startswith("0HVR"):
-                    known_registers = KNOWN_NEXA_REGISTERS
-                elif modbus_device_id.startswith("HAQ"):
-                    known_registers = KNOWN_SPF_REGISTERS
-                elif modbus_device_id.startswith("RAQ"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                elif modbus_device_id.startswith("PTQ"):
-                    known_registers = KNOWN_NEO_REGISTERS
-                # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
-                elif modbus_device_id.startswith("ZGQ"):
-                    known_registers = KNOWN_XH2_REGISTERS
-                # MOD-series 3-phase inverters
-                elif modbus_device_id.startswith("VWQ"):
-                    known_registers = KNOWN_MOD_REGISTERS
+                known_registers = get_known_registers(modbus_device_id)
+                if modbus_message.metadata and (
+                    not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+                ):
+                    # Unknown or generic datalogger, identify the device by the serial of its inverter
+                    detected = detect_device_by_inverter_serial(
+                        modbus_device_id, modbus_message.metadata.device_sn
+                    )
+                    if detected:
+                        known_registers = detected
+                if modbus_message.function in (
+                    GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    GrowattModbusFunction.READ_HOLDING_REGISTER,
+                ) and (not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)):
+                    detected = detect_device_by_type_code(modbus_device_id, _device_type_code(modbus_message))
+                    if detected:
+                        known_registers = detected
+                        LOG.info(
+                            "Detected %s by device type code behind datalogger %s",
+                            get_device_type_name(modbus_device_id),
+                            modbus_device_id,
+                        )
+                        LOG.info(
+                            "Detected %s inverter %s behind datalogger %s",
+                            get_device_type_name(modbus_device_id),
+                            modbus_message.metadata.device_sn,
+                            modbus_device_id,
+                        )
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
+                    self.__request_device_type_code(modbus_device_id)
                     return
 
                 if modbus_message.function in (
@@ -489,6 +480,21 @@ class Client:
             LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
             LOG.error(f"Processing message: {e}")
+
+    def __request_device_type_code(self, device_id: str):
+        """Ask an unknown device once for its device type code (holding register 43)."""
+        if device_id in self._type_code_requested:
+            return
+        self._type_code_requested.add(device_id)
+        LOG.info("Requesting device type code of unknown device %s", device_id)
+        self.send_command(
+            GrowattModbusFunctionSingle(
+                device_id=device_id,
+                function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                register=DEVICE_TYPE_CODE_REGISTERS[0],
+                value=DEVICE_TYPE_CODE_REGISTERS[0],
+            )
+        )
 
     def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
         LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
@@ -571,6 +577,15 @@ def dump_message_binary(topic, payload):
             f.write(payload)
     except Exception as e:
         LOG.error(f"Failed to dump message for topic {topic}: {e}")
+
+
+def _device_type_code(modbus_message: GrowattModbusMessage):
+    """Return the device type code if the message contains register 43 or 30000."""
+    for register_no in DEVICE_TYPE_CODE_REGISTERS:
+        data = modbus_message.get_data(GrowattRegisterPosition(register_no=register_no, size=2))
+        if data:
+            return int.from_bytes(data, "big")
+    return None
 
 
 def get_property(msg, prop) -> str:

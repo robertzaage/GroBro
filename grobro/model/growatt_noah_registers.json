@@ -11,10 +11,11 @@
         "publish": true,
         "name": "Update Interval",
         "type": "number",
-        "unit_of_measurement": "min",
+        "unit_of_measurement": "s",
         "min": 0,
         "max": 60,
-        "step": 1
+        "step": 1,
+        "entity_category": "config"
       }
     },
     "mqtt_ip": {
@@ -28,7 +29,8 @@
         "publish": true,
         "name": "MQTT IP",
         "type": "text",
-        "icon": "mdi:ip-network"
+        "icon": "mdi:ip-network",
+        "entity_category": "config"
       }
     },
     "mqtt_port": {
@@ -43,7 +45,8 @@
         "name": "MQTT Port",
         "type": "number",
         "min": 1,
-        "max": 65535
+        "max": 65535,
+        "entity_category": "config"
       }
     },
     "mqtt_broker": {
@@ -57,7 +60,8 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
-        "icon": "mdi:server-network"
+        "icon": "mdi:server-network",
+        "entity_category": "config"
       }
     },
     "system_time": {
@@ -71,7 +75,8 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     },
     "wifi_signal_strength": {
@@ -88,7 +93,8 @@
         "state_class": "measurement",
         "device_class": "signal_strength",
         "unit_of_measurement": "dBm",
-        "icon": "mdi:wifi"
+        "icon": "mdi:wifi",
+        "entity_category": "diagnostic"
       }
     }
   },
@@ -1157,7 +1163,7 @@
     "heater": {
       "growatt": {
         "position": {
-          "register_no": 17,
+          "register_no": 14,
           "offset": 0,
           "size": 2
         },
@@ -2037,6 +2043,97 @@
         "name": "Firmware Version Part 3",
         "publish": false,
         "icon": "mdi:information"
+      }
+    },
+    "pv1_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 94,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV1 Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "pv2_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 97,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "system_temp": {
+      "growatt": {
+        "position": {
+          "register_no": 98,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": -273.1,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "System Temp",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "temperature",
+        "unit_of_measurement": "°C",
+        "icon": "mdi:thermometer"
+      }
+    },
+    "bat_soh": {
+      "growatt": {
+        "position": {
+          "register_no": 102,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery SoH",
+        "publish": true,
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:battery-heart-variant"
       }
     }
   }

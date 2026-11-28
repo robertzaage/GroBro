@@ -352,3 +352,55 @@ class TestMQTTConfig:
         assert result.use_tls is False
         assert result.username == "user"
         assert result.password == "pass"
+
+
+def test_float_options_default_to_no_offset():
+    from grobro.model.growatt_registers import GrowattRegisterFloatOptions
+
+    assert GrowattRegisterFloatOptions(multiplier=0.1).delta == 0
+
+
+@pytest.mark.parametrize("family", ["NEO", "XH2"])
+def test_bms_battery_current_is_signed(family):
+    import grobro.model.growatt_registers as regs
+
+    reg = getattr(regs, f"KNOWN_{family}_REGISTERS").input_registers["BMS_BatteryCurr"]
+    assert reg.growatt.data.parse(struct.pack("!h", -250)) == pytest.approx(-2.5)
+
+
+@pytest.mark.parametrize("key, raw, expected", [("Pac", struct.pack("!i", -5000), -500.0), ("Iac1", struct.pack("!h", -15), -1.5)])
+def test_xh2_output_power_and_current_are_signed(key, raw, expected):
+    from grobro.model.growatt_registers import KNOWN_XH2_REGISTERS
+
+    reg = KNOWN_XH2_REGISTERS.input_registers[key]
+    assert reg.growatt.data.parse(raw) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "key, register_no", [("Vbat", 3169), ("Ibat", 3170), ("SOC", 3171), ("Pdischr", 3178), ("Pchr", 3180), ("Edischr_total", 3127), ("Echr_total", 3131)]
+)
+def test_xh2_battery_values_use_first_bdc(key, register_no):
+    from grobro.model.growatt_registers import KNOWN_XH2_REGISTERS
+
+    assert KNOWN_XH2_REGISTERS.input_registers[key].growatt.position.register_no == register_no
+
+
+@pytest.mark.parametrize(
+    "family, key, raw, expected",
+    [
+        ("SPF", "System_Status", 1, "PV & Grid Supporting Loads"),
+        ("SPF", "System_Status", 21, "PV Export to Grid"),
+        ("SPF", "System_Status", 2, "Discharge"),
+        ("SPH", "Inverter_Status", 8, "Battery Off-Grid"),
+        ("XH2", "Derating_Mode", 21, "Bus bar current limit"),
+        ("MOD", "Derating_Mode", 0, "No derating"),
+        ("XH2", "BMS_Status", 1, "Charging"),
+        ("XH2", "AFCI_Status", 2, "Arc detection"),
+        ("MOD", "AFCI_Status", 0, "Waiting"),
+    ],
+)
+def test_status_tables(family, key, raw, expected):
+    import grobro.model.growatt_registers as regs
+
+    reg = getattr(regs, f"KNOWN_{family}_REGISTERS").input_registers[key]
+    assert reg.growatt.data.parse(struct.pack("!H", raw)) == expected

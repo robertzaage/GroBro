@@ -1,0 +1,79 @@
+configuration:
+  SOURCE_MQTT_HOST:
+    name: SOURCE_MQTT_HOST
+    description: "Hostnaam of IP van de bron-MQTT-broker (voor Growatt)"
+  SOURCE_MQTT_PORT:
+    name: SOURCE_MQTT_PORT
+    description: "Poort van de bron-MQTT-broker"
+  SOURCE_MQTT_TLS:
+    name: SOURCE_MQTT_TLS
+    description: "Inschakelen om TLS te gebruiken zonder certificaatcontrole"
+  SOURCE_MQTT_USER:
+    name: SOURCE_MQTT_USER
+    description: "Gebruikersnaam voor de bron-MQTT-broker (als authenticatie vereist is)"
+  SOURCE_MQTT_PASS:
+    name: SOURCE_MQTT_PASS
+    description: "Wachtwoord voor de bron-MQTT-broker"
+  TARGET_MQTT_HOST:
+    name: TARGET_MQTT_HOST
+    description: "Hostnaam of IP van de doel-MQTT-broker (voor Home Assistant)"
+  TARGET_MQTT_PORT:
+    name: TARGET_MQTT_PORT
+    description: "Poort van de doel-MQTT-broker"
+  TARGET_MQTT_TLS:
+    name: TARGET_MQTT_TLS
+    description: "Inschakelen om TLS te gebruiken zonder certificaatcontrole"
+  TARGET_MQTT_USER:
+    name: TARGET_MQTT_USER
+    description: "Gebruikersnaam voor de doel-MQTT-broker (als authenticatie vereist is)"
+  TARGET_MQTT_PASS:
+    name: TARGET_MQTT_PASS
+    description: "Wachtwoord voor de doel-MQTT-broker"
+  HA_BASE_TOPIC:
+    name: HA_BASE_TOPIC
+    description: "Basis-MQTT-topic voor Home Assistant auto-discovery en sensorstatussen"
+  REGISTER_FILTER:
+    name: REGISTER_FILTER
+    description: "Wordt niet meer gebruikt, apparaten worden automatisch herkend."
+  GROWATT_CLOUD:
+    name: GROWATT_CLOUD
+    description: "Inschakelen om berichten van en naar de Growatt-cloud door te sturen. Standaard uitgeschakeld"
+  GROWATT_CLOUD_CONFIG_FILTER:
+    name: GROWATT_CLOUD_CONFIG_FILTER
+    description: "Inschakelen om configuratieberichten niet door te sturen. Dit beschermt de datalogger tegen wijzigingen op afstand vanuit de Growatt-cloud. Standaard uitgeschakeld"
+  LOG_LEVEL:
+    name: LOG_LEVEL
+    description: "Logniveau: ERROR, INFO of DEBUG. Standaard ERROR."
+  DUMP_MESSAGES:
+    name: DUMP_MESSAGES
+    description: "Slaat alle ontvangen berichten op in $DUMP_DIR voor latere analyse."
+  MAX_SLOTS:
+    name: MAX_SLOTS
+    description: "Hoeveel tijdsloten in Home Assistant worden getoond voor de batterijplanning (NOAH, NEXA, TL-XH en MOD, max. 9). Standaard 1."
+  MAX_BAT:
+    name: MAX_BAT
+    description: "Hoeveel batterijpakketten in Home Assistant worden getoond. \"auto\" (standaard) herkent het aantal via het apparaat, een getal legt het vast en verwijdert de entiteiten van batterijen daarboven."
+  DUMP_DIR:
+    name: DUMP_DIR
+    description: "Map voor opgeslagen berichten. Standaard /share/GroBro/dump. In de add-on moet deze met /share beginnen"
+  DEVICE_TIMEOUT:
+    name: DEVICE_TIMEOUT
+    description: "Time-out in seconden voor de communicatie met het apparaat. Standaard 0 (uitgeschakeld). Aanbevolen 300 of meer."
+  AVAILABILITY_SENSOR:
+    name: AVAILABILITY_SENSOR
+    description: "Beschikbaarheid alleen als aparte online-sensor tonen, in plaats van het apparaat en alle entiteiten na de time-out als onbeschikbaar te markeren."
+  FILTER_DATA_GLITCHES:
+    name: FILTER_DATA_GLITCHES
+    description: "Voorkomt sprongen in total_increasing-sensoren (energietellers enz.) wanneer een apparaat opnieuw verbinding maakt. Standaard uitgeschakeld."
+  TZ:
+    name: Tijdzone
+    description: "Lokale tijdzone, zodat logs en gebeurtenissen de juiste tijd hebben."
+  KEEP_BATTERY_POSITION:
+    name: KEEP_BATTERY_POSITION
+    description: "GroBro volgt de serienummers van de NOAH-batterijen en logt een waarschuwing als een batterij van positie wisselt. Standaard uitgeschakeld."
+  PUBLISH_SENSORS_RETAINED:
+    name: PUBLISH_SENSORS_RETAINED
+    description: "Publiceert sensorstatussen als retained MQTT-berichten, zodat ze ook na een herstart van de MQTT-broker of GroBro worden hersteld. Herstarts van Home Assistant worden ook zonder deze optie afgehandeld. Standaard uitgeschakeld."
+  AUTO_TIME_SYNC:
+    name: AUTO_TIME_SYNC
+    description: "GroBro synchroniseert de tijd van je apparaten om 00:00 en 12:00. Standaard uitgeschakeld."

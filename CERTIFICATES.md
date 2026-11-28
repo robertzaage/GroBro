@@ -15,7 +15,7 @@ The firmware may not have the full chain pre-installed, so you need to provide i
 
 ### Example Scenario
 
-Let’s say you’ve generated a certificate for `mqtt.example.com` via Let’s Encrypt. You inspect the connection using `openssl`:
+Let’s say you’ve generated a certificate for `mqtt.example.com` via Let’s Encrypt. Check the chain your broker sends using `openssl`:
 
 ```bash
 openssl s_client -showcerts -connect mqtt.example.com:7006
@@ -36,34 +36,40 @@ To satisfy Growatt clients, you must provide a **fullchain.pem** that includes:
 ![ISRG Hierarchy](./assets/isrg-hierarchy.png)
 *Let’s Encrypt Certificate Hierarchy as of June 2024, showing the relationship between root, intermediate, and subscriber certificates. Source: [letsencrypt.org/certificates](https://letsencrypt.org/certificates/)*
 
-### Step-by-Step: Building a Correct `fullchain.pem`
+### Step-by-Step: Building a Correct Chain
 
 1. **Get Your Certificate**
-   This is your own domain certificate, usually provided by certbot as `cert.pem`.
+   certbot creates `fullchain.pem` in `/etc/letsencrypt/live/<your-domain>/`. It already contains your certificate and the intermediate certificate, only the root is missing.
 
-2. **Download the Intermediate Certificate (E6)**
+2. **Find the Root of Your Chain**
+   Check which root issued the last certificate in `fullchain.pem`:
    ```bash
-   wget https://letsencrypt.org/certs/2024/e6.pem
+   openssl crl2pkcs7 -nocrl -certfile fullchain.pem | openssl pkcs7 -print_certs -noout
    ```
+   The `issuer` of the last entry is your root, e.g. `ISRG Root X1` or `ISRG Root X2`.
 
-3. **Download the Root Certificate (ISRG Root X2)**
+3. **Download the Matching Root Certificate**
    ```bash
-   wget https://letsencrypt.org/certs/isrg-root-x2.pem
+   # ISRG Root X2 (ECDSA chains)
+   wget -O root.pem https://letsencrypt.org/certs/isrg-root-x2.pem
+   # ISRG Root X1 (RSA chains)
+   wget -O root.pem https://letsencrypt.org/certs/isrgrootx1.pem
    ```
 
 4. **Create the Full Chain**
-   Concatenate all three in the correct order:
+   Append the root to your full chain:
    ```bash
-   cat cert.pem e6.pem isrg-root-x2.pem > fullchain.pem
+   cat fullchain.pem root.pem > chain-full.pem
    ```
 
 5. **Use the Full Chain**
-   Your Growatt device will now be able to verify the entire trust chain when connecting over TLS.
+   Configure `chain-full.pem` as `certfile` in Mosquitto. Your Growatt device will now be able to verify the entire trust chain when connecting over TLS.
 
 ### Tips
 
-- Always verify the chain with `openssl s_client` after creating `fullchain.pem`.
-- If you’re unsure about which intermediate/root to use, check the [Let’s Encrypt certificate list](https://letsencrypt.org/certificates/).
+- Always verify the chain with `openssl s_client` after creating `chain-full.pem`.
+- Don't append a root that doesn't match your chain. If you're unsure, check the [Let’s Encrypt certificate list](https://letsencrypt.org/certificates/).
+- Renewed certificates may come from a different intermediate, so rebuild `chain-full.pem` after every renewal.
 - If the device is using a different root, make sure to follow the corresponding chain.
 
 ## Supported Root Certificates

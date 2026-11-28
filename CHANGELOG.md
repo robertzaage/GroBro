@@ -1,3 +1,66 @@
+## Unreleased
+
+### New Features
++ `PUBLISH_SENSORS_RETAINED` is now configurable in the add-on UI. It already existed as an environment variable, but the add-on never passed it through
+
+### Bug Fixes
++ Fixed NOAH battery 2-4 entities being created after every GroBro restart and then reported as orphaned (e.g. by Spook). Until the battery count is detected after a restart, a single battery is assumed. Entities of batteries above the detected count (or `MAX_BAT`) are now explicitly removed from Home Assistant, which also cleans up existing orphans. While GroBro runs, the detected count only grows, so a disconnected battery keeps its entities
+
+## v2.8.3
+
+### New Features
++ NEXA devices now expose smart meter connection and power, off-grid mode, off-grid voltage, battery current, inverter temperature and the daily battery charge, battery discharge and AC output energy
+
+### Bug Fixes
++ Fixed NEXA on-grid power, off-grid current and power, grid current and inverter voltages using wrong scaling. The former `Register No 110`, `111`, `112`, `114` and `117` sensors now have proper names and units, existing entities are kept
++ NEXA energy counters are now read as 32 bit values, so they no longer wrap around at 6553.5 kWh
++ Fixed SPF apparent power and battery discharge power only reading the upper half of their 32 bit values
++ Fixed NEO and XH2 BMS battery current showing huge values instead of negative ones
++ Fixed the NOAH and NEXA update interval being shown in minutes although the device uses seconds (#248)
+
+## v2.8.2
+
+### New Features
++ Added optional certificate and hostname verification for the source and target MQTT connections (`SOURCE_MQTT_TLS_VERIFY`, `SOURCE_MQTT_CA_FILE`, `TARGET_MQTT_TLS_VERIFY`, `TARGET_MQTT_CA_FILE`). It is disabled by default, so existing setups keep working unchanged (#247)
++ NOAH devices now expose PV1 temperature, PV2 temperature, system temperature and battery state of health (#242)
++ NEXA devices now expose the temperatures of battery packs 2-4 (#240)
++ Added a Power+ switch for NEXA. It raises the output power limit of the device from 800W to 1000W, and slot power can now be set up to 1000W as well (#229)
++ NEXA devices now expose the battery heater state (#153)
++ Added an MQTT and network troubleshooting guide (#246)
+
+### Bug Fixes
++ Fixed the NOAH heater state always showing "Off". It is now read from register 14, which reports one bit per battery pack whose heater is running (#153)
++ Fixed Home Assistant controls silently stopping to work after the MQTT broker was restarted or the connection dropped. The command topic subscriptions are now re-established on every reconnect (#242)
++ Fixed NEXA PV1-PV4 and system temperatures always showing around 28 °C. They are now scaled like the battery temperatures (#240)
++ Absent temperature sensors (e.g. an unused PV input or a missing battery pack) now show as unknown instead of -273.1 °C
++ Fixed the ISRG Root X2 download link in the configuration guide (#235)
+
+## v2.8.1
+
+### Breaking Changes
++ NOAH and NEXA slot modes are now select entities and slot start/end times are now time entities instead of numbers. Home Assistant creates them with new entity IDs, so automations and dashboards using the old `number.*` slot entities need to be updated (#211, #222)
++ NEXA serial number parts 1-4 are no longer published as separate sensors. Use the existing serial number sensor instead (#215)
+
+### New Features
++ Added initial support for MOD-series inverters
++ Added an Inverter Power switch for NEO inverters (register 0). It turns the inverter fully off, which the output power limit can't do because of its ~30 W floor (#188)
++ Added Wi-Fi signal strength sensors for NEO (#227), NOAH and NEXA (#223)
++ Added firmware sensors for NOAH and NEXA, plus a combined firmware version matching the one shown in ShinePhone (#206, #231)
++ Added the MQTT IP config register (17) for all device families
++ NEXA default output power can now be set up to 1000W (#229)
++ NEXA 2000 0xFE19 config messages are now parsed (#216)
++ The 0x6F64 smart meter message is no longer EcoTracker-specific and now also works for other meters like Shelly (#218)
++ Debug logging now includes decrypted messages forwarded from the Growatt Cloud and the full EcoTracker payload (#204, #208)
++ Passwords are now masked in the add-on configuration UI and successful MQTT connections are logged as INFO (#232)
+
+### Bug Fixes
++ Fixed NEO output power limit sometimes showing "unknown". Confirmed writes from the Growatt Cloud are now synced to Home Assistant and holding register states are retained (#228)
++ Fixed config read responses including trailing protocol data in their state value (#227)
++ Fixed handling of the hourly holding register dump (message type 0x0103) (#198, #225)
++ Fixed wrong offsets of the NOAH firmware version parts (#210)
++ Fixed the description of the NEXA Default Smart Mode Enabled switch (#224)
++ Updated the configuration guide for the latest ShinePhone app (#220)
+
 ## v2.7.5
 
 ### Bug Fixes

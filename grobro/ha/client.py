@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import ssl
 import json
 import logging
 from threading import Timer
@@ -16,12 +15,8 @@ from grobro.model.growatt_registers import (
     HomeAssistantInputRegister,
     HomeAssistantHoldingRegisterInput,
     GroBroRegisters,
-    KNOWN_NEO_REGISTERS,
-    KNOWN_NOAH_REGISTERS,
-    KNOWN_NEXA_REGISTERS,
-    KNOWN_SPF_REGISTERS,
-    KNOWN_XH2_REGISTERS,
-    KNOWN_MOD_REGISTERS,
+    get_device_type_name,
+    get_known_registers,
 )
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_function import (
@@ -29,6 +24,10 @@ from grobro.model.modbus_function import (
 )
 
 HA_BASE_TOPIC = os.getenv("HA_BASE_TOPIC", "homeassistant")
+# Availability of GroBro itself, set to offline by the broker if GroBro disconnects
+BRIDGE_AVAILABILITY_TOPIC = f"{HA_BASE_TOPIC}/grobro/bridge/availability"
+# Home Assistant announces restarts on this topic (birth message)
+HA_STATUS_TOPIC = f"{HA_BASE_TOPIC}/status"
 DEVICE_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 0))
 AVAILABILITY_SENSOR = os.getenv("AVAILABILITY_SENSOR", "False").lower() == "true"
 PUBLISH_SENSORS_RETAINED = os.getenv("PUBLISH_SENSORS_RETAINED", "False").lower() == "true"
@@ -40,6 +39,8 @@ except ValueError:
     MAX_BAT = MAX_BAT_RAW
 FILTER_DATA_GLITCHES = os.getenv("FILTER_DATA_GLITCHES", "False").lower() == "true"
 KEEP_BATTERY_POSITION = os.getenv("KEEP_BATTERY_POSITION", "False").lower() == "true"
+AUTO_TIME_SYNC = os.getenv("AUTO_TIME_SYNC", "False").lower() == "true"
+TIME_SYNC_HOURS = (0, 12)
 LOG = logging.getLogger(__name__)
 
 _MAX_BAT_CACHE: dict[str, int] = {}
@@ -64,54 +65,45 @@ def _detect_bat_count(payload: dict) -> int:
     return count
 
 
+def _can_detect_bat_count(device_id: str) -> bool:
+    known_registers = get_known_registers(device_id)
+    if not known_registers:
+        return False
+    return any(
+        name == "bat_cnt" or (name.startswith("bat") and name.endswith("_ser_part_1"))
+        for name in known_registers.input_registers
+    )
+
+
+def _has_bat_info(payload: dict) -> bool:
+    bat_cnt = payload.get("bat_cnt")
+    if isinstance(bat_cnt, int) and bat_cnt >= 1:
+        return True
+    return any(str(payload.get(f"bat{n}_ser_part_1") or "").strip() for n in range(2, 5))
+
+
 def _resolve_max_bat(device_id: str, payload: dict | None = None) -> int:
     if isinstance(MAX_BAT, int):
         return MAX_BAT
-    if payload is not None:
-        c = _detect_bat_count(payload)
+    if payload is not None and _has_bat_info(payload):
+        # The count only grows while GroBro runs: a battery that stops
+        # reporting, e.g. because it was disconnected, keeps its entities
+        # instead of having them removed. Set MAX_BAT to drop it for good.
+        c = max(_detect_bat_count(payload), _MAX_BAT_CACHE.get(device_id, 0))
         _MAX_BAT_CACHE[device_id] = c
         return c
-    return _MAX_BAT_CACHE.get(device_id, 4)
-
-def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
-    """Ermittle passende Register-Sammlung anhand device_id-Präfix."""
-    if device_id.startswith("QMN"):
-        return KNOWN_NEO_REGISTERS
-    if device_id.startswith("0PVP"):
-        return KNOWN_NOAH_REGISTERS
-    if device_id.startswith("0HVR"):
-        return KNOWN_NEXA_REGISTERS
-    if device_id.startswith("HAQ"):
-        return KNOWN_SPF_REGISTERS
-    if device_id.startswith("RAQ") or device_id.startswith("PTQ"):
-        return KNOWN_NEO_REGISTERS
-    # MIN TL-XH2 hybrid inverters (ShineWiFi-X2 dongle, ZGQ prefix)
-    if device_id.startswith("ZGQ"):
-        return KNOWN_XH2_REGISTERS
-    # MOD-series 3-phase inverters
-    if device_id.startswith("VWQ"):
-        return KNOWN_MOD_REGISTERS
-    return None
+    if device_id in _MAX_BAT_CACHE:
+        return _MAX_BAT_CACHE[device_id]
+    if payload is not None or not _can_detect_bat_count(device_id):
+        return 4
+    # No payload seen since startup: assume a single battery. Entities of
+    # further batteries are added once a payload reports them, which (unlike
+    # removing entities again) leaves no orphans behind in Home Assistant.
+    return 1
 
 
-def get_device_type_name(device_id: str) -> str:
-    """Ermittle Klartext-Typname anhand der device_id."""
-    if device_id.startswith("QMN") or device_id.startswith("PTQ"):
-        return "NEO"
-    if device_id.startswith("0PVP"):
-        return "NOAH"
-    if device_id.startswith("0HVR"):
-        return "NEXA"
-    if device_id.startswith("HAQ"):
-        return "SPF"
-    if device_id.startswith("RAQ"):
-        return "ShineWeLink"
-    if device_id.startswith("ZGQ"):
-        return "MIN-XH2"
-    if device_id.startswith("VWQ"):
-        return "MOD"
-    return "UNKNOWN"
-
+def _bat_count_known(device_id: str) -> bool:
+    return isinstance(MAX_BAT, int) or device_id in _MAX_BAT_CACHE
 
 def map_enum_value(reg, value):
     """Wandelt ENUM-INT_MAP-Werte in Klartext um (falls vorhanden)."""
@@ -136,6 +128,53 @@ def make_modbus_command(device_id: str, func: GrowattModbusFunction, register_no
         register=register_no,
         value=value if value is not None else register_no,
     )
+
+
+def _to_register_value(reg, cmd_type: str, raw_value: str) -> int:
+    """Convert a Home Assistant value into the raw 16 bit register value of a holding register."""
+    if cmd_type == "switch":
+        return 1 if raw_value.upper() == "ON" else 0
+    if cmd_type == "time":
+        hour, minute = map(int, raw_value.split(":")[:2])
+        return (hour * 256) + minute
+    if cmd_type == "select":
+        options = getattr(reg.homeassistant, "options", None)
+        if options:
+            reverse_options = {value: int(key) for key, value in options.items()}
+            if raw_value not in reverse_options:
+                raise ValueError(f"unknown option {raw_value}")
+            return reverse_options[raw_value]
+        return int(raw_value)
+
+    data = reg.growatt.data
+    value = float(raw_value)
+    if data.float_options and data.data_type in ("FLOAT", "SIGNED_FLOAT"):
+        value = (value - data.float_options.delta) / data.float_options.multiplier
+    elif data.mult:
+        value = value / data.mult
+    raw = int(round(value))
+    # Negative values are written as two's complement
+    return raw & 0xFFFF if raw < 0 else raw
+
+
+def _has_status_summary(known_registers) -> bool:
+    regs = known_registers.input_registers
+    return "Inverter_Status" in regs and ("Derating_Mode" in regs or "Fault_code" in regs)
+
+
+def _status_summary(payload: dict) -> Optional[str]:
+    """Combine status, derating reason and fault code into one readable text."""
+    status = payload.get("Inverter_Status")
+    if not isinstance(status, str) or status == "unknown":
+        return None
+    parts = [status.removesuffix("Status") or status]
+    derating = payload.get("Derating_Mode")
+    if isinstance(derating, str) and derating not in ("No derating", "unknown"):
+        parts.append(derating)
+    fault = payload.get("Fault_code")
+    if isinstance(fault, (int, float)) and fault > 0:
+        parts.append(f"Code {int(fault)}")
+    return " – ".join(parts)
 
 
 def _get_bat_number(name: str) -> Optional[int]:
@@ -221,16 +260,16 @@ class Client:
 
         if mqtt_config.username and mqtt_config.password:
             self._client.username_pw_set(mqtt_config.username, mqtt_config.password)
-        if mqtt_config.use_tls:
-            self._client.tls_set(cert_reqs=ssl.CERT_NONE)
-            self._client.tls_insecure_set(True)
+        mqtt_config.configure_tls(self._client)
+        self._client.will_set(BRIDGE_AVAILABILITY_TOPIC, "offline", retain=True)
+        self._last_states: dict[str, str] = {}
+        self._time_sync_timer: Optional[Timer] = None
+        if AUTO_TIME_SYNC:
+            self.__schedule_time_sync()
         self._client.connect(mqtt_config.host, mqtt_config.port, 60)
 
-        # Subscriptions
-        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
-            for action in ["set", "read"]:
-                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
-                self._client.subscribe(topic)
+        # Subscriptions are (re)established in __on_connect so they survive
+        # broker restarts and reconnects (clean session drops them).
         self._client.on_message = self.__on_message
         self._client.on_connect = self.__on_connect
 
@@ -242,6 +281,8 @@ class Client:
                     self._config_cache[config.device_id] = config
 
         self._discovery_payload_cache: dict[str, str] = {}
+        # Last published holding register values, needed to update packed registers
+        self._holding_values: dict[tuple[str, str], str] = {}
         self._neo_pv_count: dict[str, int] = {}
 
     # ------------------- Lifecycle -------------------
@@ -285,18 +326,16 @@ class Client:
         payload = dict(state.payload)
         known_registers = get_known_registers(state.device_id)
 
-        # Replace invalid battery temperatures (-273) with None
+        # Absent temperature sensors report a raw 0 K, which decodes to -273.1 °C
         if known_registers:
             for key, value in list(payload.items()):
                 reg = known_registers.input_registers.get(key)
                 if not reg:
                     continue
-
-                # Identify batX_temp sensors
-                name = key  # key == "bat1_temp", "bat2_temp", etc.
-                if name.startswith("bat") and name.endswith("_temp"):
-                    if isinstance(value, (int, float)) and value == -273.1:
-                        payload[key] = None
+                if getattr(reg.homeassistant, "device_class", None) != "temperature":
+                    continue
+                if isinstance(value, (int, float)) and value == -273.1:
+                    payload[key] = None
 
         for key in list(payload.keys()):
             bat_num = _get_bat_number(key)
@@ -309,6 +348,10 @@ class Client:
                 reg = known_registers.input_registers.get(key)
                 if reg:
                     payload[key] = map_enum_value(reg, value)
+
+        status_summary = _status_summary(payload)
+        if status_summary:
+            payload["Status_Summary"] = status_summary
 
         # Prevent glitches on total_increasing sensors (energy counters)
         if FILTER_DATA_GLITCHES and known_registers:
@@ -360,7 +403,9 @@ class Client:
 
         # State publish
         topic = f"{HA_BASE_TOPIC}/grobro/{state.device_id}/state"
-        self._client.publish(topic, json.dumps(payload, separators=(",", ":")), retain=PUBLISH_SENSORS_RETAINED)
+        state_str = json.dumps(payload, separators=(",", ":"))
+        self._last_states[topic] = state_str
+        self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
 
 
     def publish_holding_register_input(self, ha_input: HomeAssistantHoldingRegisterInput):
@@ -368,6 +413,7 @@ class Client:
             LOG.debug("HA: publish: %s", ha_input)
             for value in ha_input.payload:
                 topic = f"{HA_BASE_TOPIC}/{value.register_def.type}/grobro/{ha_input.device_id}/{value.name}/get"
+                self._holding_values[(ha_input.device_id, value.name)] = str(value.value)
                 self._client.publish(topic, value.value, retain=True)
         except Exception as e:
             LOG.error(f"HA: publish msg: {e}")
@@ -376,8 +422,21 @@ class Client:
 
     def __on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to HA MQTT server with result code {reason_code}")
+        self._client.publish(BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
+        self._client.subscribe(HA_STATUS_TOPIC)
+        self.__subscribe_commands()
+
+    def __subscribe_commands(self):
+        for cmd_type in ["number", "time", "button", "switch", "select", "config"]:
+            for action in ["set", "read"]:
+                topic = f"{HA_BASE_TOPIC}/{cmd_type}/grobro/+/+/{action}"
+                self._client.subscribe(topic)
 
     def __on_message(self, client, userdata, msg: mqtt.MQTTMessage):
+        if msg.topic == HA_STATUS_TOPIC:
+            if msg.payload.decode(errors="ignore").strip() == "online":
+                self.__republish_after_ha_restart()
+            return
         parts = msg.topic.removeprefix(f"{HA_BASE_TOPIC}/").split("/")
         if len(parts) != 5 or parts[0] not in {"number", "time", "button", "switch", "select", "config"}:
             return
@@ -463,41 +522,17 @@ class Client:
                 )
                 return
 
-            if cmd_type == "switch":
-                parsed_value = 1 if raw_value.upper() == "ON" else 0
+            try:
+                parsed_value = _to_register_value(reg, cmd_type, raw_value)
+            except ValueError as e:
+                LOG.error("Invalid value %s for %s: %s", raw_value, cmd_name, e)
+                return
 
-            elif cmd_type == "time":
-                hour, minute = map(int, raw_value.split(":")[:2])
-                parsed_value = (hour * 256) + minute
-
-            elif cmd_type == "select":
-                options = getattr(
-                    reg.homeassistant,
-                    "options",
-                    None,
-                )
-
-                if options:
-                    reverse_options = {
-                        value: int(key)
-                        for key, value in options.items()
-                    }
-
-                    if raw_value not in reverse_options:
-                        LOG.error(
-                            "Unknown select value %s for %s",
-                            raw_value,
-                            cmd_name,
-                        )
-                        return
-
-                    parsed_value = reverse_options[raw_value]
-
-                else:
-                    parsed_value = int(raw_value)
-
-            else:
-                parsed_value = int(raw_value)
+            # Packed registers hold several fields, keep the other fields unchanged
+            if reg.growatt.data.bit_width is not None:
+                parsed_value = self.__pack_register_value(device_id, known_registers, cmd_name, parsed_value)
+                if parsed_value is None:
+                    return
 
             pos = reg.growatt.position
 
@@ -550,6 +585,68 @@ class Client:
             if self.on_config_command:
                 self.on_config_command(device_id, register_no, value)
             return
+
+    def __schedule_time_sync(self):
+        from datetime import datetime, timedelta
+
+        now = datetime.now()
+        candidates = [now.replace(hour=h, minute=0, second=0, microsecond=0) for h in TIME_SYNC_HOURS]
+        candidates += [c + timedelta(days=1) for c in candidates]
+        next_sync = min(c for c in candidates if c > now)
+        self._time_sync_timer = Timer((next_sync - now).total_seconds(), self.sync_time_of_all_devices, args=(True,))
+        self._time_sync_timer.daemon = True
+        self._time_sync_timer.start()
+
+    def sync_time_of_all_devices(self, reschedule: bool = False):
+        """Write the current time to every known device that supports it (config register 31)."""
+        from datetime import datetime
+
+        value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for device_id in list(self._discovery_cache):
+            known_registers = get_known_registers(device_id)
+            if not known_registers or not self.on_config_command:
+                continue
+            if any(reg.growatt.register_no == 31 for reg in known_registers.config_registers.values()):
+                LOG.info("Synchronizing time of %s", device_id)
+                self.on_config_command(device_id, 31, value)
+        if reschedule:
+            self.__schedule_time_sync()
+
+    def __republish_after_ha_restart(self):
+        """Home Assistant restarted: send discovery and the last states again."""
+        LOG.info("Home Assistant came online, republishing discovery and states")
+        for device_id in list(self._discovery_cache):
+            # Republish without clearing, so Home Assistant keeps the device
+            self._discovery_payload_cache.pop(device_id, None)
+            self.__publish_device_discovery(device_id)
+        for topic, state_str in list(self._last_states.items()):
+            self._client.publish(topic, state_str, retain=PUBLISH_SENSORS_RETAINED)
+
+    def __pack_register_value(self, device_id: str, known_registers, cmd_name: str, field_value: int) -> Optional[int]:
+        """Combine a new field value with the last known values of the other fields in the same register."""
+        reg = known_registers.holding_registers[cmd_name]
+        register_no = reg.growatt.position.register_no
+        raw = 0
+        for name, other in known_registers.holding_registers.items():
+            data = other.growatt.data
+            if other.growatt.position.register_no != register_no or data.bit_width is None:
+                continue
+            if name == cmd_name:
+                value = field_value
+            else:
+                current = self._holding_values.get((device_id, name))
+                if current is None:
+                    LOG.warning(
+                        "Unknown value of %s for %s, reading register %s first. Please try again.",
+                        name, device_id, register_no,
+                    )
+                    self.on_command(
+                        make_modbus_command(device_id, GrowattModbusFunction.READ_SINGLE_REGISTER, register_no)
+                    )
+                    return None
+                value = _to_register_value(other, other.homeassistant.type, current)
+            raw |= (value & ((1 << data.bit_width) - 1)) << data.bit_shift
+        return raw
 
     # ------------------- Internals -------------------
 
@@ -608,6 +705,10 @@ class Client:
             return
         if effective_max_bat is None:
             effective_max_bat = _resolve_max_bat(device_id)
+        # Entities of batteries above the known count are explicitly removed
+        # (component config with only the platform key), so HA doesn't keep
+        # them as orphans. Skipped while the count is only a guess.
+        remove_extra_bats = _bat_count_known(device_id)
 
         self.__migrate_entity_discovery(device_id, known_registers)
 
@@ -616,7 +717,11 @@ class Client:
         # prepare discovery payload
         payload: dict = {
             "dev": self.__device_info_from_config(device_id),
-            "avty_t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability",
+            "avty": [
+                {"t": f"{HA_BASE_TOPIC}/grobro/{device_id}/availability"},
+                {"t": BRIDGE_AVAILABILITY_TOPIC},
+            ],
+            "avty_mode": "all",
             "o": {"name": "grobro", "url": "https://github.com/robertzaage/GroBro"},
             "cmps": {},
         }
@@ -694,12 +799,14 @@ class Client:
             if not state.homeassistant.publish:
                 if not (self._neo_pv_count.get(device_id) == 4 and state_name in ("Vpv3", "Ipv3", "Ppv3", "Vpv4", "Ipv4", "Ppv4", "Epv3_today", "Epv3_total")):
                     continue
-            bat_num = _get_bat_number(state_name)
-            if bat_num is not None and bat_num > effective_max_bat:
-                continue
             if "_ser_part_" in state_name and state_name.startswith("bat"):
                 continue
             unique_id = f"grobro_{device_id}_{state_name}"
+            bat_num = _get_bat_number(state_name)
+            if bat_num is not None and bat_num > effective_max_bat:
+                if remove_extra_bats:
+                    payload["cmps"][unique_id] = {"platform": "sensor"}
+                continue
             payload["cmps"][unique_id] = {
                 "platform": "sensor",
                 "name": state.homeassistant.name,
@@ -711,6 +818,20 @@ class Client:
                 "unit_of_measurement": state.homeassistant.unit_of_measurement,
                 "icon": state.homeassistant.icon,
             }
+            if state.homeassistant.entity_category:
+                payload["cmps"][unique_id]["entity_category"] = state.homeassistant.entity_category
+
+        # Combined status text (status, derating reason and fault code)
+        if _has_status_summary(known_registers):
+            summary_uid = f"grobro_{device_id}_Status_Summary"
+            payload["cmps"][summary_uid] = {
+                "platform": "sensor",
+                "name": "Status",
+                "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
+                "value_template": "{{ value_json['Status_Summary'] | default('unknown') }}",
+                "unique_id": summary_uid,
+                "icon": "mdi:information-outline",
+            }
 
         # Combined battery serial entities (NOAH only — has _ser_part_ registers)
         has_bat_ser_parts = any(
@@ -719,13 +840,16 @@ class Client:
         )
         if has_bat_ser_parts:
             for bat_num in range(2, 5):
-                if bat_num > effective_max_bat:
-                    continue
                 combined_name = f"bat{bat_num}_serial"
                 uid = f"grobro_{device_id}_{combined_name}"
+                if bat_num > effective_max_bat:
+                    if remove_extra_bats:
+                        payload["cmps"][uid] = {"platform": "sensor"}
+                    continue
                 payload["cmps"][uid] = {
                     "platform": "sensor",
                     "name": f"Bat{bat_num} Serial",
+                    "entity_category": "diagnostic",
                     "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
                     "value_template": f"{{{{ value_json['{combined_name}'] }}}}",
                     "unique_id": uid,
@@ -751,6 +875,7 @@ class Client:
             payload["cmps"][firmware_unique_id] = {
                 "platform": "sensor",
                 "name": "Firmware Version",
+                "entity_category": "diagnostic",
                 "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/state",
                 "value_template": value_template,
                 "unique_id": firmware_unique_id,
@@ -762,6 +887,7 @@ class Client:
         payload["cmps"][serial_unique_id] = {
             "platform": "sensor",
             "name": "Device SN",
+            "entity_category": "diagnostic",
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/serial",
             "unique_id": serial_unique_id,
             "icon": "mdi:identifier",
@@ -772,6 +898,7 @@ class Client:
         payload["cmps"][type_unique_id] = {
             "platform": "sensor",
             "name": "Device Type",
+            "entity_category": "diagnostic",
             "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/type",
             "unique_id": type_unique_id,
             "icon": "mdi:chip",
@@ -783,6 +910,7 @@ class Client:
             payload["cmps"][online_unique_id] = {
                 "platform": "binary_sensor",
                 "name": "Online",
+                "entity_category": "diagnostic",
                 "state_topic": f"{HA_BASE_TOPIC}/grobro/{device_id}/online",
                 "device_class": "connectivity",
                 "unique_id": online_unique_id,
@@ -790,18 +918,21 @@ class Client:
 
         payload_str = json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
-        if self._discovery_payload_cache.get(device_id) == payload_str:
+        old_payload_str = self._discovery_payload_cache.get(device_id)
+        if old_payload_str == payload_str:
             LOG.debug("Discovery unchanged for %s, skipping", device_id)
             if device_id not in self._discovery_cache:
                 self._discovery_cache.append(device_id)
             # trotzdem States aktualisieren
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/serial", device_id, retain=True)
             self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/type", get_device_type_name(device_id), retain=True)
-            self._client.publish(f"{HA_BASE_TOPIC}/grobro/{device_id}/sw_version", device_id, retain=True)
             return
 
         LOG.info("Publishing updated discovery for %s", device_id)
-        self._client.publish(topic, "", retain=True)  # force HA to refresh
+        # Only clear the discovery when it changed while running. Clearing it after a restart
+        # would make Home Assistant delete and recreate the device and its customizations.
+        if old_payload_str is not None:
+            self._client.publish(topic, "", retain=True)
         self._client.publish(topic, payload_str, retain=True)
         self._discovery_payload_cache[device_id] = payload_str
         if device_id not in self._discovery_cache:

@@ -1,3 +1,4 @@
+import struct
 import json
 from grobro.grobro import parser
 
@@ -80,3 +81,19 @@ def test_parse_neo_config_read_uses_declared_value_length():
     assert result["device_id"] == "QMN000ABC1D2E3FG"
     assert result["register_no"] == 76
     assert result["value"] == "-055"
+
+
+def test_parse_gtsw_config_announcement_only_returns_first_value():
+    # NEO datalogger GTSW0000 announces its config as a chain of TLVs. Only the
+    # value of the first register may end up in its state topic (#219).
+    tlvs = b"".join(
+        struct.pack(">HH", reg, len(val)) + val
+        for reg, val in [(5, b"1"), (6, b"32"), (8, b"QMN000ABC1D2E3FG"), (20, b"GTSW0000"), (21, b"3.8.2.8")]
+    )
+    body = b"QMN000ABC1D2E3FG" + bytes(14) + struct.pack(">HxHH", 2, 4, 1) + b"1" + tlvs
+    data = struct.pack(">HHHH", 1, 7, len(body) + 4, 0x0119) + body + b"\x00\x00"
+
+    result = parser.parse_config_message(data)
+
+    assert result["register_no"] == 4
+    assert result["value"] == "1"

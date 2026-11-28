@@ -21,7 +21,7 @@ class GrowattRegisterEnumTypes(str, Enum):
 
 
 class GrowattRegisterFloatOptions(BaseModel):
-    delta: float = 1
+    delta: float = 0
     multiplier: float = 1
 
 
@@ -35,6 +35,14 @@ class GrowattRegisterDataType(BaseModel):
     float_options: Optional[GrowattRegisterFloatOptions] = None
     enum_options: Optional[GrowattRegisterEnumOptions] = None
     mult: Optional[float] = None
+    # Optional bit field inside the register, e.g. the enable flag of a packed time slot
+    bit_shift: int = 0
+    bit_width: Optional[int] = None
+
+    def extract_bits(self, value: int) -> int:
+        if self.bit_width is None:
+            return value
+        return (value >> self.bit_shift) & ((1 << self.bit_width) - 1)
 
     def parse(self, data_raw: bytes):
         if not data_raw:
@@ -54,16 +62,15 @@ class GrowattRegisterDataType(BaseModel):
                 value += self.float_options.delta
             return round(value, 3)
         elif self.data_type == GrowattRegisterDataTypes.TIME_HHMM:
-            value = struct.unpack(unpack_type, data_raw)[0]
+            value = self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
             hour = (value >> 8) & 0xFF
             minute = value & 0xFF
             return f"{hour:02d}:{minute:02d}"
         elif self.data_type in [GrowattRegisterDataTypes.INT, GrowattRegisterDataTypes.SIGNED_INT]:
-            value = struct.unpack(unpack_type, data_raw)[0]
-            return value
+            return self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
         elif self.data_type == GrowattRegisterDataTypes.ENUM:
             opts = self.enum_options
-            value = struct.unpack(unpack_type, data_raw)[0]
+            value = self.extract_bits(struct.unpack(unpack_type, data_raw)[0])
 
             if opts.enum_type == GrowattRegisterEnumTypes.BITFIELD:
                 return None  # TODO: implement
@@ -87,14 +94,15 @@ class HomeAssistantHoldingRegister(BaseModel):
     name: str
     publish: bool
     type: str
-    min: Optional[int] = None
-    max: Optional[int] = None
-    step: Optional[int] = None
+    min: Optional[Union[int, float]] = None
+    max: Optional[Union[int, float]] = None
+    step: Optional[Union[int, float]] = None
     state_class: Optional[str] = None
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
     options: Optional[dict[str, str]] = None
+    entity_category: Optional[str] = None
     
     model_config = ConfigDict(extra="forbid")
 
@@ -106,6 +114,7 @@ class HomeassistantInputRegister(BaseModel):
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
+    entity_category: Optional[str] = None
 
 
 class HomeAssistantHoldingRegisterValue(BaseModel):
@@ -150,6 +159,7 @@ class HomeAssistantConfigRegister(BaseModel):
     device_class: Optional[str] = None
     unit_of_measurement: Optional[str] = None
     icon: Optional[str] = None
+    entity_category: Optional[str] = None
 
 class GroBroConfigRegisterDef(BaseModel):
     growatt: GroBroConfigRegister
@@ -184,9 +194,118 @@ with resources.files(__package__).joinpath("growatt_spf_registers.json").open("r
 with resources.files(__package__).joinpath("growatt_xh2_registers.json").open("rb") as f:
     KNOWN_XH2_REGISTERS = GroBroRegisters.model_validate(json.load(f))
 # MOD 3-phase inverter family (ShineWiFi-X dongle).
-# Similar register block layout (3000-3499) to NEO but with key differences:
-# - Phase powers are u16*0.1 instead of u32*0.1
-# - Pac total at reg 3020 (u16) instead of 3019 (u32)
-# - Pac1 at 3025, Pac2 at 3029, Pac3 at 3033
+# Uses the standard 3000-3249 input register layout shared with MIN/TL-XH, all
+# three phases published and battery values read from the first BDC (3169+).
 with resources.files(__package__).joinpath("growatt_mod_registers.json").open("rb") as f:
     KNOWN_MOD_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+
+# SPH/SPA storage inverter family: PV and grid values in input registers 0-124,
+# storage values in 1000-1124, priority and time slots in holding registers 1044-1118.
+with resources.files(__package__).joinpath("growatt_sph_registers.json").open("rb") as f:
+    KNOWN_SPH_REGISTERS = GroBroRegisters.model_validate(json.load(f))
+
+
+# Device routing by the serial in the MQTT topic (datalogger or integrated inverter serial)
+DEVICE_PREFIXES: list[tuple[str, str, GroBroRegisters]] = [
+    ("QMN", "NEO", KNOWN_NEO_REGISTERS),
+    ("0PVP", "NOAH", KNOWN_NOAH_REGISTERS),
+    ("0HVR", "NEXA", KNOWN_NEXA_REGISTERS),
+    ("HAQ", "SPF", KNOWN_SPF_REGISTERS),
+    # ShineWeLink-X2 datalogger, its LoRa inverters (PTQ) are registered as NEO devices
+    ("RAQ", "ShineWeLink", KNOWN_NEO_REGISTERS),
+    ("PTQ", "NEO", KNOWN_NEO_REGISTERS),
+    ("ZGQ", "MIN-XH2", KNOWN_XH2_REGISTERS),
+    ("VWQ", "MOD", KNOWN_MOD_REGISTERS),
+]
+
+# Inverter serial prefixes (reported in the metadata of every input register message)
+# of the supported inverter families. Used for dataloggers whose own serial prefix is
+# unknown. Single-phase models of the 3000 register layout use the XH2 map, three-phase
+# models the MOD map and the SPH/SPA storage inverters their own map.
+INVERTER_PREFIXES: dict[str, tuple[str, GroBroRegisters]] = {
+    **{p: ("MIN TL-XH", KNOWN_XH2_REGISTERS) for p in ("ABJ", "SKL", "XVM", "SMN", "JGQ", "HJU", "VFJ")},
+    **{p: ("MIN TL-X", KNOWN_XH2_REGISTERS) for p in ("QYL", "XTD", "BDK", "DCF", "WVN")},
+    **{p: ("MIC TL-X", KNOWN_XH2_REGISTERS) for p in ("FPH", "FWJ")},
+    **{p: ("MOD TL3-XH", KNOWN_MOD_REGISTERS) for p in ("XHL", "MFK", "PYL", "JCM", "MEK", "DFK", "FMP", "FPP", "FQP", "CZM")},
+    **{p: ("MOD TL3-HU", KNOWN_MOD_REGISTERS) for p in ("DPS", "DMS", "DKS", "DO1", "TTS", "TSS", "EGR")},
+    **{p: ("MID TL3-XH", KNOWN_MOD_REGISTERS) for p in ("KLN", "KMN", "KNN", "RKM", "DLP")},
+    **{p: ("MID TL3-XL", KNOWN_MOD_REGISTERS) for p in ("GXF",)},
+    **{p: ("MAX TL3", KNOWN_MOD_REGISTERS) for p in ("NAH",)},
+    **{p: ("WIT", KNOWN_MOD_REGISTERS) for p in ("0PE", "0PC", "0PH", "0HU")},
+    **{p: ("SPH", KNOWN_SPH_REGISTERS) for p in ("YRP", "DIE", "PYH", "NLC", "NRC")},
+    **{p: ("SPA", KNOWN_SPH_REGISTERS) for p in ("WPD",)},
+}
+
+# Dataloggers used with different inverter families. Their devices are identified by the
+# inverter serial, the map in DEVICE_PREFIXES is only the fallback (ShineWiFi-X: MOD).
+GENERIC_DATALOGGER_PREFIXES = ("VWQ",)
+
+# Devices identified by their inverter serial, keyed by the serial in the MQTT topic
+DETECTED_DEVICES: dict[str, tuple[str, GroBroRegisters]] = {}
+
+
+def get_known_registers(device_id: str) -> Optional[GroBroRegisters]:
+    """Return the register map for a device, based on its serial prefix."""
+    detected = DETECTED_DEVICES.get(device_id)
+    if detected:
+        return detected[1]
+    for prefix, _, registers in DEVICE_PREFIXES:
+        if device_id.startswith(prefix):
+            return registers
+    return None
+
+
+def get_device_type_name(device_id: str) -> str:
+    """Return the device type name for a device, based on its serial prefix."""
+    detected = DETECTED_DEVICES.get(device_id)
+    if detected:
+        return detected[0]
+    for prefix, name, _ in DEVICE_PREFIXES:
+        if device_id.startswith(prefix):
+            return name
+    return "UNKNOWN"
+
+
+def detect_device_by_inverter_serial(device_id: str, inverter_serial: Optional[str]) -> Optional[GroBroRegisters]:
+    """Identify a device behind an unknown or generic datalogger by the serial of its inverter."""
+    if not inverter_serial or device_id in DETECTED_DEVICES:
+        return None
+    generic = device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+    if not generic and get_known_registers(device_id) is not None:
+        return None
+    match = INVERTER_PREFIXES.get(inverter_serial[:3])
+    if match is None:
+        return None
+    DETECTED_DEVICES[device_id] = match
+    return match[1]
+
+
+# Device type codes (holding register 43, or 30000 on firmware with the VPP protocol) of the
+# families with a known register map. Variants with a different register layout (e.g. SPH TL3,
+# MOD/MID TL3-X) are left out on purpose.
+DEVICE_TYPE_CODES: dict[int, tuple[str, GroBroRegisters]] = {
+    5100: ("MIN TL-XH", KNOWN_XH2_REGISTERS),
+    5200: ("MIN TL-X", KNOWN_XH2_REGISTERS),
+    5201: ("MIN TL-X", KNOWN_XH2_REGISTERS),
+    5400: ("MOD TL3-XH", KNOWN_MOD_REGISTERS),
+    5401: ("MOD TL3-HU", KNOWN_MOD_REGISTERS),
+    **{code: ("WIT", KNOWN_MOD_REGISTERS) for code in (5600, 5601, 5603, 5605)},
+    **{code: ("SPH", KNOWN_SPH_REGISTERS) for code in (3501, 3502, 3503, 3504)},
+    **{code: ("SPA", KNOWN_SPH_REGISTERS) for code in (3701, 3715, 3716, 3725, 3735)},
+    **{code: ("SPF", KNOWN_SPF_REGISTERS) for code in (3400, 3401, 3402, 3403, 20105)},
+}
+DEVICE_TYPE_CODE_REGISTERS = (43, 30000)
+
+
+def detect_device_by_type_code(device_id: str, type_code: Optional[int]) -> Optional[GroBroRegisters]:
+    """Identify a device behind an unknown or generic datalogger by its device type code."""
+    if not type_code or device_id in DETECTED_DEVICES:
+        return None
+    generic = device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+    if not generic and get_known_registers(device_id) is not None:
+        return None
+    match = DEVICE_TYPE_CODES.get(type_code)
+    if match is None:
+        return None
+    DETECTED_DEVICES[device_id] = match
+    return match[1]

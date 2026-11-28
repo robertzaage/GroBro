@@ -14,7 +14,8 @@
         "unit_of_measurement": "min",
         "min": 0,
         "max": 60,
-        "step": 1
+        "step": 1,
+        "entity_category": "config"
       }
     },
     "mqtt_ip": {
@@ -28,7 +29,8 @@
         "publish": true,
         "name": "MQTT IP",
         "type": "text",
-        "icon": "mdi:ip-network"
+        "icon": "mdi:ip-network",
+        "entity_category": "config"
       }
     },
     "mqtt_port": {
@@ -43,7 +45,8 @@
         "name": "MQTT Port",
         "type": "number",
         "min": 1,
-        "max": 65535
+        "max": 65535,
+        "entity_category": "config"
       }
     },
     "mqtt_broker": {
@@ -57,7 +60,8 @@
         "publish": true,
         "name": "MQTT Broker",
         "type": "text",
-        "icon": "mdi:server-network"
+        "icon": "mdi:server-network",
+        "entity_category": "config"
       }
     },
     "system_time": {
@@ -71,7 +75,8 @@
         "publish": true,
         "name": "System Time",
         "type": "text",
-        "icon": "mdi:clock-outline"
+        "icon": "mdi:clock-outline",
+        "entity_category": "config"
       }
     }
   },
@@ -90,7 +95,7 @@
             "enum_type": "INT_MAP",
             "values": {
               "0": "Standby",
-              "1": "(No Use)",
+              "1": "PV & Grid Supporting Loads",
               "2": "Discharge",
               "3": "Fault",
               "4": "Flash",
@@ -101,7 +106,25 @@
               "9": "PV charge and Bypass",
               "10": "AC charge and Bypass",
               "11": "Bypass",
-              "12": "PV charge and Discharge"
+              "12": "PV charge and Discharge",
+              "13": "PV Discharging",
+              "14": "PV & Battery Discharging",
+              "15": "Gen Charging",
+              "16": "Gen Charging and Gen Bypass",
+              "17": "PV & Gen Charging",
+              "18": "PV & Gen Charging and Gen Bypass",
+              "19": "PV Charging and Gen Bypass",
+              "20": "Gen Bypass",
+              "21": "PV Export to Grid",
+              "22": "PV Export to Grid and Loads Supporting",
+              "23": "PV Charging and Export to Grid",
+              "24": "PV Charging, Export to Grid and Loads Supporting",
+              "25": "Battery Export to Grid",
+              "26": "Battery Export to Grid and Loads Supporting",
+              "27": "Battery & PV Export to Grid",
+              "28": "Battery & PV Export to Grid and Loads Supporting",
+              "29": "Battery & Grid Supporting Loads",
+              "30": "PV, Battery & Grid Supporting Loads"
             }
           }
         }
@@ -333,7 +356,7 @@
         "position": {
           "register_no": 15,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -715,7 +738,7 @@
           "size": 4
         },
         "data": {
-          "data_type": "FLOAT",
+          "data_type": "SIGNED_FLOAT",
           "float_options": {
             "delta": 0.0,
             "multiplier": 0.1
@@ -736,7 +759,7 @@
         "position": {
           "register_no": 38,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -755,6 +778,72 @@
         "icon": "mdi:flash"
       }
     },
+    "Device_Type_Code": {
+      "growatt": {
+        "position": {
+          "register_no": 44,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Device type code",
+        "publish": true,
+        "icon": "mdi:chip",
+        "entity_category": "diagnostic"
+      }
+    },
+    "Export_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 45,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Export to grid today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:transmission-tower-export"
+      }
+    },
+    "Export_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 46,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Export to grid total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:transmission-tower-export"
+      }
+    },
     "PV_Energy_Today": {
       "growatt": {
         "position": {
@@ -771,7 +860,7 @@
         }
       },
       "homeassistant": {
-        "name": "PV energy today",
+        "name": "PV1 energy today",
         "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
@@ -795,7 +884,55 @@
         }
       },
       "homeassistant": {
-        "name": "PV energy total",
+        "name": "PV1 energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "PV2_Energy_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 52,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:solar-power"
+      }
+    },
+    "PV2_Energy_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 54,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "PV2 energy total",
         "publish": true,
         "state_class": "total_increasing",
         "device_class": "energy",
@@ -1000,7 +1137,7 @@
         "position": {
           "register_no": 71,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1024,7 +1161,7 @@
         "position": {
           "register_no": 73,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1048,7 +1185,7 @@
         "position": {
           "register_no": 75,
           "offset": 0,
-          "size": 2
+          "size": 4
         },
         "data": {
           "data_type": "FLOAT",
@@ -1184,7 +1321,7 @@
         }
       },
       "homeassistant": {
-        "name": "Inverter fault value",
+        "name": "Warning bits high",
         "publish": false,
         "icon": "mdi:alert-circle"
       }
@@ -1223,6 +1360,246 @@
         "state_class": "measurement",
         "unit_of_measurement": "s",
         "icon": "mdi:information-outline"
+      }
+    },
+    "Total_Charge_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 83,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Total charge current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:flash"
+      }
+    },
+    "Total_Discharge_Current": {
+      "growatt": {
+        "position": {
+          "register_no": 84,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Total discharge current",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:flash"
+      }
+    },
+    "Output_Discharge_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 85,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output discharge energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:home-lightning-bolt"
+      }
+    },
+    "Output_Discharge_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 87,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Output discharge energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:home-lightning-bolt"
+      }
+    },
+    "Generator_Energy_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 92,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Generator energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:engine"
+      }
+    },
+    "Generator_Energy_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 94,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Generator energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:engine"
+      }
+    },
+    "Generator_Power": {
+      "growatt": {
+        "position": {
+          "register_no": 96,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 1.0
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Generator power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:engine"
+      }
+    },
+    "Generator_Voltage": {
+      "growatt": {
+        "position": {
+          "register_no": 97,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Generator voltage",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:engine"
+      }
+    },
+    "Battery_Charge_Today": {
+      "growatt": {
+        "position": {
+          "register_no": 98,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery charge energy today",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:battery-arrow-up"
+      }
+    },
+    "Battery_Charge_Total": {
+      "growatt": {
+        "position": {
+          "register_no": 100,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0.0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "name": "Battery charge energy total",
+        "publish": true,
+        "state_class": "total_increasing",
+        "device_class": "energy",
+        "unit_of_measurement": "kWh",
+        "icon": "mdi:battery-arrow-up"
       }
     }
   }
