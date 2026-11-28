@@ -74,39 +74,47 @@ broker, and the inverter communicates with the logger wirelessly. This means:
 - The MQTT topic contains the data logger serial (`c/33/RAQ0E8H042`).
 - The FE19 config TLV contains the data logger's own serial — not the inverter's.
 - NEO input/holding register data is wrapped in NOAH `0x0103` frames within the data logger's messages.
-- The RAQ prefix routes through NEO register files via `get_known_registers()`. The PTQ prefix (NEO 1000M-X) is only handled in `grobro/client.py` config message processing, not in `ha/client.py` register routing.
+- The RAQ prefix routes through NEO register files via `get_known_registers()`. The PTQ prefix (NEO 1000M-X) is only handled in `grobro/client.py` config message processing, not in the register routing.
 
 ### Component responsibilities
 
 | Layer | Module | Role |
 |-------|--------|------|
 | Bridge wiring | `grobro/ha_bridge.py` | Instantiates both clients, wires callbacks, runs the event loop |
-| Device comms | `grobro/grobro/client.py` | Subscribes to `c/#`, descrambles, dispatches by message type, sends commands on `s/33/` |
+| Options | `grobro/settings.py` | All options, read once from the environment. Modules use `settings.<NAME>`, tests patch `grobro.settings.<NAME>` |
+| Device comms | `grobro/grobro/client.py` | Subscribes to `c/#`, descrambles, dispatches by message type to one `_handle_*` method each, sends commands on `s/33/` |
+| Cloud forwarding | `grobro/grobro/forward.py` | Optional forwarding to and from the Growatt Cloud (`GROWATT_CLOUD`) |
 | Parsing | `grobro/grobro/parser.py` | Config TLV parser, NOAH sub-parsers, unscramble |
 | Packet building | `grobro/grobro/builder.py` | Scramble, CRC-16 append, hexdump |
-| HA integration | `grobro/ha/client.py` | MQTT auto-discovery, state publishing, command handling, config read sequencing |
+| HA connection | `grobro/ha/client.py` | MQTT connection, availability, device configs. Combines the mixins below |
+| HA discovery | `grobro/ha/discovery.py` | Discovery payload: controls, sensors, device info, entity migration |
+| HA states | `grobro/ha/state.py` | Input and holding register values as states: enums, battery count, status sensor, glitch filter |
+| Value cache | `grobro/ha/value_cache.py` | `KEEP_LAST_VALUES` and the persisted battery count |
+| HA commands | `grobro/ha/commands.py` | Commands from HA, packed registers, config read sequencing, time sync |
+| Firmware | `grobro/ha/firmware.py` | NOAH/NEXA firmware version composed like the ShinePhone app shows it |
 | Registers | `grobro/model/*.json` + `growatt_registers.py` | Device register maps loaded from JSON at import time |
+| Codes | `grobro/model/growatt_codes.py` | Fault and warning texts for the status sensor |
 | Models | `grobro/model/*.py` | Pydantic models for device config, modbus messages, MQTT config |
 
 ### Data flow (read path)
 
 ```
-Device → Source MQTT → grobro.Client.__on_message
+Device → Source MQTT → grobro.Client._on_message
                          ├─ unscramble(msg.payload)
-                         ├─ detect message type from header
+                         ├─ detect message type from header, call its _handle_* method
                          ├─ parser.parse_*(unscrambled)
                          └─ call ha.Client callback
                                ├─ publish_input_register(state)
                                ├─ publish_holding_register_input(state)
                                └─ set_config(device_id, config)
-                                      └─ __publish_device_discovery(device_id)
+                                      └─ _publish_device_discovery(device_id)
                                             └─ Target MQTT → HA
 ```
 
 ### Data flow (write / command path)
 
 ```
-HA → Target MQTT → ha.Client.__on_message
+HA → Target MQTT → ha.Client._on_message → _handle_command
                       ├─ identify device + register from topic
                       ├─ build modbus / config command
                       └─ call grobro.Client callback
@@ -123,7 +131,7 @@ handle one outstanding config read at a time:
 
 1. `read_all` button handler enqueues all config register numbers (3-second delay before
    starting to let modbus reads complete).
-2. `__kickoff_next_config_read` pops the next register, sends the read command, and adds
+2. `_kickoff_next_config_read` pops the next register, sends the read command, and adds
    an inflight entry to `_config_read_inflight` with a 60-second timer.
 3. When the response arrives (`parse_config_message` → `on_config_read_response` →
    `ha.Client.handle_config_read_response`), the inflight entry is cleared and the queue advances.
@@ -140,7 +148,7 @@ MQTT_PROP_FORWARD_HA       # UserProperty: ("forwarded-for", "ha")
 MQTT_PROP_DRY_RUN          # UserProperty: ("dry-run", "true")  — defined but unused
 ```
 
-When `__on_message` receives a packet, `get_property(msg, "forwarded-for")` checks for
+When `_on_message` receives a packet, `get_property(msg, "forwarded-for")` checks for
 these tags. Messages tagged `"ha"` or `"growatt"` are skipped to avoid echo loops.
 
 ### Config persistence
@@ -224,7 +232,7 @@ use a different framing (see [§2.7](#27-noah-message-envelope)).
 
 ### 2.3 Message type catalog
 
-Dispatch priority in `__on_message`:
+Dispatch priority in `_on_message`:
 
 | Priority | Type | Value | Devices | Handler |
 |----------|------|-------|---------|---------|
@@ -375,7 +383,7 @@ register) responses are wrapped in a NOAH `0x0103` frame:
 
 The `parse_noah_0103` parser extracts the inner serial and register values into a dict,
 but the parsed values are not published to HA — the dict is returned but discarded in
-`__on_message` (NOAH dispatch falls through, then `parse_grobro` returns `None` on the
+`_on_message` (NOAH dispatch falls through, then `parse_grobro` returns `None` on the
 NOAH-wrapped data). This is a known area for future improvement.
 
 ### 2.8 ShineWeLink config message (type 0x0129)
@@ -407,7 +415,7 @@ header with no additional framing:
 - **Config messages** (types 340/341/387) arrive on separate MQTT messages from register data.
   These are TLV-encoded and trigger `on_config()` for HA discovery.
 - **Holding register writes** use modbus function 6 (single) or 16 (multiple). GroBro
-  builds the command via `make_modbus_command()` in `ha/client.py` or directly via
+  builds the command via `make_modbus_command()` in `ha/commands.py` or directly via
   `Client.send_command()` / `Client.send_config_message()` in `grobro/client.py`.
 - **CRC**: NEO messages include a 2-byte CRC-16 (Modbus variant) at the end of every payload.
   `parse_grobro` validates this before parsing registers.
@@ -417,7 +425,7 @@ header with no additional framing:
   the sum of individual MPPT powers:
 
   ```python
-  # In ha/client.py __detect_neo_pv_count():
+  # In ha/state.py _detect_neo_pv_count():
   if abs(Ppv - (Ppv1+Ppv2+Ppv3+Ppv4)) < 10 and (Ppv3 > 0 or Ppv4 > 0):
       count = 4  # NEO 2000
   elif abs(Ppv - (Ppv1+Ppv2)) < 10:
@@ -559,7 +567,7 @@ The serial number prefix in the MQTT topic determines which register set to use:
 | `RAQ` | ShineWeLink | `growatt_neo_registers.json` (passthrough for LoRa NEO) |
 | `PTQ` | NEO 1000M-X (LoRa) | `growatt_neo_registers.json` — extracted from ShineWeLink 0x0129 config as a separate HA device |
 
-`get_device_type_name('RAQ')` returns `"ShineWeLink"`. The `PTQ` prefix is now also recognized in `ha/client.py` — `get_known_registers()` returns `KNOWN_NEO_REGISTERS` and `get_device_type_name()` returns `"NEO"`. PTQ serials are automatically extracted from ShineWeLink (RAQ) 0x0129 config messages and registered as separate inverter devices with modbus data routed to them.
+`get_device_type_name('RAQ')` returns `"ShineWeLink"`. The `PTQ` prefix is also recognized by the register routing — `get_known_registers()` returns `KNOWN_NEO_REGISTERS` and `get_device_type_name()` returns `"NEO"`. PTQ serials are automatically extracted from ShineWeLink (RAQ) 0x0129 config messages and registered as separate inverter devices with modbus data routed to them.
 
 The routing lives in one place, `DEVICE_PREFIXES` in `grobro/model/growatt_registers.py`,
 used through `get_known_registers()` and `get_device_type_name()` by both clients.
@@ -654,7 +662,7 @@ removed. Discovery skips `_ser_part_` entities and instead publishes a single
    - Add `KNOWN_<NAME>_REGISTERS = GroBroRegisters.model_validate(json.load(f))`
 3. **Add prefix routing**: add an entry to `DEVICE_PREFIXES` in `grobro/model/growatt_registers.py`.
    If the family is identified by its inverter serial instead, add its prefixes to `INVERTER_PREFIXES`.
-4. **Check special cases** in `grobro/grobro/client.py` and `grobro/ha/client.py` that match on a
+4. **Check special cases** in `grobro/grobro/client.py` and `grobro/ha/` that match on a
    prefix directly (e.g. NEO PV count detection, NOAH/NEXA message types).
 5. **Create test fixtures** from real device logs (see [§6 Testing](#6-testing)).
 6. **Add fixture-driven tests** in the appropriate test file.
@@ -667,10 +675,10 @@ removed. Discovery skips `_ser_part_` entities and instead publishes a single
    ```python
    0xABCD: parse_noah_abcd,
    ```
-3. **Wire the result** in `grobro/grobro/client.py` `__on_message`. Currently only
-   `message_type == 0xFE19` is handled for HA discovery; add an `elif` for new types
-   that should trigger HA callbacks.
-4. **If HA integration is needed**, add handling in `grobro/ha/client.py`.
+3. **Wire the result** in `grobro/grobro/client.py`: add a `_handle_*` method and call it from
+   `_on_message`. Currently only `message_type == 0xFE19` is handled for HA discovery
+   (`_handle_noah_config`).
+4. **If HA integration is needed**, add handling in the matching module in `grobro/ha/`.
 5. **Add a test fixture** and a parser test.
 
 ### 4.4 Add a new HA platform type (e.g. `select`, `climate`)
@@ -678,10 +686,10 @@ removed. Discovery skips `_ser_part_` entities and instead publishes a single
 Home Assistant MQTT discovery natively supports many platform types. To add one:
 
 1. **Add a register entry** with `"homeassistant": { "type": "select", … }`.
-2. The `__publish_device_discovery` method auto-generates the `cmps` entry from the
+2. `_command_components` in `ha/discovery.py` auto-generates the `cmps` entry from the
    Pydantic model — no code change is usually needed.
-3. **Add command handling** in `ha/client.py` `__on_message` for the new platform's
-   `set` action.
+3. **Add command handling** in `ha/commands.py`: add the platform to `COMMAND_PLATFORMS`
+   and handle its `set` action in `_handle_command`.
 4. **Test** with a command-trigger test.
 
 ---
@@ -815,6 +823,9 @@ tests/
 ├── test_noah_firmware_version.py   # Combined NOAH/NEXA firmware version
 ├── test_nexa_registers.py          # NEXA register definitions and scaling
 ├── test_spf_registers.py           # SPF register definitions
+├── test_settings.py                # Option parsing
+├── test_snapshots.py               # Snapshots of all MQTT output per device family
+├── snapshots/                      # The recorded snapshots
 └── model/
     ├── test_commands.py            # Binary fixture roundtrip + parsing
     └── test_models.py              # Pydantic model tests
@@ -892,18 +903,24 @@ def test_unscramble(self, name):
 
 Neither marker is currently applied to any test — all tests are fast and self-contained.
 
-### 6.6 Test isolation notes
+### 6.6 Snapshot tests
 
-Config read state (`_config_read_queues`, `_config_read_inflight`, `_config_read_timers`)
-is shared class-state on `ha.Client`. Tests that exercise config read logic must clear
-these structures on teardown to avoid cross-test interference:
+`tests/test_snapshots.py` records everything GroBro publishes to Home Assistant and sends to
+devices (topics, payloads, retain flags and order) for every device family, from sample
+payloads and from the binary fixtures. A refactoring must not change them. After an intended
+change of the output, update them and review the diff:
 
-```python
-def teardown_method(self):
-    self.client._config_read_queues.clear()
-    self.client._config_read_inflight.clear()
-    self.client._config_read_timers.clear()
+```bash
+GROBRO_UPDATE_SNAPSHOTS=1 pytest tests/test_snapshots.py
+git diff tests/snapshots
 ```
+
+### 6.7 Test isolation notes
+
+All client state lives on the instance, so every test gets a clean client. Module-level state
+that tests have to reset: `_MAX_BAT_CACHE` (done by `conftest.py`), `DETECTED_DEVICES` and
+`INVERTER_SERIALS` in `growatt_registers.py`. `conftest.py` also points `settings.CONFIG_DIR`
+to a temporary directory per test.
 
 ---
 
