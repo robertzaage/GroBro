@@ -278,3 +278,34 @@ def detect_device_by_inverter_serial(device_id: str, inverter_serial: Optional[s
         return None
     DETECTED_DEVICES[device_id] = match
     return match[1]
+
+
+# Device type codes (holding register 43, or 30000 on firmware with the VPP protocol) of the
+# families with a known register map. Variants with a different register layout (e.g. SPH TL3,
+# MOD/MID TL3-X) are left out on purpose.
+DEVICE_TYPE_CODES: dict[int, tuple[str, GroBroRegisters]] = {
+    5100: ("MIN TL-XH", KNOWN_XH2_REGISTERS),
+    5200: ("MIN TL-X", KNOWN_XH2_REGISTERS),
+    5201: ("MIN TL-X", KNOWN_XH2_REGISTERS),
+    5400: ("MOD TL3-XH", KNOWN_MOD_REGISTERS),
+    5401: ("MOD TL3-HU", KNOWN_MOD_REGISTERS),
+    **{code: ("WIT", KNOWN_MOD_REGISTERS) for code in (5600, 5601, 5603, 5605)},
+    **{code: ("SPH", KNOWN_SPH_REGISTERS) for code in (3501, 3502, 3503, 3504)},
+    **{code: ("SPA", KNOWN_SPH_REGISTERS) for code in (3701, 3715, 3716, 3725, 3735)},
+    **{code: ("SPF", KNOWN_SPF_REGISTERS) for code in (3400, 3401, 3402, 3403, 20105)},
+}
+DEVICE_TYPE_CODE_REGISTERS = (43, 30000)
+
+
+def detect_device_by_type_code(device_id: str, type_code: Optional[int]) -> Optional[GroBroRegisters]:
+    """Identify a device behind an unknown or generic datalogger by its device type code."""
+    if not type_code or device_id in DETECTED_DEVICES:
+        return None
+    generic = device_id.startswith(GENERIC_DATALOGGER_PREFIXES)
+    if not generic and get_known_registers(device_id) is not None:
+        return None
+    match = DEVICE_TYPE_CODES.get(type_code)
+    if match is None:
+        return None
+    DETECTED_DEVICES[device_id] = match
+    return match[1]

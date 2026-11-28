@@ -27,9 +27,12 @@ from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
 from grobro.model.growatt_registers import (
+    DEVICE_TYPE_CODE_REGISTERS,
     GENERIC_DATALOGGER_PREFIXES,
+    GrowattRegisterPosition,
     KNOWN_NEO_REGISTERS,
     detect_device_by_inverter_serial,
+    detect_device_by_type_code,
     get_device_type_name,
     get_known_registers,
 )
@@ -104,6 +107,7 @@ class Client:
         )
         client_id_suffix = os.getenv("MQTT_CLIENT_SUFFIX", "")
         client_id = f"grobro-grobro{('-' + client_id_suffix) if client_id_suffix else ''}"
+        self._type_code_requested: set[str] = set()
 
         self._client = mqtt.Client(
             client_id=client_id,
@@ -400,6 +404,18 @@ class Client:
                     )
                     if detected:
                         known_registers = detected
+                if modbus_message.function in (
+                    GrowattModbusFunction.READ_SINGLE_REGISTER,
+                    GrowattModbusFunction.READ_HOLDING_REGISTER,
+                ) and (not known_registers or modbus_device_id.startswith(GENERIC_DATALOGGER_PREFIXES)):
+                    detected = detect_device_by_type_code(modbus_device_id, _device_type_code(modbus_message))
+                    if detected:
+                        known_registers = detected
+                        LOG.info(
+                            "Detected %s by device type code behind datalogger %s",
+                            get_device_type_name(modbus_device_id),
+                            modbus_device_id,
+                        )
                         LOG.info(
                             "Detected %s inverter %s behind datalogger %s",
                             get_device_type_name(modbus_device_id),
@@ -408,6 +424,7 @@ class Client:
                         )
                 if not known_registers:
                     LOG.info("Modbus message from unknown device type: %s", device_id)
+                    self.__request_device_type_code(modbus_device_id)
                     return
 
                 if modbus_message.function in (
@@ -463,6 +480,21 @@ class Client:
             LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
             LOG.error(f"Processing message: {e}")
+
+    def __request_device_type_code(self, device_id: str):
+        """Ask an unknown device once for its device type code (holding register 43)."""
+        if device_id in self._type_code_requested:
+            return
+        self._type_code_requested.add(device_id)
+        LOG.info("Requesting device type code of unknown device %s", device_id)
+        self.send_command(
+            GrowattModbusFunctionSingle(
+                device_id=device_id,
+                function=GrowattModbusFunction.READ_SINGLE_REGISTER,
+                register=DEVICE_TYPE_CODE_REGISTERS[0],
+                value=DEVICE_TYPE_CODE_REGISTERS[0],
+            )
+        )
 
     def __on_message_forward_client(self, client, userdata, msg: MQTTMessage):
         LOG.debug("Received Growatt forward message: %s: %s", msg.topic, msg.payload)
@@ -545,6 +577,15 @@ def dump_message_binary(topic, payload):
             f.write(payload)
     except Exception as e:
         LOG.error(f"Failed to dump message for topic {topic}: {e}")
+
+
+def _device_type_code(modbus_message: GrowattModbusMessage):
+    """Return the device type code if the message contains register 43 or 30000."""
+    for register_no in DEVICE_TYPE_CODE_REGISTERS:
+        data = modbus_message.get_data(GrowattRegisterPosition(register_no=register_no, size=2))
+        if data:
+            return int.from_bytes(data, "big")
+    return None
 
 
 def get_property(msg, prop) -> str:

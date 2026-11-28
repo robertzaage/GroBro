@@ -543,7 +543,13 @@ This covers MIN/MIC TL-X and MIN TL-XH (XH2 map) as well as MOD/MID TL3-XH, MOD 
 MAX TL3 and WIT (MOD map) as well as SPH/SPA storage inverters (`growatt_sph_registers.json`,
 input registers 0-124 and 1000-1124). A known topic prefix always takes precedence, except for generic dataloggers in
 `GENERIC_DATALOGGER_PREFIXES` (ShineWiFi-X, `VWQ`), which are used with different inverter
-families: their map in `DEVICE_PREFIXES` is only the fallback. Detection happens
+families: their map in `DEVICE_PREFIXES` is only the fallback.
+
+**Detection by device type code**: as second signal, GroBro reads the device type code from
+holding register 43 (30000 on firmware with the VPP protocol) whenever a holding response
+contains it, and maps it with `DEVICE_TYPE_CODES` (e.g. 5100 MIN TL-XH, 5400 MOD TL3-XH,
+3501-3504 SPH). If a device stays unknown after its first input register message, GroBro
+requests register 43 once. Detection happens
 on the first input register message, so holding and config messages of such a device are
 only routed after that.
 

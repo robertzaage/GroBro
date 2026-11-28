@@ -1,3 +1,4 @@
+import struct
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -113,3 +114,44 @@ def test_shinewifi_x_with_unknown_inverter_stays_mod():
     assert regs.detect_device_by_inverter_serial("VWQ0000TEST0001", "ZZZ0TEST01") is None
     assert regs.get_known_registers("VWQ0000TEST0001") is regs.KNOWN_MOD_REGISTERS
     assert regs.get_device_type_name("VWQ0000TEST0001") == "MOD"
+
+
+@pytest.mark.parametrize(
+    "type_code, name, registers",
+    [
+        (5100, "MIN TL-XH", regs.KNOWN_XH2_REGISTERS),
+        (5400, "MOD TL3-XH", regs.KNOWN_MOD_REGISTERS),
+        (3502, "SPH", regs.KNOWN_SPH_REGISTERS),
+        (3400, "SPF", regs.KNOWN_SPF_REGISTERS),
+    ],
+)
+def test_detect_device_by_type_code(type_code, name, registers):
+    assert regs.detect_device_by_type_code("XYZ0000TEST0001", type_code) is registers
+    assert regs.get_device_type_name("XYZ0000TEST0001") == name
+
+
+def test_type_code_never_overrides_known_prefix_or_unknown_code():
+    assert regs.detect_device_by_type_code("QMN000ABC1D2E3FG", 5400) is None
+    assert regs.detect_device_by_type_code("XYZ0000TEST0001", 5002) is None
+    assert regs.get_known_registers("XYZ0000TEST0001") is None
+
+
+def test_single_register_response_with_type_code_detects_device():
+    client = _client()
+    client.on_holding_register_input = MagicMock()
+    response = struct.pack(">HHHBB30sHHH", 1, 7, 38, 1, 5, b"XYZ0000TEST0001".ljust(30, b"\x00"), 43, 43, 5100)
+    client._client.on_message(None, None, _msg("c/33/XYZ0000TEST0001", scramble(response + b"\x00\x00")))
+    assert regs.get_device_type_name("XYZ0000TEST0001") == "MIN TL-XH"
+
+
+def test_unknown_device_is_asked_for_its_type_code_once():
+    client = _client()
+    client.send_command = MagicMock()
+    frame = _frame_with_inverter_serial("ZZZ0TEST01")
+    client._client.on_message(None, None, _msg("c/33/XYZ0000TEST0001", frame))
+    client._client.on_message(None, None, _msg("c/33/XYZ0000TEST0001", frame))
+
+    client.send_command.assert_called_once()
+    command = client.send_command.call_args.args[0]
+    assert command.register_no == 43
+    assert command.device_id == "XYZ0000TEST0001"
