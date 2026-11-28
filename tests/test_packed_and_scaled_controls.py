@@ -127,3 +127,12 @@ def test_scaled_number_writes(ha_client, name, payload, register_no, value):
 def test_signed_export_limit_is_read_back():
     reg = KNOWN_XH2_REGISTERS.holding_registers["export_limit"]
     assert reg.growatt.data.parse(struct.pack(">H", (-125) & 0xFFFF)) == pytest.approx(-12.5)
+
+
+def test_read_all_reads_packed_registers_once(ha_client, monkeypatch):
+    monkeypatch.setattr("grobro.settings.MAX_SLOTS", 9)
+    with patch("grobro.ha.commands.Timer"):
+        ha_client._client.on_message(None, None, _msg(f"homeassistant/button/grobro/{XH2_ID}/read_all/read", b"PRESS"))
+    registers = [c.args[0].register_no for c in ha_client.on_command.call_args_list]
+    assert len(registers) == len(set(registers))
+    assert 3038 in registers

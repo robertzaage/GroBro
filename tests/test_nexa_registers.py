@@ -136,3 +136,67 @@ def test_nexa_fault_words_are_diagnostic(key, register_no):
     reg = KNOWN_NEXA_REGISTERS.input_registers[key]
     assert reg.growatt.position.register_no == register_no
     assert reg.homeassistant.entity_category == "diagnostic"
+
+
+@pytest.mark.parametrize(
+    "key, register_no",
+    [
+        ("batteryFaults", 15),
+        ("battery1Alarm", 31),
+        ("battery1Protection", 32),
+        ("battery2Alarm", 43),
+        ("battery2Protection", 44),
+        ("battery3Alarm", 55),
+        ("battery3Protection", 56),
+        ("battery4Alarm", 67),
+        ("battery4Protection", 68),
+        ("smartPlugConnected", 88),
+        ("smartPlugPower", 89),
+    ],
+)
+def test_nexa_alarm_and_smart_plug_registers(key, register_no):
+    reg = KNOWN_NEXA_REGISTERS.input_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    assert reg.growatt.data.parse(struct.pack("!H", 0x0021)) == 0x0021
+
+
+DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+
+@pytest.mark.parametrize("slot", range(1, 10))
+def test_nexa_slot_weekdays(slot):
+    """One weekday mask per slot from register 342, Monday in the lowest bit."""
+    for bit, day in enumerate(DAYS):
+        reg = KNOWN_NEXA_REGISTERS.holding_registers[f"slot{slot}_{day}"]
+        assert reg.growatt.position.register_no == 342 + 2 * (slot - 1)
+        assert reg.homeassistant.type == "switch"
+        assert reg.growatt.data.parse(struct.pack("!H", 1 << bit)) == 1
+        assert reg.growatt.data.parse(struct.pack("!H", 0x7F & ~(1 << bit))) == 0
+
+
+def test_nexa_weekday_write_keeps_other_days():
+    from unittest.mock import MagicMock, patch
+
+    from paho.mqtt.client import MQTTMessage
+
+    from grobro.ha.client import Client
+    from grobro.model.mqtt_config import MQTTConfig
+
+    device_id = "0HVR0000TEST0001"
+    with patch("grobro.ha.client.mqtt.Client"), patch("grobro.ha.client.os.listdir", return_value=[]):
+        client = Client(MQTTConfig(host="localhost", port=1883))
+    client.on_command = MagicMock()
+    # Weekdays known from the last read: Monday to Friday
+    for bit, day in enumerate(DAYS):
+        client._holding_values[(device_id, f"slot1_{day}")] = "ON" if bit < 5 else "OFF"
+
+    msg = MagicMock(spec=MQTTMessage)
+    msg.topic = f"homeassistant/switch/grobro/{device_id}/slot1_saturday/set"
+    msg.payload = b"ON"
+    client._client.on_message(None, None, msg)
+
+    write = client.on_command.call_args_list[0].args[0]
+    assert write.register_no == 342
+    assert write.value == 0b0111111
+    # read back once
+    assert client.on_command.call_args_list[1].args[0].register_no == 342

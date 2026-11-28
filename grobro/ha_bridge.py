@@ -10,6 +10,7 @@ import logging
 import time
 
 from grobro import model, ha, grobro, settings
+from grobro.stats import BridgeStats
 
 # Setup Logger
 LOG_LEVEL = settings.LOG_LEVEL
@@ -75,8 +76,9 @@ class SignalHandler:
 
 
 if __name__ == "__main__":
-    ha_client = ha.Client(HA_MQTT_CONFIG)
-    grobro_client = grobro.Client(GROBRO_MQTT_CONFIG, FORWARD_MQTT_CONFIG)
+    stats = BridgeStats()
+    ha_client = ha.Client(HA_MQTT_CONFIG, stats=stats)
+    grobro_client = grobro.Client(GROBRO_MQTT_CONFIG, FORWARD_MQTT_CONFIG, stats=stats)
 
     # setup com: grobro -> ha
     grobro_client.on_input_register = ha_client.publish_input_register

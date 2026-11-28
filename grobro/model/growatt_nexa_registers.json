@@ -349,6 +349,146 @@
         "type": "switch"
       }
     },
+    "slot1_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot1_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 342,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 1 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
     "slot2_start_time": {
       "growatt": {
         "position": {
@@ -451,6 +591,146 @@
         "publish": true,
         "name": "Slot 2 Enabled",
         "type": "switch"
+      }
+    },
+    "slot2_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot2_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 344,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 2 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
       }
     },
     "slot3_start_time": {
@@ -557,6 +837,146 @@
         "type": "switch"
       }
     },
+    "slot3_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot3_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 346,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 3 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
     "slot4_start_time": {
       "growatt": {
         "position": {
@@ -659,6 +1079,146 @@
         "publish": true,
         "name": "Slot 4 Enabled",
         "type": "switch"
+      }
+    },
+    "slot4_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot4_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 348,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 4 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
       }
     },
     "slot5_start_time": {
@@ -765,6 +1325,146 @@
         "type": "switch"
       }
     },
+    "slot5_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot5_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 350,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 5 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
     "slot6_start_time": {
       "growatt": {
         "position": {
@@ -867,6 +1567,146 @@
         "publish": true,
         "name": "Slot 6 Enabled",
         "type": "switch"
+      }
+    },
+    "slot6_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot6_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 352,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 6 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
       }
     },
     "slot7_start_time": {
@@ -973,6 +1813,146 @@
         "type": "switch"
       }
     },
+    "slot7_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot7_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 354,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 7 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
     "slot8_start_time": {
       "growatt": {
         "position": {
@@ -1077,6 +2057,146 @@
         "type": "switch"
       }
     },
+    "slot8_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot8_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 356,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 8 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
     "slot9_start_time": {
       "growatt": {
         "position": {
@@ -1179,6 +2299,146 @@
         "publish": true,
         "name": "Slot 9 Enabled",
         "type": "switch"
+      }
+    },
+    "slot9_monday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 0,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Monday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_tuesday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 1,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Tuesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_wednesday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 2,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Wednesday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_thursday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 3,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Thursday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_friday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 4,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Friday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_saturday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 5,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Saturday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
+      }
+    },
+    "slot9_sunday": {
+      "growatt": {
+        "position": {
+          "register_no": 358,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT",
+          "bit_shift": 6,
+          "bit_width": 1
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Slot 9 Sunday",
+        "type": "switch",
+        "icon": "mdi:calendar-week"
       }
     },
     "ac_couple": {
@@ -2869,6 +4129,205 @@
         "name": "Firmware Version Part 4",
         "publish": false,
         "icon": "mdi:information"
+      }
+    },
+    "batteryFaults": {
+      "growatt": {
+        "position": {
+          "register_no": 15,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery Faults",
+        "publish": true,
+        "icon": "mdi:battery-alert",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery1Alarm": {
+      "growatt": {
+        "position": {
+          "register_no": 31,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 1 Alarm",
+        "publish": true,
+        "icon": "mdi:battery-alert-variant-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery1Protection": {
+      "growatt": {
+        "position": {
+          "register_no": 32,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 1 Protection",
+        "publish": true,
+        "icon": "mdi:shield-alert-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery2Alarm": {
+      "growatt": {
+        "position": {
+          "register_no": 43,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 2 Alarm",
+        "publish": true,
+        "icon": "mdi:battery-alert-variant-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery2Protection": {
+      "growatt": {
+        "position": {
+          "register_no": 44,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 2 Protection",
+        "publish": true,
+        "icon": "mdi:shield-alert-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery3Alarm": {
+      "growatt": {
+        "position": {
+          "register_no": 55,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 3 Alarm",
+        "publish": true,
+        "icon": "mdi:battery-alert-variant-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery3Protection": {
+      "growatt": {
+        "position": {
+          "register_no": 56,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 3 Protection",
+        "publish": true,
+        "icon": "mdi:shield-alert-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery4Alarm": {
+      "growatt": {
+        "position": {
+          "register_no": 67,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 4 Alarm",
+        "publish": true,
+        "icon": "mdi:battery-alert-variant-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "battery4Protection": {
+      "growatt": {
+        "position": {
+          "register_no": 68,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Battery 4 Protection",
+        "publish": true,
+        "icon": "mdi:shield-alert-outline",
+        "entity_category": "diagnostic"
+      }
+    },
+    "smartPlugConnected": {
+      "growatt": {
+        "position": {
+          "register_no": 88,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Smart Plug Connected",
+        "publish": true,
+        "icon": "mdi:power-socket-eu"
+      }
+    },
+    "smartPlugPower": {
+      "growatt": {
+        "position": {
+          "register_no": 89,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "name": "Smart Plug Power",
+        "publish": true,
+        "state_class": "measurement",
+        "device_class": "power",
+        "unit_of_measurement": "W",
+        "icon": "mdi:power-socket-eu"
       }
     }
   }

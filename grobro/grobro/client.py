@@ -18,10 +18,11 @@ from grobro.grobro import parser
 from grobro.grobro.builder import append_crc
 from grobro.grobro.builder import scramble
 from grobro.grobro.forward import MQTT_PROP_FORWARD_HA, CloudForwardMixin
-from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.model.modbus_function import GrowattModbusFunctionMultiple, GrowattModbusFunctionSingle
 from grobro.model.modbus_message import GrowattModbusFunction
 from grobro.model.modbus_message import GrowattModbusMessage
 from grobro.model.mqtt_config import MQTTConfig
+from grobro.stats import BridgeStats
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterInput
 from grobro.model.growatt_registers import HomeAssistantHoldingRegisterValue
 from grobro.model.growatt_registers import HomeAssistantInputRegister
@@ -68,8 +69,9 @@ class Client(CloudForwardMixin):
     _client: mqtt.Client
     _forward_mqtt_config: model.MQTTConfig
 
-    def __init__(self, grobro_mqtt: MQTTConfig, forward_mqtt: MQTTConfig):
+    def __init__(self, grobro_mqtt: MQTTConfig, forward_mqtt: MQTTConfig, stats: BridgeStats | None = None):
         self._forward_clients = {}
+        self._stats = stats or BridgeStats()
         LOG.info(
             f"Connecting to GroBro broker at '{grobro_mqtt.host}:{grobro_mqtt.port}'"
         )
@@ -89,6 +91,7 @@ class Client(CloudForwardMixin):
         self._client.connect(grobro_mqtt.host, grobro_mqtt.port, 60)
         self._client.on_message = self._on_message
         self._client.on_connect = self._on_connect
+        self._client.on_disconnect = self._on_disconnect
         self._forward_mqtt_config = forward_mqtt
         self._ptq_for_raq: dict[str, str] = {}
 
@@ -104,7 +107,7 @@ class Client(CloudForwardMixin):
             client.loop_stop()
             client.disconnect()
 
-    def send_command(self, cmd: GrowattModbusFunctionSingle):
+    def send_command(self, cmd: GrowattModbusFunctionSingle | GrowattModbusFunctionMultiple):
         scrambled = scramble(cmd.build_grobro())
         final_payload = append_crc(scrambled)
 
@@ -190,7 +193,12 @@ class Client(CloudForwardMixin):
 
     def _on_connect(self, client, userdata, flags, reason_code, properties):
         LOG.info(f"Connected to GroBro MQTT server with result code {reason_code}")
+        self._stats.set_source_connected(not getattr(reason_code, "is_failure", False))
         self._client.subscribe("c/#")
+
+    def _on_disconnect(self, client, userdata, flags, reason_code, properties):
+        LOG.warning("Disconnected from GroBro MQTT server: %s", reason_code)
+        self._stats.set_source_connected(False)
 
     def _on_message(self, client, userdata, msg: MQTTMessage):
         # check for forwarded messages and ignore them
@@ -203,8 +211,10 @@ class Client(CloudForwardMixin):
         LOG.debug("Received message (%s): %s: %s", file, msg.topic, msg.payload)
         if settings.DUMP_MESSAGES:
             dump_message_binary(msg.topic, msg.payload)
+        device_id = None
         try:
             device_id = _extract_device_id(msg.topic)
+            self._stats.message_received(device_id)
             self._forward_to_cloud(msg, device_id)
 
             unscrambled = parser.unscramble(msg.payload)
@@ -233,6 +243,7 @@ class Client(CloudForwardMixin):
                 # msg type 831 looks like published holding registers. Both aren't handled yet.
                 LOG.debug("Unknown msg_type %s: %s", msg_type, unscrambled.hex())
         except Exception as e:
+            self._stats.decode_error(device_id)
             LOG.error(f"Processing message: {e}")
 
     def _handle_config(self, device_id: str, unscrambled: bytes, msg_type_4: int, msg_type: int):

@@ -6,6 +6,7 @@ configs. The other parts live in mixins:
 - state.py: input and holding register values as states
 - value_cache.py: KEEP_LAST_VALUES
 - commands.py: commands from Home Assistant, config reads and the time sync
+- bridge.py: the GroBro device itself
 """
 
 from __future__ import annotations
@@ -20,16 +21,18 @@ import paho.mqtt.client as mqtt
 
 import grobro.model as model
 from grobro import settings
+from grobro.ha.bridge import BridgeMixin
 from grobro.ha.commands import COMMAND_PLATFORMS, CommandsMixin
 from grobro.ha.discovery import DiscoveryMixin
 from grobro.ha.state import StateMixin
 from grobro.ha.value_cache import ValueCacheMixin
 from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.stats import BridgeStats
 
 LOG = logging.getLogger(__name__)
 
 
-class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin):
+class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin, BridgeMixin):
     on_command: Optional[Callable[[GrowattModbusFunctionSingle], None]] = None
     on_config_command: Optional[Callable[[str, int, str], None]] = None
     on_config_read: Optional[Callable[[str, int], None]] = None
@@ -37,7 +40,9 @@ class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin):
 
     _client: mqtt.Client
 
-    def __init__(self, mqtt_config: model.MQTTConfig):
+    def __init__(self, mqtt_config: model.MQTTConfig, stats: Optional[BridgeStats] = None):
+        self._stats = stats or BridgeStats()
+        self._bridge_timer: Optional[Timer] = None
         self._config_cache: dict[str, model.DeviceConfig] = {}
         self._discovery_cache: list[str] = []
         self._device_timers: dict[str, Timer] = {}
@@ -106,8 +111,11 @@ class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin):
 
     def start(self):
         self._client.loop_start()
+        self._schedule_bridge_state()
 
     def stop(self):
+        if self._bridge_timer:
+            self._bridge_timer.cancel()
         for device_id in list(self._value_cache_dirty):
             self._save_value_cache(device_id)
         self._client.loop_stop()
@@ -142,6 +150,8 @@ class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin):
         self._client.publish(settings.BRIDGE_AVAILABILITY_TOPIC, "online", retain=True)
         self._client.subscribe(settings.HA_STATUS_TOPIC)
         self._subscribe_commands()
+        self._publish_bridge_discovery()
+        self._publish_bridge_state()
         self._republish_cached_values()
 
     def _subscribe_commands(self):
@@ -160,6 +170,8 @@ class Client(DiscoveryMixin, StateMixin, ValueCacheMixin, CommandsMixin):
     def _republish_after_ha_restart(self):
         """Home Assistant restarted: send discovery and the last states again."""
         LOG.info("Home Assistant came online, republishing discovery and states")
+        self._publish_bridge_discovery()
+        self._publish_bridge_state()
         for device_id in list(self._discovery_cache):
             # Republish without clearing, so Home Assistant keeps the device
             self._discovery_payload_cache.pop(device_id, None)

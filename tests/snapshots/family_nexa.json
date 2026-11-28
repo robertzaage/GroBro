@@ -180,6 +180,118 @@
 {
 "device_id": "0HVR000SNAP0001",
 "function": 6,
+"register_no": 342,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 342,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 342,
+"value": 342
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
 "register_no": 259,
 "value": 3102
 }
@@ -254,6 +366,118 @@
 "function": 5,
 "register_no": 263,
 "value": 263
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 344,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 344,
+"value": 344
 }
 ],
 [
@@ -340,6 +564,118 @@
 {
 "device_id": "0HVR000SNAP0001",
 "function": 6,
+"register_no": 346,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 346,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 346,
+"value": 346
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
 "register_no": 269,
 "value": 3102
 }
@@ -414,6 +750,118 @@
 "function": 5,
 "register_no": 273,
 "value": 273
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 348,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 348,
+"value": 348
 }
 ],
 [
@@ -500,6 +948,118 @@
 {
 "device_id": "0HVR000SNAP0001",
 "function": 6,
+"register_no": 350,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 350,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 350,
+"value": 350
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
 "register_no": 279,
 "value": 3102
 }
@@ -574,6 +1134,118 @@
 "function": 5,
 "register_no": 283,
 "value": 283
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 352,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 352,
+"value": 352
 }
 ],
 [
@@ -660,6 +1332,118 @@
 {
 "device_id": "0HVR000SNAP0001",
 "function": 6,
+"register_no": 354,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 354,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 354,
+"value": 354
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
 "register_no": 289,
 "value": 3102
 }
@@ -740,6 +1524,118 @@
 {
 "device_id": "0HVR000SNAP0001",
 "function": 6,
+"register_no": 356,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 356,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 356,
+"value": 356
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
 "register_no": 294,
 "value": 3102
 }
@@ -814,6 +1710,118 @@
 "function": 5,
 "register_no": 298,
 "value": 298
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 1
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 2
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 4
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 8
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 16
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 32
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 6,
+"register_no": 358,
+"value": 64
+}
+],
+[
+{
+"device_id": "0HVR000SNAP0001",
+"function": 5,
+"register_no": 358,
+"value": 358
 }
 ],
 [
@@ -1091,6 +2099,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot2_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -1137,6 +2215,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot2_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -1191,6 +2339,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot4_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -1237,6 +2455,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot4_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -1291,6 +2579,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot6_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -1337,6 +2695,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot6_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -1391,6 +2819,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot8_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -1441,6 +2939,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot9_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -1487,6 +3055,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot9_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -1896,8 +3534,63 @@ true
 true
 ],
 [
+"homeassistant/sensor/grobro/0HVR000SNAP0001_batteryFaults/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugConnected/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugPower/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/device/0HVR000SNAP0001/config",
-"@fdda4284e67c",
+"@8c64deab3341",
 true
 ],
 [
@@ -1917,7 +3610,7 @@ true
 ],
 [
 "homeassistant/grobro/0HVR000SNAP0001/state",
-"@a7d4a63db9c5",
+"@4e57b4a0b625",
 false
 ],
 [
@@ -2036,6 +3729,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot2_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -2082,6 +3845,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot2_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -2136,6 +3969,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot4_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -2182,6 +4085,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot4_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -2236,6 +4209,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot6_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -2282,6 +4325,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot6_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -2336,6 +4449,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot8_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -2386,6 +4569,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot9_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -2432,6 +4685,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot9_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -2837,6 +5160,61 @@ true
 ],
 [
 "homeassistant/sensor/grobro/0HVR000SNAP0001_fw_version_part_4/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_batteryFaults/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugConnected/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugPower/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -2916,6 +5294,41 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_monday/get",
+77,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_tuesday/get",
+84,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_wednesday/get",
+91,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_thursday/get",
+98,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_friday/get",
+105,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_saturday/get",
+112,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot1_sunday/get",
+6,
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001/slot2_start_time/get",
 "12:30",
 true
@@ -2932,12 +5345,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot2_power/get",
-98,
+34,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_enabled/get",
-105,
+41,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_monday/get",
+48,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_tuesday/get",
+55,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_wednesday/get",
+62,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_thursday/get",
+69,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_friday/get",
+76,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_saturday/get",
+83,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot2_sunday/get",
+90,
 true
 ],
 [
@@ -2957,12 +5405,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot3_power/get",
-20,
+5,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_enabled/get",
-27,
+12,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_monday/get",
+19,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_tuesday/get",
+26,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_wednesday/get",
+33,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_thursday/get",
+40,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_friday/get",
+47,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_saturday/get",
+54,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot3_sunday/get",
+61,
 true
 ],
 [
@@ -2982,12 +5465,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot4_power/get",
-55,
+89,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_enabled/get",
-62,
+96,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_monday/get",
+103,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_tuesday/get",
+110,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_wednesday/get",
+4,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_thursday/get",
+11,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_friday/get",
+18,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_saturday/get",
+25,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot4_sunday/get",
+32,
 true
 ],
 [
@@ -3007,12 +5525,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot5_power/get",
-90,
+60,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_enabled/get",
-97,
+67,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_monday/get",
+74,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_tuesday/get",
+81,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_wednesday/get",
+88,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_thursday/get",
+95,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_friday/get",
+102,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_saturday/get",
+109,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot5_sunday/get",
+3,
 true
 ],
 [
@@ -3032,12 +5585,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot6_power/get",
-12,
+31,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_enabled/get",
-19,
+38,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_monday/get",
+45,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_tuesday/get",
+52,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_wednesday/get",
+59,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_thursday/get",
+66,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_friday/get",
+73,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_saturday/get",
+80,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot6_sunday/get",
+87,
 true
 ],
 [
@@ -3057,12 +5645,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot7_power/get",
-47,
+2,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_enabled/get",
-54,
+9,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_monday/get",
+16,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_tuesday/get",
+23,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_wednesday/get",
+30,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_thursday/get",
+37,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_friday/get",
+44,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_saturday/get",
+51,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot7_sunday/get",
+58,
 true
 ],
 [
@@ -3082,12 +5705,47 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot8_power/get",
-82,
+86,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_enabled/get",
-89,
+93,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_monday/get",
+100,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_tuesday/get",
+107,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_wednesday/get",
+1,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_thursday/get",
+8,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_friday/get",
+15,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_saturday/get",
+22,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot8_sunday/get",
+29,
 true
 ],
 [
@@ -3107,27 +5765,62 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/slot9_power/get",
-4,
+57,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_enabled/get",
-11,
+64,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_monday/get",
+71,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_tuesday/get",
+78,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_wednesday/get",
+85,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_thursday/get",
+92,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_friday/get",
+99,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_saturday/get",
+106,
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001/slot9_sunday/get",
+0,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/ac_couple/get",
-18,
+7,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/always_on/get",
-25,
+14,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/ac_always_on/get",
-32,
+21,
 true
 ],
 [
@@ -3137,12 +5830,27 @@ true
 ],
 [
 "homeassistant/number/grobro/0HVR000SNAP0001/default_power/get",
-46,
+35,
 true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001/island_mode/get",
-53,
+42,
+true
+],
+[
+"homeassistant/device/grobro_bridge/config",
+"@33203d9f88b3",
+true
+],
+[
+"homeassistant/grobro/grobro_bridge/state",
+"@1d02da9fedac",
+true
+],
+[
+"homeassistant/grobro/grobro_bridge/devices",
+"{}",
 true
 ],
 [
@@ -3261,6 +5969,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot1_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot2_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -3307,6 +6085,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot2_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot2_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -3361,6 +6209,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot3_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot4_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -3407,6 +6325,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot4_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot4_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -3461,6 +6449,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot5_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot6_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -3507,6 +6565,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot6_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot6_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -3561,6 +6689,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot7_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot8_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -3611,6 +6809,76 @@ true
 true
 ],
 [
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot8_sunday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/time/grobro/0HVR000SNAP0001_slot9_start_time/config",
 "{\"migrate_discovery\": true}",
 true
@@ -3657,6 +6925,76 @@ true
 ],
 [
 "homeassistant/switch/grobro/0HVR000SNAP0001_slot9_enabled_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_monday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_tuesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_wednesday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_thursday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_friday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_saturday_read/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/switch/grobro/0HVR000SNAP0001_slot9_sunday_read/config",
 "{\"migrate_discovery\": true}",
 true
 ],
@@ -4066,8 +7404,63 @@ true
 true
 ],
 [
+"homeassistant/sensor/grobro/0HVR000SNAP0001_batteryFaults/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery1Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery2Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery3Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Alarm/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_battery4Protection/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugConnected/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
+"homeassistant/sensor/grobro/0HVR000SNAP0001_smartPlugPower/config",
+"{\"migrate_discovery\": true}",
+true
+],
+[
 "homeassistant/device/0HVR000SNAP0001/config",
-"@fdda4284e67c",
+"@8c64deab3341",
 true
 ],
 [
@@ -4087,20 +7480,117 @@ false
 ]
 ],
 "payloads": {
-"@a7d4a63db9c5": {
+"@1d02da9fedac": {
+"decode_errors": 0,
+"devices": 0,
+"messages": 0,
+"source_connected": "OFF",
+"started": "1970-01-01T00:00:00+00:00",
+"version": "0.0.0-test"
+},
+"@33203d9f88b3": {
+"avty": [
+{
+"t": "homeassistant/grobro/bridge/availability"
+}
+],
+"cmps": {
+"grobro_bridge_decode_errors": {
+"entity_category": "diagnostic",
+"icon": "mdi:alert-circle-outline",
+"name": "Decode Errors",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_decode_errors",
+"value_template": "{{ value_json.decode_errors }}"
+},
+"grobro_bridge_devices": {
+"icon": "mdi:solar-power-variant",
+"json_attributes_topic": "homeassistant/grobro/grobro_bridge/devices",
+"name": "Devices",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_devices",
+"value_template": "{{ value_json.devices }}"
+},
+"grobro_bridge_messages": {
+"entity_category": "diagnostic",
+"icon": "mdi:message-processing-outline",
+"name": "Messages Received",
+"platform": "sensor",
+"state_class": "total_increasing",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_messages",
+"value_template": "{{ value_json.messages }}"
+},
+"grobro_bridge_source_connected": {
+"device_class": "connectivity",
+"entity_category": "diagnostic",
+"name": "Device Broker",
+"platform": "binary_sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_source_connected",
+"value_template": "{{ value_json.source_connected }}"
+},
+"grobro_bridge_started": {
+"device_class": "timestamp",
+"entity_category": "diagnostic",
+"name": "Started",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_started",
+"value_template": "{{ value_json.started }}"
+},
+"grobro_bridge_version": {
+"entity_category": "diagnostic",
+"icon": "mdi:tag-outline",
+"name": "Version",
+"platform": "sensor",
+"state_topic": "homeassistant/grobro/grobro_bridge/state",
+"unique_id": "grobro_bridge_version",
+"value_template": "{{ value_json.version }}"
+}
+},
+"dev": {
+"identifiers": [
+"grobro_bridge"
+],
+"manufacturer": "GroBro",
+"model": "Growatt MQTT Bridge",
+"name": "GroBro",
+"sw_version": "0.0.0-test"
+},
+"o": {
+"name": "grobro",
+"sw": "0.0.0-test",
+"url": "https://github.com/robertzaage/GroBro"
+}
+},
+"@4e57b4a0b625": {
 "acOutputEnergyToday": 104.5,
+"battery1Alarm": 38,
+"battery1Protection": 45,
 "battery1Soc": 27.5,
 "battery1Temp": 46.5,
+"battery2Alarm": 52,
+"battery2Protection": 59,
 "battery2Soc": 34.5,
 "battery2Temp": 53.5,
+"battery3Alarm": 66,
+"battery3Protection": 73,
 "battery3Soc": 41.5,
 "battery3Temp": 60.5,
+"battery4Alarm": 80,
+"battery4Protection": 87,
 "battery4Soc": 48.5,
 "battery4Temp": 67.5,
 "batteryChargeEnergyToday": 97.5,
 "batteryCurrent": 109.5,
 "batteryCycles": 75,
 "batteryDischargeEnergyToday": 90.5,
+"batteryFaults": 31,
 "batteryPackageQuantity": 63,
 "batterySoh": 82.5,
 "chargeSocLimit": 5.5,
@@ -4152,6 +7642,8 @@ false
 "ser_part_2": "S017",
 "ser_part_3": "S018",
 "ser_part_4": "S019",
+"smartPlugConnected": 94,
+"smartPlugPower": 101,
 "systemTemp": 54.5,
 "totalBatteryPackChargingPower": 56.5,
 "totalBatteryPackChargingStatus": "Idle",
@@ -4159,7 +7651,7 @@ false
 "totalHouseholdLoad": 84.5,
 "workMode": "Load First"
 },
-"@fdda4284e67c": {
+"@8c64deab3341": {
 "avty": [
 {
 "t": "homeassistant/grobro/0HVR000SNAP0001/availability"
@@ -4177,9 +7669,34 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_acOutputEnergyToday",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['acOutputEnergyToday'] }}"
+},
+"grobro_0HVR000SNAP0001_battery1Alarm": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:battery-alert-variant-outline",
+"name": "Battery 1 Alarm",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery1Alarm",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery1Alarm'] }}"
+},
+"grobro_0HVR000SNAP0001_battery1Protection": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:shield-alert-outline",
+"name": "Battery 1 Protection",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery1Protection",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery1Protection'] }}"
 },
 "grobro_0HVR000SNAP0001_battery1Soc": {
 "device_class": "battery",
@@ -4188,6 +7705,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_battery1Soc",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['battery1Soc'] }}"
@@ -4199,9 +7717,34 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_battery1Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['battery1Temp'] }}"
+},
+"grobro_0HVR000SNAP0001_battery2Alarm": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:battery-alert-variant-outline",
+"name": "Battery 2 Alarm",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery2Alarm",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery2Alarm'] }}"
+},
+"grobro_0HVR000SNAP0001_battery2Protection": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:shield-alert-outline",
+"name": "Battery 2 Protection",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery2Protection",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery2Protection'] }}"
 },
 "grobro_0HVR000SNAP0001_battery2Soc": {
 "device_class": "battery",
@@ -4210,6 +7753,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_battery2Soc",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['battery2Soc'] }}"
@@ -4221,9 +7765,34 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_battery2Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['battery2Temp'] }}"
+},
+"grobro_0HVR000SNAP0001_battery3Alarm": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:battery-alert-variant-outline",
+"name": "Battery 3 Alarm",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery3Alarm",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery3Alarm'] }}"
+},
+"grobro_0HVR000SNAP0001_battery3Protection": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:shield-alert-outline",
+"name": "Battery 3 Protection",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery3Protection",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery3Protection'] }}"
 },
 "grobro_0HVR000SNAP0001_battery3Soc": {
 "device_class": "battery",
@@ -4232,6 +7801,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_battery3Soc",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['battery3Soc'] }}"
@@ -4243,9 +7813,34 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_battery3Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['battery3Temp'] }}"
+},
+"grobro_0HVR000SNAP0001_battery4Alarm": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:battery-alert-variant-outline",
+"name": "Battery 4 Alarm",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery4Alarm",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery4Alarm'] }}"
+},
+"grobro_0HVR000SNAP0001_battery4Protection": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:shield-alert-outline",
+"name": "Battery 4 Protection",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_battery4Protection",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['battery4Protection'] }}"
 },
 "grobro_0HVR000SNAP0001_battery4Soc": {
 "device_class": "battery",
@@ -4254,6 +7849,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_battery4Soc",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['battery4Soc'] }}"
@@ -4265,6 +7861,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_battery4Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['battery4Temp'] }}"
@@ -4276,6 +7873,7 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_batteryChargeEnergyToday",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['batteryChargeEnergyToday'] }}"
@@ -4287,6 +7885,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_batteryCurrent",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['batteryCurrent'] }}"
@@ -4309,9 +7908,22 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_batteryDischargeEnergyToday",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['batteryDischargeEnergyToday'] }}"
+},
+"grobro_0HVR000SNAP0001_batteryFaults": {
+"device_class": null,
+"entity_category": "diagnostic",
+"icon": "mdi:battery-alert",
+"name": "Battery Faults",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_batteryFaults",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['batteryFaults'] }}"
 },
 "grobro_0HVR000SNAP0001_batteryPackageQuantity": {
 "device_class": null,
@@ -4331,6 +7943,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_batterySoh",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['batterySoh'] }}"
@@ -4342,6 +7955,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_chargeSocLimit",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['chargeSocLimit'] }}"
@@ -4484,6 +8098,26 @@ false
 "type": "switch",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_island_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_meter_reading": {
+"command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/meter_reading/set",
+"device_class": "power",
+"icon": "mdi:meter-electric-outline",
+"max": 10000,
+"min": -10000,
+"mode": "box",
+"name": "Smart Meter Reading",
+"platform": "number",
+"step": 1,
+"unique_id": "grobro_0HVR000SNAP0001_cmd_meter_reading",
+"unit_of_measurement": "W"
+},
+"grobro_0HVR000SNAP0001_cmd_meter_reading_clear": {
+"command_topic": "homeassistant/button/grobro/0HVR000SNAP0001/meter_reading/set",
+"icon": "mdi:meter-electric-outline",
+"name": "Clear Smart Meter Reading",
+"platform": "button",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_meter_reading_clear"
+},
 "grobro_0HVR000SNAP0001_cmd_mqtt_broker": {
 "command_topic": "homeassistant/config/grobro/0HVR000SNAP0001/19/set",
 "entity_category": "config",
@@ -4553,6 +8187,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot1_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot1_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot1_mode/set",
 "name": "Slot 1 Mode",
@@ -4567,6 +8211,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot1_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot1_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot1_power/set",
 "max": 1000,
@@ -4580,6 +8234,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot1_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot1_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot1_start_time/set",
 "icon": "mdi:clock-start",
@@ -4589,6 +8253,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot1_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot1_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot1_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot1_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot1_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 1 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot1_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot1_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot2_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_enabled/set",
@@ -4609,6 +8313,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot2_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot2_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot2_mode/set",
 "name": "Slot 2 Mode",
@@ -4623,6 +8337,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot2_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot2_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot2_power/set",
 "max": 1000,
@@ -4636,6 +8360,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot2_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot2_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot2_start_time/set",
 "icon": "mdi:clock-start",
@@ -4645,6 +8379,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot2_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot2_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot2_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot2_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot2_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 2 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot2_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot2_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot3_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_enabled/set",
@@ -4665,6 +8439,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot3_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot3_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot3_mode/set",
 "name": "Slot 3 Mode",
@@ -4679,6 +8463,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot3_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot3_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot3_power/set",
 "max": 1000,
@@ -4692,6 +8486,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot3_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot3_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot3_start_time/set",
 "icon": "mdi:clock-start",
@@ -4701,6 +8505,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot3_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot3_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot3_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot3_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot3_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 3 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot3_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot3_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot4_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_enabled/set",
@@ -4721,6 +8565,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot4_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot4_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot4_mode/set",
 "name": "Slot 4 Mode",
@@ -4735,6 +8589,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot4_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot4_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot4_power/set",
 "max": 1000,
@@ -4748,6 +8612,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot4_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot4_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot4_start_time/set",
 "icon": "mdi:clock-start",
@@ -4757,6 +8631,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot4_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot4_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot4_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot4_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot4_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 4 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot4_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot4_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot5_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_enabled/set",
@@ -4777,6 +8691,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot5_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot5_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot5_mode/set",
 "name": "Slot 5 Mode",
@@ -4791,6 +8715,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot5_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot5_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot5_power/set",
 "max": 1000,
@@ -4804,6 +8738,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot5_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot5_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot5_start_time/set",
 "icon": "mdi:clock-start",
@@ -4813,6 +8757,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot5_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot5_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot5_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot5_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot5_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 5 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot5_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot5_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot6_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_enabled/set",
@@ -4833,6 +8817,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot6_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot6_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot6_mode/set",
 "name": "Slot 6 Mode",
@@ -4847,6 +8841,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot6_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot6_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot6_power/set",
 "max": 1000,
@@ -4860,6 +8864,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot6_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot6_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot6_start_time/set",
 "icon": "mdi:clock-start",
@@ -4869,6 +8883,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot6_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot6_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot6_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot6_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot6_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 6 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot6_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot6_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot7_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_enabled/set",
@@ -4889,6 +8943,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot7_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot7_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot7_mode/set",
 "name": "Slot 7 Mode",
@@ -4903,6 +8967,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot7_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot7_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot7_power/set",
 "max": 1000,
@@ -4916,6 +8990,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot7_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot7_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot7_start_time/set",
 "icon": "mdi:clock-start",
@@ -4925,6 +9009,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot7_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot7_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot7_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot7_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot7_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 7 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot7_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot7_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot8_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_enabled/set",
@@ -4945,6 +9069,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot8_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot8_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot8_mode/set",
 "name": "Slot 8 Mode",
@@ -4959,6 +9093,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot8_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot8_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot8_power/set",
 "max": 1000,
@@ -4972,6 +9116,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot8_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot8_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot8_start_time/set",
 "icon": "mdi:clock-start",
@@ -4981,6 +9135,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot8_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot8_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot8_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot8_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot8_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 8 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot8_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot8_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_slot9_enabled": {
 "command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_enabled/set",
@@ -5001,6 +9195,16 @@ false
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_end_time"
 },
+"grobro_0HVR000SNAP0001_cmd_slot9_friday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_friday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Friday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_friday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_friday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot9_mode": {
 "command_topic": "homeassistant/select/grobro/0HVR000SNAP0001/slot9_mode/set",
 "name": "Slot 9 Mode",
@@ -5015,6 +9219,16 @@ false
 "type": "select",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_mode"
 },
+"grobro_0HVR000SNAP0001_cmd_slot9_monday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_monday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Monday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_monday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_monday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot9_power": {
 "command_topic": "homeassistant/number/grobro/0HVR000SNAP0001/slot9_power/set",
 "max": 1000,
@@ -5028,6 +9242,16 @@ false
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_power",
 "unit_of_measurement": "W"
 },
+"grobro_0HVR000SNAP0001_cmd_slot9_saturday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_saturday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Saturday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_saturday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_saturday"
+},
 "grobro_0HVR000SNAP0001_cmd_slot9_start_time": {
 "command_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot9_start_time/set",
 "icon": "mdi:clock-start",
@@ -5037,6 +9261,46 @@ false
 "state_topic": "homeassistant/time/grobro/0HVR000SNAP0001/slot9_start_time/get",
 "type": "time",
 "unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_start_time"
+},
+"grobro_0HVR000SNAP0001_cmd_slot9_sunday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_sunday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Sunday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_sunday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_sunday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot9_thursday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_thursday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Thursday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_thursday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_thursday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot9_tuesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_tuesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Tuesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_tuesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_tuesday"
+},
+"grobro_0HVR000SNAP0001_cmd_slot9_wednesday": {
+"command_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_wednesday/set",
+"icon": "mdi:calendar-week",
+"name": "Slot 9 Wednesday",
+"platform": "switch",
+"publish": true,
+"state_topic": "homeassistant/switch/grobro/0HVR000SNAP0001/slot9_wednesday/get",
+"type": "switch",
+"unique_id": "grobro_0HVR000SNAP0001_cmd_slot9_wednesday"
 },
 "grobro_0HVR000SNAP0001_cmd_system_time": {
 "command_topic": "homeassistant/config/grobro/0HVR000SNAP0001/31/set",
@@ -5081,6 +9345,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_dischargeSocLimit",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['dischargeSocLimit'] }}"
@@ -5092,6 +9357,7 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_eacMonth",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['eacMonth'] }}"
@@ -5103,6 +9369,7 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_eacToday",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['eacToday'] }}"
@@ -5114,6 +9381,7 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_eacTotal",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['eacTotal'] }}"
@@ -5125,6 +9393,7 @@ false
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_eacYear",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['eacYear'] }}"
@@ -5168,6 +9437,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_householdLoadApartFromGroplug",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['householdLoadApartFromGroplug'] }}"
@@ -5191,6 +9461,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_inverterTemp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['inverterTemp'] }}"
@@ -5202,6 +9473,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 3,
 "unique_id": "grobro_0HVR000SNAP0001_maxCellVoltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['maxCellVoltage'] }}"
@@ -5224,6 +9496,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_meterPower",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['meterPower'] }}"
@@ -5235,6 +9508,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 3,
 "unique_id": "grobro_0HVR000SNAP0001_minCellVoltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['minCellVoltage'] }}"
@@ -5257,6 +9531,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_offGridVoltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['offGridVoltage'] }}"
@@ -5268,6 +9543,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_onGridPower",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['onGridPower'] }}"
@@ -5279,6 +9555,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_onGridVoltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['onGridVoltage'] }}"
@@ -5302,6 +9579,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_pac",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['pac'] }}"
@@ -5313,6 +9591,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_ppv",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['ppv'] }}"
@@ -5324,6 +9603,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv1Current",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['pv1Current'] }}"
@@ -5335,6 +9615,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_pv1Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['pv1Temp'] }}"
@@ -5346,6 +9627,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv1Voltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['pv1Voltage'] }}"
@@ -5357,6 +9639,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv2Current",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['pv2Current'] }}"
@@ -5368,6 +9651,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_pv2Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['pv2Temp'] }}"
@@ -5379,6 +9663,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv2Voltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['pv2Voltage'] }}"
@@ -5390,6 +9675,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv3Current",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['pv3Current'] }}"
@@ -5401,6 +9687,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_pv3Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['pv3Temp'] }}"
@@ -5412,6 +9699,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv3Voltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['pv3Voltage'] }}"
@@ -5423,6 +9711,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv4Current",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['pv4Current'] }}"
@@ -5434,6 +9723,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_pv4Temp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['pv4Temp'] }}"
@@ -5445,6 +9735,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_pv4Voltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['pv4Voltage'] }}"
@@ -5456,6 +9747,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_register_110",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['register_110'] }}"
@@ -5467,6 +9759,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_register_111",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['register_111'] }}"
@@ -5478,6 +9771,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_register_112",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['register_112'] }}"
@@ -5489,6 +9783,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_register_114",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['register_114'] }}"
@@ -5500,6 +9795,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_0HVR000SNAP0001_register_117",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['register_117'] }}"
@@ -5532,6 +9828,28 @@ false
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/serial",
 "unique_id": "grobro_0HVR000SNAP0001_serial"
 },
+"grobro_0HVR000SNAP0001_smartPlugConnected": {
+"device_class": null,
+"icon": "mdi:power-socket-eu",
+"name": "Smart Plug Connected",
+"platform": "sensor",
+"state_class": null,
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_smartPlugConnected",
+"unit_of_measurement": null,
+"value_template": "{{ value_json['smartPlugConnected'] }}"
+},
+"grobro_0HVR000SNAP0001_smartPlugPower": {
+"device_class": "power",
+"icon": "mdi:power-socket-eu",
+"name": "Smart Plug Power",
+"platform": "sensor",
+"state_class": "measurement",
+"state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"unique_id": "grobro_0HVR000SNAP0001_smartPlugPower",
+"unit_of_measurement": "W",
+"value_template": "{{ value_json['smartPlugPower'] }}"
+},
 "grobro_0HVR000SNAP0001_sync_time": {
 "command_topic": "homeassistant/config/grobro/0HVR000SNAP0001/31/set",
 "icon": "mdi:clock-outline",
@@ -5546,6 +9864,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_0HVR000SNAP0001_systemTemp",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['systemTemp'] }}"
@@ -5557,6 +9876,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_totalBatteryPackChargingPower",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['totalBatteryPackChargingPower'] }}"
@@ -5579,6 +9899,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_totalBatteryPackSoc",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['totalBatteryPackSoc'] }}"
@@ -5590,6 +9911,7 @@ false
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/0HVR000SNAP0001/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_0HVR000SNAP0001_totalHouseholdLoad",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['totalHouseholdLoad'] }}"
@@ -5622,10 +9944,12 @@ false
 "model": "NEXA-series",
 "name": "Growatt 0HVR000SNAP0001",
 "serial_number": "0HVR000SNAP0001",
-"sw_version": "3.10.17.24"
+"sw_version": "3.10.17.24",
+"via_device": "grobro_bridge"
 },
 "o": {
 "name": "grobro",
+"sw": "0.0.0-test",
 "url": "https://github.com/robertzaage/GroBro"
 }
 }

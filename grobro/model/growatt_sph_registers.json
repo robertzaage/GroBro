@@ -2099,6 +2099,122 @@
         "icon": "mdi:battery",
         "entity_category": "diagnostic"
       }
+    },
+    "EPS_Fac": {
+      "growatt": {
+        "position": {
+          "register_no": 1067,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0,
+            "multiplier": 0.01
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "EPS frequency",
+        "state_class": "measurement",
+        "device_class": "frequency",
+        "unit_of_measurement": "Hz",
+        "icon": "mdi:sine-wave"
+      }
+    },
+    "EPS_Vac1": {
+      "growatt": {
+        "position": {
+          "register_no": 1068,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "EPS voltage",
+        "state_class": "measurement",
+        "device_class": "voltage",
+        "unit_of_measurement": "V",
+        "icon": "mdi:power-plug-battery-outline"
+      }
+    },
+    "EPS_Iac1": {
+      "growatt": {
+        "position": {
+          "register_no": 1069,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "EPS current",
+        "state_class": "measurement",
+        "device_class": "current",
+        "unit_of_measurement": "A",
+        "icon": "mdi:power-plug-battery-outline"
+      }
+    },
+    "EPS_Pac1": {
+      "growatt": {
+        "position": {
+          "register_no": 1070,
+          "offset": 0,
+          "size": 4
+        },
+        "data": {
+          "data_type": "FLOAT",
+          "float_options": {
+            "delta": 0,
+            "multiplier": 0.1
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "EPS power",
+        "state_class": "measurement",
+        "device_class": "apparent_power",
+        "unit_of_measurement": "VA",
+        "icon": "mdi:power-plug-battery-outline"
+      }
+    },
+    "EPS_Load_Percent": {
+      "growatt": {
+        "position": {
+          "register_no": 1080,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "EPS load",
+        "state_class": "measurement",
+        "unit_of_measurement": "%",
+        "icon": "mdi:gauge",
+        "offline": "zero"
+      }
     }
   }
 }

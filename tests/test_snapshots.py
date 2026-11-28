@@ -34,7 +34,11 @@ UPDATE = os.getenv("GROBRO_UPDATE_SNAPSHOTS") == "1"
 def _clean_state():
     regs.DETECTED_DEVICES.clear()
     regs.INVERTER_SERIALS.clear()
-    yield
+    # The version and the bridge start time would change the snapshots on every release and run
+    clock = MagicMock()
+    clock.time.return_value = 0
+    with patch("grobro.version.VERSION", "0.0.0-test"), patch("grobro.stats.time", clock):
+        yield
     regs.DETECTED_DEVICES.clear()
     regs.INVERTER_SERIALS.clear()
 

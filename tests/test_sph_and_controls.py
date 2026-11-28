@@ -137,3 +137,37 @@ def test_sph_battery_and_diagnostic_registers(key, register_no, raw, expected):
     assert reg.growatt.position.register_no == register_no
     value = reg.growatt.data.parse(raw)
     assert value == expected if isinstance(expected, str) else value == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "key, register_no, raw, expected",
+    [
+        ("EPS_Fac", 1067, struct.pack(">H", 5001), 50.01),
+        ("EPS_Vac1", 1068, struct.pack(">H", 2304), 230.4),
+        ("EPS_Iac1", 1069, struct.pack(">H", 52), 5.2),
+        ("EPS_Pac1", 1070, struct.pack(">I", 12345), 1234.5),
+        ("EPS_Load_Percent", 1080, struct.pack(">H", 37), 37),
+    ],
+)
+def test_sph_eps_registers(key, register_no, raw, expected):
+    reg = regs.KNOWN_SPH_REGISTERS.input_registers[key]
+    assert reg.growatt.position.register_no == register_no
+    assert reg.growatt.data.parse(raw) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "platform, name, payload, register_no, value",
+    [
+        ("select", "output_priority", b"Battery First", 1, 0),
+        ("select", "output_priority", b"PV & Grid First", 1, 3),
+        ("select", "charge_priority", b"PV Only", 2, 2),
+        ("number", "max_charge_current", b"60", 34, 60),
+        ("number", "ac_charge_current", b"30", 38, 30),
+        ("switch", "buzzer", b"OFF", 22, 0),
+    ],
+)
+def test_spf_controls(ha_client, platform, name, payload, register_no, value):
+    ha_client._client.on_message(None, None, _msg(f"homeassistant/{platform}/grobro/HAQ0000TEST0001/{name}/set", payload))
+    command = ha_client.on_command.call_args_list[0].args[0]
+    assert command.register_no == register_no
+    assert command.value == value

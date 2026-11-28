@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import logging
+import math
+import struct
 from collections import deque
 from threading import Timer
 from typing import Optional
 
 from grobro import settings
 from grobro.model.growatt_registers import (
+    KNOWN_NEXA_REGISTERS,
+    KNOWN_NOAH_REGISTERS,
     get_known_registers,
 )
-from grobro.model.modbus_function import GrowattModbusFunctionSingle
+from grobro.model.modbus_function import GrowattModbusFunctionMultiple, GrowattModbusFunctionSingle
 from grobro.model.modbus_message import GrowattModbusFunction
 from datetime import datetime
 
@@ -55,6 +59,34 @@ def _to_register_value(reg, cmd_type: str, raw_value: str) -> int:
     return raw & 0xFFFF if raw < 0 else raw
 
 
+# Holding registers 310-312 take a smart meter reading (NOAH, NEXA), written the way the
+# Growatt Cloud writes it. Direction is carried by the register holding the magnitude:
+# 310 export, 311 import, 312 marks the reading as valid. All zero withdraws the reading.
+# The device drops a reading after about 120 s, so it has to be sent at least every minute.
+METER_READING_START = 310
+METER_READING_END = 312
+
+
+def supports_meter_reading(known_registers) -> bool:
+    return known_registers is KNOWN_NEXA_REGISTERS or known_registers is KNOWN_NOAH_REGISTERS
+
+
+def make_meter_reading_command(device_id: str, watts: int | None) -> GrowattModbusFunctionMultiple:
+    """Build the write of a meter reading in watts (positive import, negative export), None withdraws it."""
+    if watts is None:
+        values = (0, 0, 0)
+    else:
+        magnitude = abs(watts)
+        values = (magnitude if watts < 0 else 0, magnitude if watts >= 0 else 0, 1)
+    return GrowattModbusFunctionMultiple(
+        device_id=device_id,
+        function=GrowattModbusFunction.PRESET_MULTIPLE_REGISTER,
+        start=METER_READING_START,
+        end=METER_READING_END,
+        values=struct.pack(">3H", *values),
+    )
+
+
 # Home Assistant platforms GroBro receives commands for
 COMMAND_PLATFORMS = ("number", "time", "button", "switch", "select", "config")
 
@@ -76,7 +108,9 @@ class CommandsMixin:
             LOG.info("Unknown device type: %s", device_id)
             return
 
-        if cmd_type == "button":
+        if cmd_name == "meter_reading" and action == "set":
+            self._handle_meter_reading(device_id, known_registers, cmd_type, msg.payload.decode().strip())
+        elif cmd_type == "button":
             self._handle_button(device_id, known_registers, cmd_name, action)
         elif cmd_type in {"number", "switch", "time", "select"} and action == "set":
             self._handle_set(device_id, known_registers, cmd_type, cmd_name, msg.payload.decode().strip())
@@ -85,7 +119,8 @@ class CommandsMixin:
 
     def _handle_button(self, device_id: str, known_registers, cmd_name: str, action: str):
         if cmd_name == "read_all":
-            # Send all modbus reads first
+            # Send all modbus reads first, packed registers only once
+            read_registers: set[int] = set()
             for name, register in known_registers.holding_registers.items():
                 if name.startswith("slot"):
                     try:
@@ -95,6 +130,9 @@ class CommandsMixin:
                         continue
 
                 pos = register.growatt.position
+                if pos.register_no in read_registers:
+                    continue
+                read_registers.add(pos.register_no)
                 self.on_command(
                     make_modbus_command(
                         device_id,
@@ -168,6 +206,26 @@ class CommandsMixin:
                 pos.register_no,
             )
         )
+
+    def _handle_meter_reading(self, device_id: str, known_registers, cmd_type: str, raw_value: str):
+        """Pass a smart meter reading from Home Assistant to the device (number), or withdraw it (button)."""
+        if not supports_meter_reading(known_registers):
+            LOG.error("Device %s does not take smart meter readings", device_id)
+            return
+        watts = None
+        if cmd_type == "number":
+            try:
+                value = float(raw_value)
+                if not math.isfinite(value) or abs(value) > 0xFFFF:
+                    raise ValueError("out of range")
+                watts = int(round(value))
+            except ValueError:
+                LOG.error("Invalid smart meter reading %r for %s", raw_value, device_id)
+                return
+        elif cmd_type != "button":
+            return
+        LOG.debug("Supplying smart meter reading %s W to %s", watts, device_id)
+        self.on_command(make_meter_reading_command(device_id, watts))
 
     def _handle_config(self, device_id: str, register_no: int, raw_value: str):
         # Special case: Sync Time (register 31) sends the current time

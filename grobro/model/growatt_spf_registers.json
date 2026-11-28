@@ -80,7 +80,137 @@
       }
     }
   },
-  "holding_registers": {},
+  "holding_registers": {
+    "output_priority": {
+      "growatt": {
+        "position": {
+          "register_no": 1,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "Battery First",
+              "1": "PV First",
+              "2": "Grid First",
+              "3": "PV & Grid First"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Output Priority",
+        "type": "select",
+        "options": {
+          "0": "Battery First",
+          "1": "PV First",
+          "2": "Grid First",
+          "3": "PV & Grid First"
+        },
+        "icon": "mdi:home-lightning-bolt-outline"
+      }
+    },
+    "charge_priority": {
+      "growatt": {
+        "position": {
+          "register_no": 2,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "ENUM",
+          "enum_options": {
+            "enum_type": "INT_MAP",
+            "values": {
+              "0": "PV First",
+              "1": "PV & Grid",
+              "2": "PV Only"
+            }
+          }
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Charge Priority",
+        "type": "select",
+        "options": {
+          "0": "PV First",
+          "1": "PV & Grid",
+          "2": "PV Only"
+        },
+        "icon": "mdi:battery-charging-outline"
+      }
+    },
+    "max_charge_current": {
+      "growatt": {
+        "position": {
+          "register_no": 34,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Max Charge Current",
+        "type": "number",
+        "unit_of_measurement": "A",
+        "device_class": "current",
+        "min": 0,
+        "max": 400,
+        "step": 1,
+        "icon": "mdi:current-dc"
+      }
+    },
+    "ac_charge_current": {
+      "growatt": {
+        "position": {
+          "register_no": 38,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "AC Charge Current",
+        "type": "number",
+        "unit_of_measurement": "A",
+        "device_class": "current",
+        "min": 0,
+        "max": 400,
+        "step": 1,
+        "icon": "mdi:transmission-tower-import"
+      }
+    },
+    "buzzer": {
+      "growatt": {
+        "position": {
+          "register_no": 22,
+          "offset": 0,
+          "size": 2
+        },
+        "data": {
+          "data_type": "INT"
+        }
+      },
+      "homeassistant": {
+        "publish": true,
+        "name": "Buzzer",
+        "type": "switch",
+        "icon": "mdi:volume-high",
+        "entity_category": "config"
+      }
+    }
+  },
   "input_registers": {
     "System_Status": {
       "growatt": {

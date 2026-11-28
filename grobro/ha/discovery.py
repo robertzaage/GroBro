@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 
 import grobro.model as model
-from grobro import settings
+from grobro import settings, version
+from grobro.ha.bridge import bridge_id
+from grobro.ha.commands import supports_meter_reading
 from grobro.model.growatt_registers import (
     DETECTED_DEVICES,
     GENERIC_DATALOGGER_PREFIXES,
@@ -20,6 +23,16 @@ from grobro.ha.firmware import _COMBINED_FIRMWARE_PREFIXES
 from grobro.ha.state import _bat_count_known, _get_bat_number, _has_status_summary, _resolve_max_bat
 
 LOG = logging.getLogger(__name__)
+
+
+def display_precision(data) -> int | None:
+    """Decimals a scaled value really has, e.g. 1 for a value in 0.1 steps."""
+    if data.data_type not in ("FLOAT", "SIGNED_FLOAT"):
+        return None
+    multiplier = data.mult if data.mult is not None else (data.float_options.multiplier if data.float_options else 1)
+    if not multiplier or multiplier >= 1:
+        return 0
+    return max(0, round(-math.log10(multiplier)))
 
 
 def iter_command_registers(known_registers: GroBroRegisters):
@@ -73,7 +86,7 @@ class DiscoveryMixin:
                 {"t": settings.BRIDGE_AVAILABILITY_TOPIC},
             ],
             "avty_mode": "all",
-            "o": {"name": "grobro", "url": "https://github.com/robertzaage/GroBro"},
+            "o": {"name": "grobro", "sw": version.VERSION, "url": "https://github.com/robertzaage/GroBro"},
             "cmps": {},
         }
 
@@ -151,6 +164,31 @@ class DiscoveryMixin:
             "unique_id": f"grobro_{device_id}_cmd_read_all",
             "name": "Read All Values",
         }
+
+        # Smart meter reading supplied by Home Assistant (NOAH, NEXA), see commands.py
+        if supports_meter_reading(known_registers):
+            meter_uid = f"grobro_{device_id}_cmd_meter_reading"
+            cmps[meter_uid] = {
+                "platform": "number",
+                "name": "Smart Meter Reading",
+                "unique_id": meter_uid,
+                "command_topic": f"{settings.HA_BASE_TOPIC}/number/grobro/{device_id}/meter_reading/set",
+                "min": -10000,
+                "max": 10000,
+                "step": 1,
+                "mode": "box",
+                "unit_of_measurement": "W",
+                "device_class": "power",
+                "icon": "mdi:meter-electric-outline",
+            }
+            clear_uid = f"grobro_{device_id}_cmd_meter_reading_clear"
+            cmps[clear_uid] = {
+                "platform": "button",
+                "name": "Clear Smart Meter Reading",
+                "unique_id": clear_uid,
+                "command_topic": f"{settings.HA_BASE_TOPIC}/button/grobro/{device_id}/meter_reading/set",
+                "icon": "mdi:meter-electric-outline",
+            }
         return cmps
 
     def _sensor_components(self, device_id: str, known_registers: GroBroRegisters, effective_max_bat: int, remove_extra_bats: bool) -> dict:
@@ -180,6 +218,9 @@ class DiscoveryMixin:
                 "unit_of_measurement": state.homeassistant.unit_of_measurement,
                 "icon": state.homeassistant.icon,
             }
+            precision = display_precision(state.growatt.data)
+            if precision is not None and state.homeassistant.unit_of_measurement:
+                cmps[unique_id]["suggested_display_precision"] = precision
             if state.homeassistant.entity_category:
                 cmps[unique_id]["entity_category"] = state.homeassistant.entity_category
 
@@ -366,6 +407,7 @@ class DiscoveryMixin:
             "name": f"Growatt {device_id}",
             "manufacturer": "Growatt",
             "serial_number": device_id,
+            "via_device": bridge_id(),
         }
 
         type_name = get_device_type_name(device_id)

@@ -703,7 +703,7 @@ true
 ],
 [
 "homeassistant/device/QMN000ABC1D2E3FG/config",
-"@12b6831f7d5c",
+"@289fffa77856",
 true
 ],
 [
@@ -3603,7 +3603,7 @@ true
 ]
 ],
 "payloads": {
-"@12b6831f7d5c": {
+"@289fffa77856": {
 "avty": [
 {
 "t": "homeassistant/grobro/QMN000ABC1D2E3FG/availability"
@@ -3633,6 +3633,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Eac_today",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Eac_today'] }}"
@@ -3644,6 +3645,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Eac_total",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Eac_total'] }}"
@@ -3655,6 +3657,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Epv1_today",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Epv1_today'] }}"
@@ -3666,6 +3669,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Epv1_total",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Epv1_total'] }}"
@@ -3677,6 +3681,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Epv2_today",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Epv2_today'] }}"
@@ -3688,6 +3693,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Epv2_total",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Epv2_total'] }}"
@@ -3699,6 +3705,7 @@ true
 "platform": "sensor",
 "state_class": "total_increasing",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Epv_total",
 "unit_of_measurement": "kWh",
 "value_template": "{{ value_json['Epv_total'] }}"
@@ -3710,6 +3717,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 2,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Fac",
 "unit_of_measurement": "Hz",
 "value_template": "{{ value_json['Fac'] }}"
@@ -3732,6 +3740,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Iac1",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['Iac1'] }}"
@@ -3743,6 +3752,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Ipv1",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['Ipv1'] }}"
@@ -3754,6 +3764,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Ipv2",
 "unit_of_measurement": "A",
 "value_template": "{{ value_json['Ipv2'] }}"
@@ -3765,6 +3776,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_QMN000ABC1D2E3FG_PV_ISO_value",
 "unit_of_measurement": "kΩ",
 "value_template": "{{ value_json['PV_ISO_value'] }}"
@@ -3776,6 +3788,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_P_Bus_Voltage",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['P_Bus_Voltage'] }}"
@@ -3787,6 +3800,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Pac",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['Pac'] }}"
@@ -3798,6 +3812,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Pac1",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['Pac1'] }}"
@@ -3809,6 +3824,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Ppv",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['Ppv'] }}"
@@ -3820,6 +3836,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Ppv1",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['Ppv1'] }}"
@@ -3831,6 +3848,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Ppv2",
 "unit_of_measurement": "W",
 "value_template": "{{ value_json['Ppv2'] }}"
@@ -3842,6 +3860,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 0,
 "unique_id": "grobro_QMN000ABC1D2E3FG_RealOPPercent",
 "unit_of_measurement": "%",
 "value_template": "{{ value_json['RealOPPercent'] }}"
@@ -3861,6 +3880,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Temp1",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['Temp1'] }}"
@@ -3872,6 +3892,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Temp2",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['Temp2'] }}"
@@ -3883,6 +3904,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Temp3",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['Temp3'] }}"
@@ -3894,6 +3916,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Temp4",
 "unit_of_measurement": "°C",
 "value_template": "{{ value_json['Temp4'] }}"
@@ -3905,6 +3928,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Vac1",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['Vac1'] }}"
@@ -3916,6 +3940,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Vac_RS",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['Vac_RS'] }}"
@@ -3927,6 +3952,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Vpv1",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['Vpv1'] }}"
@@ -3938,6 +3964,7 @@ true
 "platform": "sensor",
 "state_class": "measurement",
 "state_topic": "homeassistant/grobro/QMN000ABC1D2E3FG/state",
+"suggested_display_precision": 1,
 "unique_id": "grobro_QMN000ABC1D2E3FG_Vpv2",
 "unit_of_measurement": "V",
 "value_template": "{{ value_json['Vpv2'] }}"
@@ -4089,10 +4116,12 @@ true
 "manufacturer": "Growatt",
 "model": "NEO-series",
 "name": "Growatt QMN000ABC1D2E3FG",
-"serial_number": "QMN000ABC1D2E3FG"
+"serial_number": "QMN000ABC1D2E3FG",
+"via_device": "grobro_bridge"
 },
 "o": {
 "name": "grobro",
+"sw": "0.0.0-test",
 "url": "https://github.com/robertzaage/GroBro"
 }
 },
